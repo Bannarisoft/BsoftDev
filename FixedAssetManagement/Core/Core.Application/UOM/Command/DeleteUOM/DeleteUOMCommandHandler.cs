@@ -7,11 +7,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IUOM;
 using Core.Application.UOM.Queries.GetUOMs;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.UOM.Command.DeleteUOM
 {
-    public class DeleteUOMCommandHandler : IRequestHandler<DeleteUOMCommand, ApiResponseDTO<UOMDto>>
+    public class DeleteUOMCommandHandler : IRequestHandler<DeleteUOMCommand, bool>
     {
         private readonly IUOMCommandRepository _uomCommandRepository;
         private readonly IMediator _mediator;
@@ -22,7 +23,7 @@ namespace Core.Application.UOM.Command.DeleteUOM
             _mediator = mediator;
             _mapper = mapper;
         }
-        public async Task<ApiResponseDTO<UOMDto>> Handle(DeleteUOMCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DeleteUOMCommand request, CancellationToken cancellationToken)
         {
             var uom  = _mapper.Map<Core.Domain.Entities.UOM>(request);
             var uomresult = await _uomCommandRepository.DeleteAsync(request.Id, uom);
@@ -40,10 +41,10 @@ namespace Core.Application.UOM.Command.DeleteUOM
 
                  if(uomresult)
                 {
-                    return new ApiResponseDTO<UOMDto>{IsSuccess = true, Message = "UOM deleted successfully."};
+                    return uomresult;
                 }
-
-                return new ApiResponseDTO<UOMDto>{IsSuccess = false, Message = "UOM not deleted."};
+                throw new ValidationException("UOM not deleted.");
+                
         }
     }
 }

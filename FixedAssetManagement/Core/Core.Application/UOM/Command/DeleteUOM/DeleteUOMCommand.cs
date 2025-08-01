@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.UOM.Command.DeleteUOM
 {
-    public class DeleteUOMCommand : IRequest<ApiResponseDTO<UOMDto>>
+    public class DeleteUOMCommand : IRequest<bool>
     {
         public int Id { get; set; }
         

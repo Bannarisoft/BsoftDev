@@ -5,11 +5,12 @@ using Core.Application.Common.Interfaces.IWdvDepreciation;
 using Core.Application.WDVDepreciation.Queries.CalculateDepreciation;
 using Core.Application.WDVDepreciation.Queries.GetDepreciation;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.WDVDepreciation.Commands.CreateDepreciation
 {
-    public class CreateDepreciationCommandHandler : IRequestHandler<CreateDepreciationCommand, ApiResponseDTO<CalculationDepreciationDto>>
+    public class CreateDepreciationCommandHandler : IRequestHandler<CreateDepreciationCommand, CalculationDepreciationDto>
     {        
         private readonly IWdvDepreciationQueryRepository _WdvQueryRepository;
         private readonly IMapper _mapper;
@@ -22,25 +23,19 @@ namespace Core.Application.WDVDepreciation.Commands.CreateDepreciation
             _mapper = mapper;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<CalculationDepreciationDto>> Handle(CreateDepreciationCommand request, CancellationToken cancellationToken)
+        public async Task<CalculationDepreciationDto> Handle(CreateDepreciationCommand request, CancellationToken cancellationToken)
         {
             var depreciationLocked = await _WdvQueryRepository.ExistDataLockedAsync(request.FinYearId);
             if (depreciationLocked==true)
             {
-                return new ApiResponseDTO<CalculationDepreciationDto>
-                {
-                    IsSuccess = false,
-                    Message = "Already depreciation details Locked."
-                };
+                throw new ValidationException("Already depreciation details Locked.");
+              
             }
             var depreciationGroups = await _WdvQueryRepository.ExistDataAsync( request.FinYearId);
             if (depreciationGroups==true)
             {
-               return new ApiResponseDTO<CalculationDepreciationDto>
-                {
-                    IsSuccess = false,
-                    Message = "Already depreciation details exist"                        
-                };
+                throw new ValidationException("Already depreciation details exist");
+              
             }         
 
             var assetGroup = _mapper.Map<Core.Domain.Entities.WDVDepreciationDetail>(request);
@@ -57,20 +52,11 @@ namespace Core.Application.WDVDepreciation.Commands.CreateDepreciation
             await _mediator.Publish(domainEvent, cancellationToken);
             if (result != null && result.Any())
             {
-                return new ApiResponseDTO<CalculationDepreciationDto>
-                {
-                    IsSuccess = true,
-                    Message = "WDV Calculation created successfully.",
-                    Data = null // you don't need to map or return data
-                };
+                
+                return  null;
             }
-
-            return new ApiResponseDTO<CalculationDepreciationDto>
-            {
-                IsSuccess = false,
-                Message = "WDV Calculation not created.",
-                Data = null
-            };
+        throw new Exception("WDV Calculation not created.");
+         
         }
     }
   

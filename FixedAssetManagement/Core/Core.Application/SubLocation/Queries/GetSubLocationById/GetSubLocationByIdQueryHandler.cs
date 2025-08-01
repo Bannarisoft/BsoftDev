@@ -7,11 +7,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.ISubLocation;
 using Core.Application.SubLocation.Queries.GetSubLocations;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.SubLocation.Queries.GetSubLocationById
 {
-    public class GetSubLocationByIdQueryHandler : IRequestHandler<GetSubLocationByIdQuery, ApiResponseDTO<SubLocationDto>>
+    public class GetSubLocationByIdQueryHandler : IRequestHandler<GetSubLocationByIdQuery, SubLocationDto>
     {
          private readonly ISubLocationQueryRepository _sublocationQueryRepository;        
         private readonly IMapper _mapper;
@@ -22,16 +23,13 @@ namespace Core.Application.SubLocation.Queries.GetSubLocationById
             _mapper = mapper;
             _mediator = mediator;   
         }
-        public async Task<ApiResponseDTO<SubLocationDto>> Handle(GetSubLocationByIdQuery request, CancellationToken cancellationToken)
+        public async Task<SubLocationDto> Handle(GetSubLocationByIdQuery request, CancellationToken cancellationToken)
         {
             var result = await _sublocationQueryRepository.GetByIdAsync(request.Id);
              if (result is null)
             {
-                return new ApiResponseDTO<SubLocationDto>
-                {
-                    IsSuccess = false,
-                    Message = "SubLocationId not found"
-                };
+                throw new ValidationException("SubLocationId not found");
+               
             }  
            var sublocation = _mapper.Map<SubLocationDto>(result);
 
@@ -44,7 +42,7 @@ namespace Core.Application.SubLocation.Queries.GetSubLocationById
                     module:"SubLocation"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-          return new ApiResponseDTO<SubLocationDto> { IsSuccess = true, Message = "Success", Data = sublocation };
+          return sublocation;
         }
     }
 }

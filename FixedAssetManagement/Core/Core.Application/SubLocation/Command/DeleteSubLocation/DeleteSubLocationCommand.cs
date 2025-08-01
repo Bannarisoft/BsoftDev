@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.Location.Command.DeleteAubLocation
 {
-    public class DeleteSubLocationCommand : IRequest<ApiResponseDTO<SubLocationDto>>
+    public class DeleteSubLocationCommand : IRequest<bool>
     {
         public int Id { get; set; }
         

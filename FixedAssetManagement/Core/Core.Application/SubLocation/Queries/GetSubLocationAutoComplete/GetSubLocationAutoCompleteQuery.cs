@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.SubLocation.Queries.GetSubLocationAutoComplete
 {
-    public class GetSubLocationAutoCompleteQuery :  IRequest<ApiResponseDTO<List<SubLocationAutoCompleteDto>>>
+    public class GetSubLocationAutoCompleteQuery :  IRequest<List<SubLocationAutoCompleteDto>>
     {
         public string? SearchPattern { get; set; }
         

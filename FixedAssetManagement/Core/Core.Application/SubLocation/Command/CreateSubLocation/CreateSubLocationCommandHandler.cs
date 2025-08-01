@@ -7,11 +7,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.ISubLocation;
 using Core.Application.SubLocation.Queries.GetSubLocations;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.SubLocation.Command.CreateSubLocation
 {
-    public class CreateSubLocationCommandHandler : IRequestHandler<CreateSubLocationCommand, ApiResponseDTO<SubLocationDto>>
+    public class CreateSubLocationCommandHandler : IRequestHandler<CreateSubLocationCommand, SubLocationDto>
     {
          private readonly ISubLocationCommandRepository _sublocationCommandRepository;
         private readonly ISubLocationQueryRepository _sublocationQueryRepository;
@@ -24,13 +25,14 @@ namespace Core.Application.SubLocation.Command.CreateSubLocation
             _mapper = mapper;
             _mediator = mediator;   
         }
-        public async Task<ApiResponseDTO<SubLocationDto>> Handle(CreateSubLocationCommand request, CancellationToken cancellationToken)
+        public async Task<SubLocationDto> Handle(CreateSubLocationCommand request, CancellationToken cancellationToken)
         {
             var existingsubLocation = await _sublocationQueryRepository.GetBySubLocationNameAsync(request.SubLocationName,request.DepartmentId,request.LocationId,request.UnitId);
 
                if (existingsubLocation != null)
                {
-                   return new ApiResponseDTO<SubLocationDto>{IsSuccess = false, Message = "SubLocation already exists"};
+                throw new ValidationException("SubLocation already exists");
+                   
                }
            
                  var sublocation  = _mapper.Map<Core.Domain.Entities.SubLocation>(request);
@@ -49,10 +51,11 @@ namespace Core.Application.SubLocation.Command.CreateSubLocation
                  );
                  await _mediator.Publish(domainEvent, cancellationToken);
                  
-                    return new ApiResponseDTO<SubLocationDto>{IsSuccess = true, Message = "SubLocation created successfully", Data = sublocationMap};
+                    return sublocationMap;
                 }
-               
-                    return new ApiResponseDTO<SubLocationDto>{IsSuccess = false, Message = "SubLocation not created"};
+
+               throw new Exception("SubLocation not created");
+                    
         }
     }
 }
