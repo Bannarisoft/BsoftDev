@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.CustomFields.Queries.GetCustomFieldById
 {
-    public class GetCustomFieldByIdQuery : IRequest<ApiResponseDTO<CustomFieldByIdDTO>>
+    public class GetCustomFieldByIdQuery : IRequest<CustomFieldByIdDTO>
     {
         public int Id { get; set; }
     }

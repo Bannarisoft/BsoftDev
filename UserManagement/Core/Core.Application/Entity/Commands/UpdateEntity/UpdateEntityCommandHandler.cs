@@ -5,12 +5,13 @@ using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IEntity;
 using Core.Application.Entity.Queries.GetEntity;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Core.Application.Entity.Commands.UpdateEntity
 {
-    public class UpdateEntityCommandHandler : IRequestHandler<UpdateEntityCommand, ApiResponseDTO<int>>
+    public class UpdateEntityCommandHandler : IRequestHandler<UpdateEntityCommand, int>
     {
        private readonly IEntityCommandRepository _Ientityrepository;
 
@@ -28,7 +29,7 @@ namespace Core.Application.Entity.Commands.UpdateEntity
              
         }
 
-       public async Task<ApiResponseDTO<int>> Handle(UpdateEntityCommand request, CancellationToken cancellationToken)
+       public async Task<int> Handle(UpdateEntityCommand request, CancellationToken cancellationToken)
         { 
             _logger.LogInformation($"Starting Entity Update process for EntityId: {request.Id}");
 
@@ -37,11 +38,8 @@ namespace Core.Application.Entity.Commands.UpdateEntity
             if (existingEntity is null)
             {
                 _logger.LogWarning($"Entity ID {request.Id} not found.");
-                return new ApiResponseDTO<int>
-                {
-                    IsSuccess = false,
-                    Message = "Entity Id not found / Entity is deleted ."
-                };
+                throw new ValidationException("Entity Id not found / Entity is deleted .");
+             
             }
 
             // 🔹 Check if entity name already exists for another ID
@@ -49,11 +47,8 @@ namespace Core.Application.Entity.Commands.UpdateEntity
             if (exists)
             {
                 _logger.LogWarning($"Entity Name {request.EntityName} already exists.");
-                return new ApiResponseDTO<int>
-                {
-                    IsSuccess = false,
-                    Message = "Entity Name already exists."
-                };
+                throw new ValidationException("Entity Name already exists.");
+               
             }
 
             var entity = _Imapper.Map<Core.Domain.Entities.Entity>(request);
@@ -62,7 +57,8 @@ namespace Core.Application.Entity.Commands.UpdateEntity
             if (result == -1) // Entity not found
             {
                 _logger.LogInformation($"EntityId {request.Id} not found.");
-                return new ApiResponseDTO<int> { IsSuccess = false, Message = "Entity not found." };
+                throw new ValidationException("Entity not found.");
+                
             }
 
               //Domain Event
@@ -75,12 +71,7 @@ namespace Core.Application.Entity.Commands.UpdateEntity
             );            
             await _mediator.Publish(domainEvent, cancellationToken);
             _logger.LogInformation($"Successfully completed Entity Update process for EntityId: {request.Id}");
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,
-                Message = "Entity Updated Successfully",
-                Data = result
-            };
+            return  result;
 
         
         

@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.RoleEntitlements.Queries.GetRolePrivileges
 {
-    public class GetRolePrivilegesQueryHandler : IRequestHandler<GetRolePrivilegesQuery, ApiResponseDTO<List<ModuleDTO>>>
+    public class GetRolePrivilegesQueryHandler : IRequestHandler<GetRolePrivilegesQuery, List<ModuleDTO>>
     {
         private readonly IRoleEntitlementQueryRepository _roleEntitlementQueryRepository;
         private readonly IMapper _mapper;
@@ -19,17 +19,12 @@ namespace Core.Application.RoleEntitlements.Queries.GetRolePrivileges
             _roleEntitlementQueryRepository = roleEntitlementQueryRepository;
             _mapper = mapper;
         }
-        public async Task<ApiResponseDTO<List<ModuleDTO>>> Handle(GetRolePrivilegesQuery request, CancellationToken cancellationToken)
+        public async Task<List<ModuleDTO>> Handle(GetRolePrivilegesQuery request, CancellationToken cancellationToken)
         {
             var rolePrivileges =await _roleEntitlementQueryRepository.GetRolePrivileges(request.UserId,cancellationToken);
             var rolePrivilegesMap= _mapper.Map<List<ModuleDTO>>(rolePrivileges);
 
-            return new ApiResponseDTO<List<ModuleDTO>> 
-            { 
-                IsSuccess = true, 
-                Message = "Success", 
-                Data = rolePrivilegesMap 
-            };
+            return rolePrivilegesMap;
         }
     }
 }

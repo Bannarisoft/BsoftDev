@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Core.Application.PwdComplexityRule.Commands.DeletePasswordComplexityRule
 {
-    public class DeletePasswordComplexityRuleCommand  :IRequest<ApiResponseDTO<int>>
+    public class DeletePasswordComplexityRuleCommand  :IRequest<int>
     {
 
           public int Id { get; set; }

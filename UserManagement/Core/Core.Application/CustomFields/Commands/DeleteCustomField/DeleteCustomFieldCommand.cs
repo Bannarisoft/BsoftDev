@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.CustomFields.Commands.DeleteCustomField
 {
-    public class DeleteCustomFieldCommand : IRequest<ApiResponseDTO<bool>>
+    public class DeleteCustomFieldCommand : IRequest<bool>
     {
         public int Id { get; set; }
     }

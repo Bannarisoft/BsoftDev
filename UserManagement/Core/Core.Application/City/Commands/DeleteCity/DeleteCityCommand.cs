@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.City.Commands.DeleteCity
 {
-       public class DeleteCityCommand :  IRequest<ApiResponseDTO<CityDto>>  
+       public class DeleteCityCommand :  IRequest<bool>
        {
               public int Id { get; set; }                
        }

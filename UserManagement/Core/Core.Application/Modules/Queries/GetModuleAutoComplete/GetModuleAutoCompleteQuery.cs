@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.Modules.Queries.GetModuleAutoComplete
 {
-    public class GetModuleAutoCompleteQuery : IRequest<ApiResponseDTO<List<ModuleAutoCompleteDTO>>>
+    public class GetModuleAutoCompleteQuery : IRequest<List<ModuleAutoCompleteDTO>>
     {
         public string? SearchPattern { get; set; }
     }

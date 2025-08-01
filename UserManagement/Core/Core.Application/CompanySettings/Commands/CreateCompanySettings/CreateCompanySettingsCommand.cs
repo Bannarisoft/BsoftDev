@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.CompanySettings.Commands.CreateCompanySettings
 {
-    public class CreateCompanySettingsCommand : IRequest<ApiResponseDTO<int>>
+    public class CreateCompanySettingsCommand : IRequest<int>
     {
         public int CompanyId { get; set; }
         public int PasswordHistoryCount { get; set; }

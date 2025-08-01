@@ -7,12 +7,13 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IFinancialYear;
 using Core.Application.FinancialYear.Queries.GetFinancialYear;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Core.Application.FinancialYear.Queries.GetFinancialYearGetById
 {
-    public class GetFinancialYearByIdQueryHanlder  :IRequestHandler<GetFinancialYearByIdQuery,ApiResponseDTO<List<GetFinancialYearDto>>>
+    public class GetFinancialYearByIdQueryHanlder  :IRequestHandler<GetFinancialYearByIdQuery,List<GetFinancialYearDto>>
     {
              
         private readonly IFinancialYearQueryRepository _financialyearRepository;
@@ -28,7 +29,7 @@ namespace Core.Application.FinancialYear.Queries.GetFinancialYearGetById
         _mediator = mediator;
         _logger = logger;
      }
-        public async Task<ApiResponseDTO<List<GetFinancialYearDto>>> Handle(GetFinancialYearByIdQuery request, CancellationToken cancellationToken)
+        public async Task<List<GetFinancialYearDto>> Handle(GetFinancialYearByIdQuery request, CancellationToken cancellationToken)
         {          
           _logger.LogInformation($"Fetching FinancialYear Request started: {request}");
 
@@ -38,8 +39,8 @@ namespace Core.Application.FinancialYear.Queries.GetFinancialYearGetById
                     if (financialyear is null)
                     {
                         _logger.LogWarning($"FinancialYear with ID {request.Id} not found." );
+                        throw new ValidationException("FinancialYear not found.");
 
-                        return new ApiResponseDTO<List<GetFinancialYearDto>>{ IsSuccess = false,Message = "FinancialYear not found.", Data = null };
                     }            
 
               var financialyearDto = _mapper.Map<GetFinancialYearDto>(financialyear);
@@ -54,7 +55,7 @@ namespace Core.Application.FinancialYear.Queries.GetFinancialYearGetById
 
                 await _mediator.Publish(domainEvent, cancellationToken);
          
-           return new ApiResponseDTO<List<GetFinancialYearDto>> { IsSuccess = true, Message = "Success", Data = new List<GetFinancialYearDto> { financialyearDto }};
+           return new List<GetFinancialYearDto> { financialyearDto };
         }
     }
 }

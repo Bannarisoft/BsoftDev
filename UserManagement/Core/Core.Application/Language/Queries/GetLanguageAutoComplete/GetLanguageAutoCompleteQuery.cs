@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.Language.Queries.GetLanguageAutoComplete
 {
-    public class GetLanguageAutoCompleteQuery : IRequest<ApiResponseDTO<List<LanguageAutoCompleteDTO>>>
+    public class GetLanguageAutoCompleteQuery : IRequest<List<LanguageAutoCompleteDTO>>
     {
         public string? SearchPattern { get; set; }
     }

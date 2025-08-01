@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Core.Application.PasswordComplexityRule.Commands.UpdatePasswordComplexityRule
 {
-    public class UpdatePasswordComplexityRuleCommand : IRequest<ApiResponseDTO<PwdRuleDto>>
+    public class UpdatePasswordComplexityRuleCommand : IRequest<bool>
     {
         
         public int Id { get; set; }

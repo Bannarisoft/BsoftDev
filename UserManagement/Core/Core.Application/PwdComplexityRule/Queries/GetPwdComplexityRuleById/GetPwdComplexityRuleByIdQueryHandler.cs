@@ -8,12 +8,13 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IPasswordComplexityRule;
 using Core.Application.PwdComplexityRule.Queries.GetPwdComplexityRule;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Core.Application.PwdComplexityRule.Queries.GetPwdComplexityRuleById
 {
-    public class GetPwdComplexityRuleByIdQueryHandler :IRequestHandler<GetPwdComplexityRuleByIdQuery, ApiResponseDTO<GetPwdRuleDto>>
+    public class GetPwdComplexityRuleByIdQueryHandler :IRequestHandler<GetPwdComplexityRuleByIdQuery, GetPwdRuleDto>
     {
          private readonly IPasswordComplexityRuleQueryRepository _pwdComplexityRuleQueryRepository;        
         private readonly IMapper _mapper;
@@ -32,7 +33,7 @@ namespace Core.Application.PwdComplexityRule.Queries.GetPwdComplexityRuleById
              _logger = logger;
         } 
 
-        public async Task<ApiResponseDTO<GetPwdRuleDto>> Handle(GetPwdComplexityRuleByIdQuery request, CancellationToken cancellationToken)
+        public async Task<GetPwdRuleDto> Handle(GetPwdComplexityRuleByIdQuery request, CancellationToken cancellationToken)
         {
 
              _logger.LogInformation($"Handling GetPwdComplexityRuleByIdQuery for ID: {request.Id}");
@@ -43,12 +44,8 @@ namespace Core.Application.PwdComplexityRule.Queries.GetPwdComplexityRuleById
                 if (pwdComplexityRule is null)
                 {
                     _logger.LogWarning($"PasswordComplexityRule with ID { request.Id} not found.");
-                      return new ApiResponseDTO<GetPwdRuleDto>
-                        {
-                            IsSuccess = false,
-                            Message = "PasswordComplexityRule not found / Deleted.",
-                            Data= null                         
-                        };                 
+                    throw new ValidationException("PasswordComplexityRule not found / Deleted.");
+                               
                 }
 
                 _logger.LogInformation($"PasswordComplexityRule with ID { request.Id} retrieved successfully.");
@@ -69,7 +66,7 @@ namespace Core.Application.PwdComplexityRule.Queries.GetPwdComplexityRuleById
                 await _mediator.Publish(domainEvent, cancellationToken);
                 _logger.LogInformation($"Domain event published for PasswordComplexityRule with ID {updatedpwdcomplexrule.Id}." );
                
-            return new ApiResponseDTO<GetPwdRuleDto> { IsSuccess = true, Message = "Success", Data = updatedpwdcomplexrule };           
+            return updatedpwdcomplexrule;           
         }
     }
 }

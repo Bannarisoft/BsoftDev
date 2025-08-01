@@ -9,7 +9,7 @@ using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Companies.Queries.GetCompanyById
 {
-    public class GetCompanyByIdQuery : IRequest<ApiResponseDTO<GetByIdDTO>>
+    public class GetCompanyByIdQuery : IRequest<GetByIdDTO>
     {
         public int CompanyId { get; set; }
     }

@@ -11,10 +11,11 @@ using Core.Application.Common;
 using Core.Domain.Events;
 using Microsoft.Extensions.Logging;
 using Core.Application.Common.HttpResponse;
+using FluentValidation;
 
 namespace Core.Application.PwdComplexityRule.Commands.DeletePasswordComplexityRule
 {
-    public class DeletePasswordComplexityRuleCommandHandler :IRequestHandler<DeletePasswordComplexityRuleCommand,ApiResponseDTO<int>>
+    public class DeletePasswordComplexityRuleCommandHandler :IRequestHandler<DeletePasswordComplexityRuleCommand,int>
     {
         private readonly  IPasswordComplexityRuleCommandRepository _IpasswordComplexityRepository;  
        private readonly IMapper _Imapper;
@@ -30,7 +31,7 @@ namespace Core.Application.PwdComplexityRule.Commands.DeletePasswordComplexityRu
             _mediator = mediator;
 
       }
-       public async Task<ApiResponseDTO<int>>Handle(DeletePasswordComplexityRuleCommand request, CancellationToken cancellationToken)
+       public async Task<int>Handle(DeletePasswordComplexityRuleCommand request, CancellationToken cancellationToken)
       {       
    
             
@@ -46,12 +47,8 @@ namespace Core.Application.PwdComplexityRule.Commands.DeletePasswordComplexityRu
     if (pwdcompresult <= 0)
     {
         _logger.LogWarning("Failed to delete Password Complexity Rule with ID {PasswordComplexityRuleId}.", request.Id);
-        return new ApiResponseDTO<int>
-        {
-            IsSuccess = false,
-            Message = "Failed to delete Password Complexity Rule",
-            Data = 0
-        };
+        throw new ValidationException("Failed to delete Password Complexity Rule");
+       
     }
 
     _logger.LogInformation("Password Complexity Rule with ID {PasswordComplexityRuleId} deleted successfully.", request.Id);
@@ -68,12 +65,7 @@ namespace Core.Application.PwdComplexityRule.Commands.DeletePasswordComplexityRu
     await _mediator.Publish(domainEvent, cancellationToken);
     _logger.LogInformation($"AuditLogsDomainEvent published for Password Complexity Rule ID {request.Id}." );
 
-    return new ApiResponseDTO<int>
-    {
-        IsSuccess = true,
-        Message = "Password Complexity Rule deleted successfully",
-        Data = 0
-    };                         
+    return 0;                         
          
       }
     }

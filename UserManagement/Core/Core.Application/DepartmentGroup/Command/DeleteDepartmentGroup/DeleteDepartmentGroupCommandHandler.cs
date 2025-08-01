@@ -6,11 +6,12 @@ using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IDepartmentGroup;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.DepartmentGroup.Command.DeleteDepartmentGroup
 {
-    public class DeleteDepartmentGroupCommandHandler : IRequestHandler<DeleteDepartmentGroupCommand, ApiResponseDTO<bool>>
+    public class DeleteDepartmentGroupCommandHandler : IRequestHandler<DeleteDepartmentGroupCommand, bool>
     {
         private readonly IDepartmentGroupCommandRepository _departmentGroupCommandRepository;
         private readonly IMapper _Imapper;
@@ -28,7 +29,7 @@ namespace Core.Application.DepartmentGroup.Command.DeleteDepartmentGroup
 
         }
       
-        public async Task<ApiResponseDTO<bool>>Handle(DeleteDepartmentGroupCommand request, CancellationToken cancellationToken)
+        public async Task<bool>Handle(DeleteDepartmentGroupCommand request, CancellationToken cancellationToken)
       {       
 
                 
@@ -38,13 +39,8 @@ namespace Core.Application.DepartmentGroup.Command.DeleteDepartmentGroup
 
                 if (!result)
                 {
-                   
-                    return new ApiResponseDTO<bool>
-                    {
-                        IsSuccess = false,
-                        Message = "Failed to delete department group.",
-                        Data = false
-                    };
+                   throw new ValidationException("Failed to delete department group.");
+                
                 }
             // Publish domain event
             var domainEvent = new AuditLogsDomainEvent(
@@ -57,12 +53,7 @@ namespace Core.Application.DepartmentGroup.Command.DeleteDepartmentGroup
 
             await _mediator.Publish(domainEvent, cancellationToken);
          
-          return new ApiResponseDTO<bool>
-            {
-                IsSuccess = true,
-                Message = "Department group deleted successfully.",
-                Data = true
-            };
+          return  true;
       }
    
     }

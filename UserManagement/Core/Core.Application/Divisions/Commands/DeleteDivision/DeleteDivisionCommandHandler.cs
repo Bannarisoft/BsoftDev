@@ -13,7 +13,7 @@ using Core.Application.Divisions.Queries.GetDivisions;
 
 namespace Core.Application.Divisions.Commands.DeleteDivision
 {
-    public class DeleteDivisionCommandHandler : IRequestHandler<DeleteDivisionCommand, ApiResponseDTO<DivisionDTO>>
+    public class DeleteDivisionCommandHandler : IRequestHandler<DeleteDivisionCommand, bool>
     {
         private readonly IDivisionCommandRepository _divisionRepository;
         private readonly IMapper _imapper;
@@ -24,7 +24,7 @@ namespace Core.Application.Divisions.Commands.DeleteDivision
             _imapper = imapper;
             _mediator = mediator;
         }
-         public async Task<ApiResponseDTO<DivisionDTO>> Handle(DeleteDivisionCommand request, CancellationToken cancellationToken)
+         public async Task<bool> Handle(DeleteDivisionCommand request, CancellationToken cancellationToken)
         {
             var division  = _imapper.Map<Division>(request);
             var divisionresult = await _divisionRepository.DeleteAsync(request.Id, division);
@@ -42,10 +42,10 @@ namespace Core.Application.Divisions.Commands.DeleteDivision
 
                  if(divisionresult)
                 {
-                    return new ApiResponseDTO<DivisionDTO>{IsSuccess = true, Message = "Division deleted successfully."};
+                    return divisionresult;
                 }
-
-                return new ApiResponseDTO<DivisionDTO>{IsSuccess = false, Message = "Division not deleted."};
+            throw new Exception("Division not deleted.");
+                
         }
     }
 }

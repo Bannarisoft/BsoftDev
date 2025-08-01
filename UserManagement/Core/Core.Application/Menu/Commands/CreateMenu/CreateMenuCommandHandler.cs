@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.Menu.Commands.CreateMenu
 {
-    public class CreateMenuCommandHandler : IRequestHandler<CreateMenuCommand, ApiResponseDTO<int>>
+    public class CreateMenuCommandHandler : IRequestHandler<CreateMenuCommand, int>
     {
           private readonly IMenuCommand _menuCommand;
         private readonly IMapper _imapper;
@@ -21,7 +21,7 @@ namespace Core.Application.Menu.Commands.CreateMenu
             _imapper = imapper;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<int>> Handle(CreateMenuCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateMenuCommand request, CancellationToken cancellationToken)
         {
                
                  var Menu  = _imapper.Map<Core.Domain.Entities.Menu>(request);
@@ -40,10 +40,9 @@ namespace Core.Application.Menu.Commands.CreateMenu
                  );
                  await _mediator.Publish(domainEvent, cancellationToken);
                  
-                    return new ApiResponseDTO<int>{IsSuccess = true, Message = "Menu created successfully", Data = MenuResult};
+                    return MenuResult;
                 }
-               
-                    return new ApiResponseDTO<int>{IsSuccess = false, Message = "Menu not created"};
+               throw new Exception("Menu not created");
         }
     }
 }

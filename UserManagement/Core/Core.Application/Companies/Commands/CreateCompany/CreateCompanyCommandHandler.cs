@@ -8,7 +8,7 @@ using Core.Domain.Events;
 
 namespace Core.Application.Companies.Commands.CreateCompany
 {
-    public class CreateCompanyCommandHandler : IRequestHandler<CreateCompanyCommand, ApiResponseDTO<int>>
+    public class CreateCompanyCommandHandler : IRequestHandler<CreateCompanyCommand, int>
     {
          private readonly ICompanyCommandRepository _icompanyRepository;
          private readonly IFileUploadService _ifileUploadService;
@@ -25,7 +25,7 @@ namespace Core.Application.Companies.Commands.CreateCompany
             _companyQueryRepository = companyQueryRepository;
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(CreateCompanyCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateCompanyCommand request, CancellationToken cancellationToken)
         {
             // var existingCompany = await _companyQueryRepository.GetByCompanynameAsync(request.Company.CompanyName);
 
@@ -50,9 +50,10 @@ namespace Core.Application.Companies.Commands.CreateCompany
 
                 if (CompanyId > 0)
                 {
-                    return new ApiResponseDTO<int>{IsSuccess = true, Message = "Company created successfully", Data = CompanyId};
+                    return CompanyId;
                 }
-                return new ApiResponseDTO<int>{IsSuccess = false, Message = "Company not created"};
+                throw new Exception("Company not created");
+                
         }
     }
 }

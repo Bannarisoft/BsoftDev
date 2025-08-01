@@ -6,11 +6,12 @@ using Core.Application.Country.Queries.GetCountries;
 using Core.Domain.Entities;
 using Core.Domain.Enums.Common;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.Country.Commands.DeleteCountry
 {  
-  public class DeleteCountryCommandHandler : IRequestHandler<DeleteCountryCommand, ApiResponseDTO<CountryDto>>
+  public class DeleteCountryCommandHandler : IRequestHandler<DeleteCountryCommand, CountryDto>
     {
         private readonly ICountryCommandRepository _countryRepository;
         private readonly ICountryQueryRepository _countryQueryRepository;
@@ -26,38 +27,28 @@ namespace Core.Application.Country.Commands.DeleteCountry
             _mediator = mediator;
             _fixedAssetCountryValidationGrpcClient = fixedAssetCountry;
         }       
-        public async Task<ApiResponseDTO<CountryDto>> Handle(DeleteCountryCommand request, CancellationToken cancellationToken)
+        public async Task<CountryDto> Handle(DeleteCountryCommand request, CancellationToken cancellationToken)
         {
             bool iscountryUsedInFixedAsset = await _fixedAssetCountryValidationGrpcClient.CheckIfCountryIsUsedForFixedAssetAsync(request.Id);
 
             if (iscountryUsedInFixedAsset)
             {
-                return new ApiResponseDTO<CountryDto>
-                {
-                    IsSuccess = false,
-                    Message = "Cannot delete Country. It is still in use in FixedAsset system."
-                   
-                };
+                throw new ValidationException("Cannot delete Country. It is still in use in FixedAsset system.");
+              
             }
 
             var country = await _countryQueryRepository.GetByIdAsync(request.Id);
             if (country is null || country.IsDeleted is Enums.IsDelete.Deleted)
             {
-                return new ApiResponseDTO<CountryDto>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid CountryID. The specified Country does not exist or is inactive."
-                };
+                throw new ValidationException("Invalid CountryID. The specified Country does not exist or is inactive.");
+            
             }         
 
             var state = await _countryQueryRepository.GetStateByCountryIdAsync(request.Id);            
             if (state.Count>0)
-            {                
-                 return new ApiResponseDTO<CountryDto>
-                {
-                    IsSuccess = false,
-                    Message = "State already exists for this country.Cannot delete the country."
-                };
+            {          
+                throw new ValidationException("State already exists for this country.Cannot delete the country.");      
+               
             }
                                     
             var countryDelete = _mapper.Map<Countries>(request);
@@ -74,18 +65,10 @@ namespace Core.Application.Country.Commands.DeleteCountry
                     module:"Country"
                 );               
                 await _mediator.Publish(domainEvent, cancellationToken);              
-                return new ApiResponseDTO<CountryDto>
-                {
-                    IsSuccess = true,
-                    Message = "Country deleted successfully.",
-                    Data = countryDto
-                };
+                return  countryDto;
             }
-            return new ApiResponseDTO<CountryDto>
-            {
-                IsSuccess = false,
-                Message = "Country deletion failed."
-            };          
+            throw new Exception("Country deletion failed.");
+                   
         }
     }
 }

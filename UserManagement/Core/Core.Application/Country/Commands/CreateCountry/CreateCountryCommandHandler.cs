@@ -5,9 +5,10 @@ using Core.Application.Country.Commands.CreateCountry;
 using Core.Application.Country.Queries.GetCountries;
 using Core.Domain.Entities;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
-public class CreateCountryCommandHandler : IRequestHandler<CreateCountryCommand, ApiResponseDTO<CountryDto>>
+public class CreateCountryCommandHandler : IRequestHandler<CreateCountryCommand, CountryDto>
 {
     private readonly IMapper _mapper;
     private readonly ICountryCommandRepository _countryRepository;    
@@ -21,16 +22,13 @@ public class CreateCountryCommandHandler : IRequestHandler<CreateCountryCommand,
         _mediator = mediator;               
     }
 
-    public async Task<ApiResponseDTO<CountryDto>> Handle(CreateCountryCommand request, CancellationToken cancellationToken)
+    public async Task<CountryDto> Handle(CreateCountryCommand request, CancellationToken cancellationToken)
     {
         var countryExists = await _countryRepository.GetCountryByCodeAsync(request.CountryName ?? string.Empty,request.CountryCode ?? string.Empty);        
         if (countryExists.Id !=0)
         {
-            return new ApiResponseDTO<CountryDto>
-            {
-                IsSuccess = false,
-                Message = "CountryCode already exists"
-            };
+            throw new ValidationException("CountryCode already exists");
+           
         }
         var countryEntity = _mapper.Map<Countries>(request);    
          
@@ -50,19 +48,11 @@ public class CreateCountryCommandHandler : IRequestHandler<CreateCountryCommand,
             var countryDto = _mapper.Map<CountryDto>(result);
             if (countryDto.Id > 0)
             {
-                return new ApiResponseDTO<CountryDto>
-                {
-                    IsSuccess = true,
-                    Message = "Country created successfully",
-                    Data = countryDto
-                };
+                return  countryDto;
             }
         }
-        return new ApiResponseDTO<CountryDto>
-        {
-            IsSuccess = false,
-            Message = "Country not created"
-        };
+        throw new Exception("Country not created");
+       
         
     }
 }

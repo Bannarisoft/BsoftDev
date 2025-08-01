@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Core.Application.PwdComplexityRule.Queries.GetPwdComplexityRuleById
 {
-    public class GetPwdComplexityRuleByIdQuery :IRequest<ApiResponseDTO<GetPwdRuleDto>>
+    public class GetPwdComplexityRuleByIdQuery :IRequest<GetPwdRuleDto>
     {
          public int Id { get; set; }
     }

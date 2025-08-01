@@ -8,7 +8,7 @@ using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement
 {
-    public class UpdateRoleEntitlementCommand : IRequest<ApiResponseDTO<bool>>
+    public class UpdateRoleEntitlementCommand : IRequest<bool>
     {
         public int RoleId { get; set; }
      public IList<RoleModuleDTO>? RoleModules { get; set; }

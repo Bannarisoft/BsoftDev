@@ -13,11 +13,12 @@ using Core.Application.Common;
 using Core.Application.Common.HttpResponse;
 using Core.Domain.Events;
 using Microsoft.Extensions.Logging;
+using FluentValidation;
 
 namespace Core.Application.Departments.Commands.CreateDepartment
 {
 
-    public class CreateDepartmentCommandHandler :IRequestHandler<CreateDepartmentCommand, ApiResponseDTO<DepartmentDto>>
+    public class CreateDepartmentCommandHandler :IRequestHandler<CreateDepartmentCommand, DepartmentDto>
     {
         private readonly IDepartmentCommandRepository _departmentRepository;
         private readonly IMapper _mapper;
@@ -33,7 +34,7 @@ namespace Core.Application.Departments.Commands.CreateDepartment
 
         }     
 
-       public async Task<ApiResponseDTO<DepartmentDto>> Handle(CreateDepartmentCommand request, CancellationToken cancellationToken)
+       public async Task<DepartmentDto> Handle(CreateDepartmentCommand request, CancellationToken cancellationToken)
         {
                 _logger.LogInformation("Starting CreateDepartmentCommandHandler for request: {@Request}", request);
       
@@ -42,11 +43,8 @@ namespace Core.Application.Departments.Commands.CreateDepartment
                     if (exists)
                     {
                         _logger.LogWarning("Department Name {DeptName} already exists.", request.DeptName);
-                        return new ApiResponseDTO<DepartmentDto>
-                    {
-                    IsSuccess = false,
-                    Message = "Department Name already exists."
-                    };
+                        throw new ValidationException("Department Name already exists.");
+                       
                     }
             // Map the request to the entity
             var departmentEntity = _mapper.Map<Department>(request);
@@ -58,11 +56,8 @@ namespace Core.Application.Departments.Commands.CreateDepartment
             if (createdDepartment is null)
             {
                 _logger.LogWarning("Failed to create department. Department entity: {@DepartmentEntity}", departmentEntity);
-                return new ApiResponseDTO<DepartmentDto>
-                {
-                    IsSuccess = false,
-                    Message = "Department not created"
-                };
+                throw new ValidationException("Department not created");
+            
             }
 
             _logger.LogInformation("Department successfully created with ID: {DepartmentId}", createdDepartment.Id);
@@ -84,12 +79,7 @@ namespace Core.Application.Departments.Commands.CreateDepartment
 
             _logger.LogInformation("Returning success response for Department ID: {DepartmentId}", createdDepartment.Id);
 
-            return new ApiResponseDTO<DepartmentDto>
-            {
-                IsSuccess = true,
-                Message = "Department created successfully",
-                Data = deptDto
-            };
+            return deptDto;
            
         }
     }  

@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Core.Application.Entity.Commands.UpdateEntity
 {
-    public class UpdateEntityCommand : IRequest<ApiResponseDTO<int>>
+    public class UpdateEntityCommand : IRequest<int>
     {
     public int Id { get; set; }
     public string? EntityName { get; set; }

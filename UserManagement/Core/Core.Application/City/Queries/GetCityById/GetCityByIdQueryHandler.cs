@@ -3,11 +3,12 @@ using Core.Application.City.Queries.GetCities;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.ICity;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.City.Queries.GetCityById
 {
-    public class GetCityByIdQueryHandler : IRequestHandler<GetCityByIdQuery,ApiResponseDTO<CityDto>>
+    public class GetCityByIdQueryHandler : IRequestHandler<GetCityByIdQuery,CityDto>
     {
         private readonly ICityQueryRepository _cityRepository;
         private readonly IMapper _mapper;
@@ -19,17 +20,14 @@ namespace Core.Application.City.Queries.GetCityById
             _mapper = mapper;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<CityDto>> Handle(GetCityByIdQuery request, CancellationToken cancellationToken)
+        public async Task<CityDto> Handle(GetCityByIdQuery request, CancellationToken cancellationToken)
         {                    
             var city = await _cityRepository.GetByIdAsync(request.Id);                
             var cityDto = _mapper.Map<CityDto>(city);
             if (city is null)
-            {                
-                return new ApiResponseDTO<CityDto>
-                {
-                    IsSuccess = false,
-                    Message = "City with ID {request.Id} not found."
-                };   
+            {        
+                throw new ValidationException("City with ID {request.Id} not found.");        
+               
             }       
                 //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
@@ -40,12 +38,7 @@ namespace Core.Application.City.Queries.GetCityById
                 module:"City"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<CityDto>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = cityDto
-            };              
+            return  cityDto;              
         }
     }
 }

@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.DepartmentGroup.Command.CreateDepartmentGroup
 {
-    public class CreateDepartmentGroupCommand : IRequest<ApiResponseDTO<int>>  // Return the created ID
+    public class CreateDepartmentGroupCommand : IRequest<int>
     {   
         public string? DepartmentGroupCode { get; set; }
         public string? DepartmentGroupName { get; set; }       

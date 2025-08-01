@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.Country.Commands.DeleteCountry
 {
-       public class DeleteCountryCommand :  IRequest<ApiResponseDTO<CountryDto>>  
+       public class DeleteCountryCommand :  IRequest<CountryDto>
        {
                 public int Id { get; set; }                
        }
