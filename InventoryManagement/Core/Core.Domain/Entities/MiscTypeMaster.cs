@@ -6,11 +6,13 @@ using Core.Domain.Common;
 
 namespace Core.Domain.Entities
 {
-    public class MiscTypeMaster: BaseEntity
+    public class MiscTypeMaster : BaseEntity
     {
         public string? MiscTypeCode { get; set; }
         public string? Description { get; set; }
         public ICollection<MiscMaster>? MiscMaster { get; set; }
+        
+        
         
     }
 }

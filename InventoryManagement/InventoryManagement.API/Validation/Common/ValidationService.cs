@@ -14,12 +14,15 @@ using Core.Application.MiscMaster.Command.UpdateMiscMaster;
 using Core.Application.MiscTypeMaster.Command.CreateMiscTypeMaster;
 using Core.Application.MiscTypeMaster.Command.DeleteMiscTypeMaster;
 using Core.Application.MiscTypeMaster.Command.UpdateMiscTypeMaster;
+using Core.Application.UOM.Command.CreateUOM;
+using Core.Application.UOM.Command.UpdateUOM;
 using FluentValidation;
 using InventoryManagement.API.Validation.HSNMaster;
 using InventoryManagement.API.Validation.Item.ItemCategory;
 using InventoryManagement.API.Validation.Item.ItemGroup;
 using InventoryManagement.API.Validation.MiscMaster;
 using InventoryManagement.API.Validation.MiscTypeMaster;
+using InventoryManagement.API.Validation.UOM;
 
 namespace InventoryManagement.API.Validation.Common
 {
@@ -43,6 +46,8 @@ namespace InventoryManagement.API.Validation.Common
             services.AddScoped<IValidator<CreateHSNMasterCommand>, CreateHSNMasterCommandValidator>();
             services.AddScoped<IValidator<UpdateHSNMasterCommand>, UpdateHSNMasterCommandValidator>();
             services.AddScoped<IValidator<DeleteHSNMasterCommand>, DeleteHSNMasterCommandValidator>();
+            services.AddScoped<IValidator<CreateUOMCommand>, CreateUOMCommandValidator>();
+            services.AddScoped<IValidator<UpdateUOMCommand>, UpdateUOMCommandValidator>();
         }
     }
 }

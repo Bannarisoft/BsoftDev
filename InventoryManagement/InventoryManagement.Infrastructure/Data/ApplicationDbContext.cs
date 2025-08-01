@@ -6,6 +6,7 @@ using Core.Domain.Entities.Item;
 using InventoryManagement.Infrastructure.Data.Configurations.Item;
 using Core.Domain.Entities;
 using InventoryManagement.Infrastructure.Data.Configurations;
+using Microsoft.Identity.Client;
 
 namespace InventoryManagement.Infrastructure.Data
 {
@@ -27,6 +28,7 @@ namespace InventoryManagement.Infrastructure.Data
 		 public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
          public DbSet<MiscMaster> MiscMaster { get; set; }        
          public DbSet<HSNMaster> HSNMaster { get; set; }
+         public DbSet<UOM> UOMs { get; set; }
 
 
 
@@ -37,6 +39,7 @@ namespace InventoryManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
             modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
             modelBuilder.ApplyConfiguration(new HSNMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new UOMConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }
