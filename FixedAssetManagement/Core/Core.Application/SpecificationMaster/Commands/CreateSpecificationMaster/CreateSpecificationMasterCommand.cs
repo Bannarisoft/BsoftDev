@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.SpecificationMaster.Commands.CreateSpecificationMaster
 {
-    public class CreateSpecificationMasterCommand : IRequest<ApiResponseDTO<SpecificationMasterDTO>>  
+    public class CreateSpecificationMasterCommand : IRequest<SpecificationMasterDTO>
     {
         public string? SpecificationName { get; set; }      
         public int? AssetGroupId { get; set; } 

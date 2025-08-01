@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.SpecificationMaster.Queries.GetSpecificationMasterById
 {
-    public class GetSpecificationMasterByIdQuery : IRequest<ApiResponseDTO<SpecificationMasterDTO>>
+    public class GetSpecificationMasterByIdQuery : IRequest<SpecificationMasterDTO>
     {
         public int Id { get; set; }
     }

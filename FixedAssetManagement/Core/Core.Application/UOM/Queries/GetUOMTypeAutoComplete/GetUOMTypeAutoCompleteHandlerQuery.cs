@@ -3,11 +3,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IUOM;
 using Core.Application.UOM.Queries.GetUOMs;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.UOM.Queries.GetUOMTypeAutoComplete
 {
-    public class GetUOMTypeAutoCompleteHandlerQuery : IRequestHandler<GetUOMTypeAutoCompleteQuery, ApiResponseDTO<List<UOMTypeAutoCompleteDto>>>
+    public class GetUOMTypeAutoCompleteHandlerQuery : IRequestHandler<GetUOMTypeAutoCompleteQuery, List<UOMTypeAutoCompleteDto>>
     {
         private readonly IUOMQueryRepository _uomQueryRepository;        
         private readonly IMapper _mapper;
@@ -19,17 +20,14 @@ namespace Core.Application.UOM.Queries.GetUOMTypeAutoComplete
             _mediator = mediator;   
         }
 
-        public async Task<ApiResponseDTO<List<UOMTypeAutoCompleteDto>>> Handle(GetUOMTypeAutoCompleteQuery request, CancellationToken cancellationToken)
+        public async Task<List<UOMTypeAutoCompleteDto>> Handle(GetUOMTypeAutoCompleteQuery request, CancellationToken cancellationToken)
         {
             var result = await _uomQueryRepository.GetUOMType(request.SearchPattern);
 
             if (result is null || result.Count == 0)
             {
-                return new ApiResponseDTO<List<UOMTypeAutoCompleteDto>>
-                {
-                    IsSuccess = false,
-                    Message = "No UOMType found matching the search pattern."
-                };
+                throw new ValidationException("No UOMType found matching the search pattern.");
+              
             }
 
             // Domain Event
@@ -43,12 +41,7 @@ namespace Core.Application.UOM.Queries.GetUOMTypeAutoComplete
 
             await _mediator.Publish(domainEvent, cancellationToken);
 
-            return new ApiResponseDTO<List<UOMTypeAutoCompleteDto>>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = result  // No need for _mapper.Map()
-            };
+            return  result;
             
         }
     }

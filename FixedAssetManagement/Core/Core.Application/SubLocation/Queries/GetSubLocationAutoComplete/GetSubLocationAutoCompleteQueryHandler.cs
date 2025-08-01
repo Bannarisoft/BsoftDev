@@ -7,11 +7,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.ISubLocation;
 using Core.Application.Location.Queries.GetSubLocations;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.SubLocation.Queries.GetSubLocationAutoComplete
 {
-    public class GetSubLocationAutoCompleteQueryHandler : IRequestHandler<GetSubLocationAutoCompleteQuery, ApiResponseDTO<List<SubLocationAutoCompleteDto>>>
+    public class GetSubLocationAutoCompleteQueryHandler : IRequestHandler<GetSubLocationAutoCompleteQuery, List<SubLocationAutoCompleteDto>>
     {
          private readonly ISubLocationQueryRepository _sublocationQueryRepository;
         private readonly IMapper _mapper;
@@ -22,16 +23,13 @@ namespace Core.Application.SubLocation.Queries.GetSubLocationAutoComplete
             _mapper = mapper;
             _mediator = mediator; 
         }
-        public async Task<ApiResponseDTO<List<SubLocationAutoCompleteDto>>> Handle(GetSubLocationAutoCompleteQuery request, CancellationToken cancellationToken)
+        public async Task<List<SubLocationAutoCompleteDto>> Handle(GetSubLocationAutoCompleteQuery request, CancellationToken cancellationToken)
         {
             var result = await _sublocationQueryRepository.GetSubLocation(request.SearchPattern);
             if (result is null || result.Count is 0)
             {
-                return new ApiResponseDTO<List<SubLocationAutoCompleteDto>>
-                {
-                    IsSuccess = false,
-                    Message = "No SubLocation found matching the search pattern."
-                };
+                throw new ValidationException("No SubLocation found matching the search pattern.");
+               
             }
               var sublocations = _mapper.Map<List<SubLocationAutoCompleteDto>>(result);
               //Domain Event
@@ -43,7 +41,7 @@ namespace Core.Application.SubLocation.Queries.GetSubLocationAutoComplete
                      module:"SubLocation"
                  );
                  await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<SubLocationAutoCompleteDto>> { IsSuccess = true, Message = "Success", Data = sublocations }; 
+            return sublocations; 
         }
     }
 }

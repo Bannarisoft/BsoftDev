@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.Manufacture.Queries.GetManufactureById
 {
-    public class GetManufactureByIdQuery : IRequest<ApiResponseDTO<ManufactureDTO>>
+    public class GetManufactureByIdQuery : IRequest<ManufactureDTO>
     {
         public int Id { get; set; }
     }

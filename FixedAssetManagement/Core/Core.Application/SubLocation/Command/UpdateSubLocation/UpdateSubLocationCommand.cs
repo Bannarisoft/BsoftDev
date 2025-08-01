@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.Location.Command.UpdateSubLocation
 {
-    public class UpdateSubLocationCommand: IRequest<ApiResponseDTO<bool>>
+    public class UpdateSubLocationCommand: IRequest<bool>
     {
         public int Id { get; set; }
         public string? Code { get; set; }

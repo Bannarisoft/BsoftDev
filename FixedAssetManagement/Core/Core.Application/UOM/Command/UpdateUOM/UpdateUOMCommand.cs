@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.UOM.Command.UpdateUOM
 {
-    public class UpdateUOMCommand : IRequest<ApiResponseDTO<bool>>
+    public class UpdateUOMCommand : IRequest<bool>
     {
         public int Id { get; set; }
         public string? Code { get; set; }

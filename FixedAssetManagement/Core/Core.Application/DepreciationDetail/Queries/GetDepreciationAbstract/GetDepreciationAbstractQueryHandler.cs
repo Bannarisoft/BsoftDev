@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.DepreciationDetail.Queries.GetDepreciationAbstract
 {
-    public class GetDepreciationAbstractQueryHandler  : IRequestHandler<GetDepreciationAbstractQuery, ApiResponseDTO<List<DepreciationAbstractDto>>>
+    public class GetDepreciationAbstractQueryHandler  : IRequestHandler<GetDepreciationAbstractQuery, List<DepreciationAbstractDto>>
     {
         private readonly IDepreciationDetailQueryRepository _depreciationDetailRepository;
         private readonly IMapper _mapper;
@@ -23,7 +23,7 @@ namespace Core.Application.DepreciationDetail.Queries.GetDepreciationAbstract
             _mapper = mapper;
             _mediator = mediator;
         }        
-        public async Task<ApiResponseDTO<List<DepreciationAbstractDto>>> Handle(GetDepreciationAbstractQuery request, CancellationToken cancellationToken)
+        public async Task<List<DepreciationAbstractDto>> Handle(GetDepreciationAbstractQuery request, CancellationToken cancellationToken)
         {
             var depreciationAbstract = await _depreciationDetailRepository.GetDepreciationAbstractAsync(request.companyId,request.unitId, request.finYearId, request.startDate,request.endDate, request.depreciationPeriod,request.depreciationType);
             var depreciationAbstractList = _mapper.Map<List<DepreciationAbstractDto>>(depreciationAbstract);
@@ -38,12 +38,7 @@ namespace Core.Application.DepreciationDetail.Queries.GetDepreciationAbstract
             );
             
             await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<DepreciationAbstractDto>>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = depreciationAbstractList                
-            };            
+            return depreciationAbstractList;            
         }
     }
   

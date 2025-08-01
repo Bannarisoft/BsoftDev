@@ -26,57 +26,37 @@ namespace FAM.API.Controllers
         public async Task<IActionResult> CreateAsync(CreateDepreciationCommand  command)
         {             
             var result = await Mediator.Send(command);
-            if (result.IsSuccess)
-            {
+        
                 return Ok(new 
                 { 
                     StatusCode=StatusCodes.Status201Created,
-                    message = result.Message, 
-                    data = result.Data
+                    message = "WDV Depreciation Details Created", 
+                    data = result
                 });
-            }                      
-            return BadRequest(new 
-            { 
-                StatusCode=StatusCodes.Status400BadRequest,
-                message = result.Message 
-            });
+          
         }        
         [HttpDelete]        
         public async Task<IActionResult> DeleteAsync(DeleteDepreciationCommand  command)
         {             
-            var result = await Mediator.Send(command);
-            if (!result.IsSuccess)
-            {                
-                return NotFound(new     
-                { 
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message
-                });
-            }
+            await Mediator.Send(command);
+          
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
                 data =$"WDV Depreciation Details Deleted" ,
-                message = result.Message
+                message = "Depreciation Details Deleted"
             });
         }
          [HttpPut]        
         public async Task<IActionResult> LockDepreciationAsync(LockDepreciationCommand  command)
         {             
-            var result = await Mediator.Send(command);
-            if (!result.IsSuccess)
-            {                
-                return NotFound(new     
-                { 
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message
-                });
-            }
+             await Mediator.Send(command);
+         
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
                 data =$"Depreciation Details Locked" ,
-                message = result.Message
+                message = "Depreciation Details Locked"
             });
         }                       
     }

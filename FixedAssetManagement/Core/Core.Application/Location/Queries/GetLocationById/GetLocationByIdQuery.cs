@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.Location.Queries.GetLocationById
 {
-    public class GetLocationByIdQuery : IRequest<ApiResponseDTO<LocationDto>>
+    public class GetLocationByIdQuery : IRequest<LocationDto>
     {
         public int Id { get; set; }
         

@@ -6,11 +6,12 @@ using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.ILocation;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.Location.Command.UpdateLocation
 {
-    public class UpdateLocationCommandHandler : IRequestHandler<UpdateLocationCommand, ApiResponseDTO<bool>>
+    public class UpdateLocationCommandHandler : IRequestHandler<UpdateLocationCommand, bool>
     {
         private readonly ILocationCommandRepository _locationCommandRepository;
         private readonly ILocationQueryRepository _locationQueryRepository;
@@ -23,7 +24,7 @@ namespace Core.Application.Location.Command.UpdateLocation
             _mediator = mediator;
             _mapper = mapper;
         }
-        public async Task<ApiResponseDTO<bool>> Handle(UpdateLocationCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(UpdateLocationCommand request, CancellationToken cancellationToken)
         {
             // var existingLocation = await _locationQueryRepository.GetByLocationNameAsync(request.LocationName,request.DepartmentId,request.UnitId, request.Id);
 
@@ -43,12 +44,8 @@ namespace Core.Application.Location.Command.UpdateLocation
                 : isNameDuplicate
                 ? "Location with the same LocationName already exists."
                 : "Location with the same Sort Order already exists.";
-
-                return new ApiResponseDTO<bool>
-                {
-                    IsSuccess = false,
-                    Message = errorMessage
-                };
+            throw new ValidationException(errorMessage);
+                
             }
 
             var location = _mapper.Map<Core.Domain.Entities.Location>(request);
@@ -67,10 +64,10 @@ namespace Core.Application.Location.Command.UpdateLocation
 
             if (locationresult)
             {
-                return new ApiResponseDTO<bool> { IsSuccess = true, Message = "Location updated successfully." };
+                return locationresult;
             }
-
-            return new ApiResponseDTO<bool> { IsSuccess = false, Message = "Location not updated." };
+            throw new Exception("Location not updated.");
+            
         }
     }
 }

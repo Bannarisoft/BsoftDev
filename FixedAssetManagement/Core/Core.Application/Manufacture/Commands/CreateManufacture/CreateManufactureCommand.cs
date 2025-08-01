@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.Manufacture.Commands.CreateManufacture
 {
-    public class CreateManufactureCommand : IRequest<ApiResponseDTO<ManufactureDTO>>  
+    public class CreateManufactureCommand : IRequest<ManufactureDTO>
     {
         public string? Code { get; set; }        
         public string? ManufactureName { get; set; }                

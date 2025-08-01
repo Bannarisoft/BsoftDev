@@ -7,11 +7,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IUOM;
 using Core.Application.UOM.Queries.GetUOMs;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.UOM.Command.CreateUOM
 {
-    public class CreateUOMCommandHandler : IRequestHandler<CreateUOMCommand, ApiResponseDTO<UOMDto>>
+    public class CreateUOMCommandHandler : IRequestHandler<CreateUOMCommand, UOMDto>
     {
          private readonly IUOMCommandRepository _uomCommandRepository;
         private readonly IUOMQueryRepository _uomQueryRepository;
@@ -24,13 +25,14 @@ namespace Core.Application.UOM.Command.CreateUOM
             _mapper = mapper;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<UOMDto>> Handle(CreateUOMCommand request, CancellationToken cancellationToken)
+        public async Task<UOMDto> Handle(CreateUOMCommand request, CancellationToken cancellationToken)
         {
             var existingUOM = await _uomQueryRepository.GetByUOMNameAsync(request.UOMName);
 
                if (existingUOM != null)
                {
-                   return new ApiResponseDTO<UOMDto>{IsSuccess = false, Message = "UOM already exists"};
+                throw new ValidationException("UOM already exists");
+                   
                }
            
                  var uom  = _mapper.Map<Core.Domain.Entities.UOM>(request);
@@ -49,10 +51,10 @@ namespace Core.Application.UOM.Command.CreateUOM
                  );
                  await _mediator.Publish(domainEvent, cancellationToken);
                  
-                    return new ApiResponseDTO<UOMDto>{IsSuccess = true, Message = "UOM created successfully", Data = locationMap};
+                    return locationMap;
                 }
-               
-                    return new ApiResponseDTO<UOMDto>{IsSuccess = false, Message = "UOM not created"};
+               throw new Exception("UOM not created");
+                    
         }
     }
 }
