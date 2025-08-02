@@ -23,23 +23,27 @@ namespace Core.Application.PartyGroup.Queries.GetPartyGroupById
             _mediator = mediator;
         }       
 
-        public async Task<PartyGroupByIdDto> Handle(GetPartyGroupByIdQuery request, CancellationToken cancellationToken)
+        public async Task<PartyGroupByIdDto?> Handle(GetPartyGroupByIdQuery request, CancellationToken cancellationToken)
         {
-             var result = await _ipartygroupQueryRepository.GetByIdAsync(request.Id);
-          
-            // Map a single entity
+            var result = await _ipartygroupQueryRepository.GetByIdAsync(request.Id);
+
+            if (result == null)
+                return null; // No CS8603 warning because return type is now nullable
+
             var partymaster = _mapper.Map<PartyGroupByIdDto>(result);
-       
-          //Domain Event
-                var domainEvent = new AuditLogsDomainEvent(
-                    actionDetail: "GetById",
-                    actionCode: "GetPartyGroupByIdQuery",        
-                    actionName: partymaster.Id.ToString(),
-                    details: $"PartyGroup details {partymaster.Id} was fetched.",
-                    module:"PartyGroup"
-                );
-                await _mediator.Publish(domainEvent, cancellationToken);
-          return partymaster;
+
+            var domainEvent = new AuditLogsDomainEvent(
+                actionDetail: "GetById",
+                actionCode: "GetPartyGroupByIdQuery",
+                actionName: partymaster.Id.ToString(),
+                details: $"PartyGroup details {partymaster.Id} was fetched.",
+                module: "PartyGroup"
+            );
+
+            await _mediator.Publish(domainEvent, cancellationToken);
+
+            return partymaster;
         }
+
     }
 }

@@ -37,7 +37,7 @@ namespace PartyManagement.API.Validation.PartyGroup
                         RuleFor(x => x.Id)
                             .MustAsync(async (id, cancellation) => 
                                 (await _ipartyGroupQueryRepository.GetByIdAsync(id)) != null) 
-                            .WithName("Id")
+                            .WithName("Id not found")
                             .WithMessage($"{rule.Error}");
                             break;
                     default:
