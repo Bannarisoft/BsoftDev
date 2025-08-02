@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using BackgroundService.Application.Notification.NotificationGroupMember.Commands.CreateNotificationGroupMember;
-using BackgroundService.Application.Notification.NotificationGroupMember.Commands.DeleteNotificationGroupMember;
 using BackgroundService.Application.Notification.NotificationGroupMember.Commands.UpdateNotificationGroupMember;
 using BackgroundService.Application.Notification.NotificationGroupMember.Queries.GetAllNotificationGroupMember;
 using static BackgroundService.Domain.Common.BaseEntity;
@@ -23,11 +18,7 @@ namespace BackgroundService.Application.Notification.Common.Mappings
                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
 
             CreateMap<UpdateNotificationGroupMemberCommand, Domain.Entities.Notification.NotificationGroupMembers>()    
-                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));
-
-              CreateMap<DeleteNotificationGroupMemberCommand, Domain.Entities.Notification.NotificationGroupMembers>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id)) 
-                .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));  
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));          
         }
     }
 }

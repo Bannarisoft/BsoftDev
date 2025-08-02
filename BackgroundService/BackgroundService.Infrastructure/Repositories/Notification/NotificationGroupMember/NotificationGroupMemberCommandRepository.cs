@@ -32,7 +32,7 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
             var result = await _notificationDbContext.SaveChangesAsync();
             return result;
         }
-        public async Task<bool> DeleteAsync(int id, NotificationGroupMembers notificationGroupMembers)
+      /*   public async Task<bool> DeleteAsync(int id, NotificationGroupMembers notificationGroupMembers)
         {
             var NotificationDelete = await _notificationDbContext.NotificationGroupMembers.FirstOrDefaultAsync(u => u.Id == id);
             if (NotificationDelete != null)
@@ -41,7 +41,7 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
                 return await _notificationDbContext.SaveChangesAsync() > 0;
             }
             return false;
-        }
+        } */
 
         public async Task<bool> UpdateAsync(NotificationGroupMembers notificationGroupMembers)
         {

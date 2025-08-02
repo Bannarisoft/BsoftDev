@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BackgroundService.Application.Notification.NotificationGroupMember.Commands.CreateNotificationGroupMember;
-using BackgroundService.Application.Notification.NotificationGroupMember.Commands.DeleteNotificationGroupMember;
 using BackgroundService.Application.Notification.NotificationGroupMember.Commands.UpdateNotificationGroupMember;
 using BackgroundService.Application.Notification.NotificationGroupMember.Queries.GetAllNotificationGroupMember;
+using BackgroundService.Application.Notification.NotificationGroupMember.Queries.GetNotificationGroupById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,39 +40,42 @@ namespace BackgroundService.API.Controller.Notification
                 PageSize = Notification.PageSize
             });
         }
-           [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateNotificationGroupMemberCommand createNotificationGroupCommand)
-        {            
-            var CreatedNotificationId = await _mediator.Send(createNotificationGroupCommand);            
+        {
+            var CreatedNotificationId = await _mediator.Send(createNotificationGroupCommand);
             return Ok(new
             {
                 StatusCode = StatusCodes.Status201Created,
-                message ="Created successfully.",
+                message = "Created successfully.",
                 data = CreatedNotificationId
-            });            
-        
+            });
+
         }
         [HttpPut]
         public async Task<IActionResult> UpdateAsync(UpdateNotificationGroupMemberCommand updateNotificationGroupMemberCommand)
         {
-            await _mediator.Send(updateNotificationGroupMemberCommand);            
+            await _mediator.Send(updateNotificationGroupMemberCommand);
             return Ok(new
             {
                 message = "Updated successfully.",
                 statusCode = StatusCodes.Status200OK
-            });                
-        }
-
-        [HttpDelete]
-        public async Task<IActionResult> DeleteAsync(int id)
+            });
+        } 
+         [HttpGet("{id}")]
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
-            await _mediator.Send(new DeleteNotificationGroupMemberCommand { Id = id });
+            var response = await _mediator.Send(new GetNotificationGroupByIdQuery { Id = id });
+
+            if (!response.IsSuccess)
+                return NotFound(new { StatusCode = 404, Message = response.Message });
+
             return Ok(new
             {
-                message = "Deleted successfully.",
-                statusCode = StatusCodes.Status200OK
+                StatusCode = 200,
+                Data = response.Data,
+                Message = response.Message
             });
-        
-        }
+        }      
     }
 }

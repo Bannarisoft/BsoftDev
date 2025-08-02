@@ -11,6 +11,6 @@ namespace BackgroundService.Application.Notification.Common.Interfaces.INotifica
         // Task<int> CreateAsync(NotificationGroupMembers notificationGroupMembers);     
         Task<int> CreateMultipleAsync(IEnumerable<NotificationGroupMembers> members);
         Task<bool> UpdateMultipleAsync(int groupId, List<int> userIds, byte isActive);
-        Task<bool> DeleteAsync(int id,NotificationGroupMembers notificationGroupMembers); 
+        //Task<bool> DeleteAsync(int id,NotificationGroupMembers notificationGroupMembers); 
     }
 }
