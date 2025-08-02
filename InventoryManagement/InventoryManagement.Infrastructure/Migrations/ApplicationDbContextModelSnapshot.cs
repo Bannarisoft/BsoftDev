@@ -22,6 +22,178 @@ namespace InventoryManagement.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Core.Domain.Entities.Budget.BudgetDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("BudgetAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("BudgetId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BudgetId");
+
+                    b.ToTable("BudgetDetail", "Inventory");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Budget.BudgetLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ActionTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BudgetDetailId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<decimal>("NewBudgetAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("OldBudgetAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Remarks")
+                        .IsRequired()
+                        .HasColumnType("varchar(1000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActionTypeId");
+
+                    b.HasIndex("BudgetDetailId");
+
+                    b.ToTable("BudgetLog", "Inventory");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Budget.BudgetMaster", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BudgetGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int>("FiscalYear")
+                        .HasColumnType("int");
+
+                    b.Property<bool?>("Is_MRApplicable")
+                        .HasColumnType("bit")
+                        .HasColumnName("Is_MRApplicable");
+
+                    b.Property<bool?>("Is_POApplicable")
+                        .HasColumnType("bit")
+                        .HasColumnName("Is_POApplicable");
+
+                    b.Property<bool?>("Is_ServiceApplicable")
+                        .HasColumnType("bit")
+                        .HasColumnName("Is_ServiceApplicable");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("YearBudgetAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BudgetMaster", "Inventory");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.Item.ItemCategory", b =>
                 {
                     b.Property<int>("Id")
@@ -94,6 +266,8 @@ namespace InventoryManagement.Infrastructure.Migrations
 
                     b.HasIndex("ParentCategoryId");
 
+                    b.HasIndex("RootCategoryId");
+
                     b.ToTable("ItemCategory", "Inventory");
                 });
 
@@ -157,34 +331,7 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.ToTable("ItemGroup", "Inventory");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Item.ItemCategory", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.Item.ItemGroup", "ItemGroup")
-                        .WithMany("ItemCategory")
-                        .HasForeignKey("ItemGroupId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.Item.ItemCategory", "ItemCategoryParent")
-                        .WithMany("ChildCategories")
-                        .HasForeignKey("ParentCategoryId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("ItemCategoryParent");
-
-                    b.Navigation("ItemGroup");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.Item.ItemCategory", b =>
-                {
-                    b.Navigation("ChildCategories");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.Item.ItemGroup", b =>
-                {
-                    b.Navigation("ItemCategory");
-                });
- modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
+            modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -311,6 +458,60 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.ToTable("MiscTypeMaster", "Inventory");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.Budget.BudgetDetail", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Budget.BudgetMaster", "BudgetMaster")
+                        .WithMany("BudgetDetail")
+                        .HasForeignKey("BudgetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("BudgetMaster");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Budget.BudgetLog", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscAction")
+                        .WithMany("BudgetAction")
+                        .HasForeignKey("ActionTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.Budget.BudgetDetail", "BudgetDetail")
+                        .WithMany("BudgetLog")
+                        .HasForeignKey("BudgetDetailId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("BudgetDetail");
+
+                    b.Navigation("MiscAction");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemCategory", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Item.ItemGroup", "ItemGroup")
+                        .WithMany("ItemCategory")
+                        .HasForeignKey("ItemGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.Item.ItemCategory", "ItemCategoryParent")
+                        .WithMany("ChildCategories")
+                        .HasForeignKey("ParentCategoryId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Core.Domain.Entities.Item.ItemCategory", "RootCategory")
+                        .WithMany()
+                        .HasForeignKey("RootCategoryId");
+
+                    b.Navigation("ItemCategoryParent");
+
+                    b.Navigation("ItemGroup");
+
+                    b.Navigation("RootCategory");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
                 {
                     b.HasOne("Core.Domain.Entities.MiscTypeMaster", "MiscTypeMaster")
@@ -320,6 +521,31 @@ namespace InventoryManagement.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("MiscTypeMaster");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Budget.BudgetDetail", b =>
+                {
+                    b.Navigation("BudgetLog");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Budget.BudgetMaster", b =>
+                {
+                    b.Navigation("BudgetDetail");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemCategory", b =>
+                {
+                    b.Navigation("ChildCategories");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemGroup", b =>
+                {
+                    b.Navigation("ItemCategory");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
+                {
+                    b.Navigation("BudgetAction");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>

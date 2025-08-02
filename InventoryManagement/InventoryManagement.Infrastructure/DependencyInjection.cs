@@ -1,6 +1,7 @@
 using System.Data;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.AuditLog;
+using Core.Application.Common.Interfaces.Budget;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IMiscTypeMaster;
 using Core.Application.Common.Interfaces.Item.ItemCategory;
@@ -8,6 +9,7 @@ using Core.Application.Common.Interfaces.Item.ItemGroup;
 using Core.Application.Common.Mappings;
 using Core.Domain.Entities.Item;
 using Infrastructure.Data;
+using Infrastructure.Persistence.Repositories;
 using InventoryManagement.Infrastructure.Data;
 using InventoryManagement.Infrastructure.Repositories;
 using InventoryManagement.Infrastructure.Repositories.Item.ItemCategory;
@@ -105,6 +107,9 @@ namespace InventoryManagement.Infrastructure
             services.AddScoped<IMiscTypeMasterCommandRepository, MiscTypeMasterCommandRepository>();
             services.AddScoped<IMiscMasterQueryRepository, MiscMasterQueryRepository>();
             services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();      
+            services.AddScoped<IBudgetCommandRepository, BudgetCommandRepository>(); 
+            services.AddScoped<IBudgetQueryRepository, BudgetQueryRepository>(); 
+            services.AddScoped<IBudgetLogQueryRepository, BudgetLogQueryRepository>(); 
 
 
             // Miscellaneous services

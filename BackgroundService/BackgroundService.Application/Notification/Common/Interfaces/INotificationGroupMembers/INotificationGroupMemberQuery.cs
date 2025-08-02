@@ -6,7 +6,9 @@ namespace BackgroundService.Application.Notification.Common.Interfaces.INotifica
 {
     public interface  INotificationGroupMemberQuery
     {
-         Task<(List<NotificationGroupMemberDto>, int)> GetAllNotificationGroupAsync(int PageNumber, int PageSize, string? SearchTerm);
+         //Task<(List<NotificationGroupMemberDto>, int)> GetAllNotificationGroupAsync(int PageNumber, int PageSize, string? SearchTerm);
+         Task<(List<NotificationGroupDto>, int)> GetAllNotificationGroupAsync(int PageNumber, int PageSize, string? SearchTerm);     
+         Task<NotificationGroupDto> GetByIdAsync(int id);      
         Task<bool> AlreadyExistsAsync(int GroupId,int UserId, int? id = null);
         Task<bool> NotFoundAsync(int groupId);
     }
