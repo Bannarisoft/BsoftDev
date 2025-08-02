@@ -41,12 +41,12 @@ namespace BackgroundService.API.Validation.NotificationGroupMember
 
                         
                         break;
-                    case "AlreadyExists":
+                  /*   case "AlreadyExists":
                         RuleForEach(x => x.UserIds)
                             .MustAsync(async (command, userId, cancellation) =>
                             !await notificationGroupQuery.AlreadyExistsAsync(command.GroupId, userId))
                             .WithMessage("UserId '{PropertyValue}' already exists in this group.");
-                        break;
+                        break; */
                         
                     case "NotFound":
                            RuleFor(x => x.GroupId )
