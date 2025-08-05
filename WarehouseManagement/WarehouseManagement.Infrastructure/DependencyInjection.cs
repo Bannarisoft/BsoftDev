@@ -1,6 +1,7 @@
 using System.Data;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.AuditLog;
+using Core.Application.Common.Interfaces.IWarehouseMaster;
 using Core.Application.Common.Mappings;
 using Infrastructure.Data;
 using Microsoft.Data.SqlClient;
@@ -11,6 +12,7 @@ using MongoDB.Driver;
 using PartyManagement.Infrastructure.Repositories;
 using Serilog;
 using WarehouseManagement.Infrastructure.Data;
+using WarehouseManagement.Infrastructure.Repositories.WarehouseMaster;
 using WarehouseManagement.Infrastructure.Services;
 
 namespace WarehouseManagement.Infrastructure
@@ -89,6 +91,8 @@ namespace WarehouseManagement.Infrastructure
             // Register repositories
             services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 
+            services.AddScoped<IWarehouseMasterQueryRepository , WarehouseMasterQueryRepository >();
+
 
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>();
@@ -96,9 +100,11 @@ namespace WarehouseManagement.Infrastructure
             services.AddSingleton<ITimeZoneService, TimeZoneService>();
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();
             // AutoMapper profiles
-            // services.AddAutoMapper(
+           
+             services.AddAutoMapper(
+                 typeof(WarehouseMasterProfile)
 
-            // );
+            );
             return services;
         }
 

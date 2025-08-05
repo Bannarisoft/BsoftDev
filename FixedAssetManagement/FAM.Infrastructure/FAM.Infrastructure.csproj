@@ -60,6 +60,7 @@
   <Protobuf Include="..\..\Shared\Contracts\Protos\city.proto" GrpcServices="Client" />
   <Protobuf Include="..\..\Shared\Contracts\Protos\states.proto" GrpcServices="Client" />
   <Protobuf Include="..\..\Shared\Contracts\Protos\country.proto" GrpcServices="Client" />
+  <Protobuf Include="..\..\Shared\Contracts\Protos\miscmaster.proto" GrpcServices="Client" />
 </ItemGroup>
 
   <PropertyGroup>

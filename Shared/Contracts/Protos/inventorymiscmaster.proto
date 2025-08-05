@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option csharp_namespace = "Inventory.Grpc";
+
+service MiscMasterService {
+  rpc GetMiscMasterById (GetMiscMasterByIdRequest) returns (MiscMastersListResponse);
+ 
+}
+
+message GetMiscMasterByIdRequest {
+  string misctype = 1;
+
+}
+
+message GetMiscMastersByIdsRequest {
+  repeated int32 ids = 1;
+}
+
+message MiscMasterDto {
+  int32 id = 1;
+  string code = 2;
+  string description = 3;
+  int32 misc_type_id =4;
+}
+
+message MiscMastersListResponse {
+  repeated MiscMasterDto items = 1;
+}
