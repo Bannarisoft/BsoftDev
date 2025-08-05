@@ -18,16 +18,11 @@ namespace UserManagement.API.Controllers
     
     public class DepartmentController : ApiControllerBase
     {
-        private readonly IValidator<CreateDepartmentCommand> _createDepartmentCommandValidator;
-        private readonly IValidator<UpdateDepartmentCommand> _updateDepartmentCommandValidator;
-        private readonly ApplicationDbContext _dbContext;
+       
         private readonly ILogger<DepartmentController> _logger;
-        public DepartmentController( ISender mediator , IValidator<CreateDepartmentCommand> createDepartmentCommandValidator
-        ,IValidator<UpdateDepartmentCommand> updateDepartmentCommandValidator, ApplicationDbContext dbContext ,ILogger<DepartmentController> logger ) : base(mediator)
+        public DepartmentController( ISender mediator,ILogger<DepartmentController> logger ) : base(mediator)
         {
-            _createDepartmentCommandValidator=createDepartmentCommandValidator;
-            _updateDepartmentCommandValidator=updateDepartmentCommandValidator;
-             _dbContext = dbContext; 
+           
              _logger = logger;
 
         }
@@ -75,24 +70,14 @@ namespace UserManagement.API.Controllers
             // Retrieve the department
             var department = await Mediator.Send(new GetDepartmentByIdQuery { DepartmentId = id });
 
-            // Check if the department exists
-            if (department == null || department.Data == null)
-            {
-                _logger.LogInformation($"Department with ID {id} not found in the database.");
-
-                return NotFound(new
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = department?.Message ?? "Department not found."
-                });
-            }
+           
 
             // Return success response
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                Data = department.Data,
-                Message = department.Message
+                Data = department,
+                Message = "Success"
             });
          
         }
@@ -104,24 +89,15 @@ namespace UserManagement.API.Controllers
              var query = new GetDepartmentAutoCompleteSearchQuery { SearchPattern = name ?? string.Empty };
                 var result = await Mediator.Send(query);
 
-             
-               if (result.IsSuccess )
-               {
                 _logger.LogInformation($"Departments found for search pattern: {name}. Returning data." );
 
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status200OK,
-                    Data = result.Data
+                    Data = result
                 });        
-               }
-                  _logger.LogWarning($"No departments found for search pattern: {name}");
-
-                    return NotFound(new
-                    {
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = "No matching departments found."
-                    });
+               
+                
             
         }
         [HttpGet("withoutDatacontrol")]
@@ -188,40 +164,18 @@ namespace UserManagement.API.Controllers
         {
                 _logger.LogInformation($"Create Department request started with data: {command}" );
 
-            // Validate the command
-            var validationResult = await _createDepartmentCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                _logger.LogWarning($"Validation failed for Create Department request. Errors: {validationResult.Errors}" );
-
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Validation failed",
-                    Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
+          
 
             // Process the command
             var createdepartment = await Mediator.Send(command);
-            if (createdepartment.IsSuccess)
-            {
-                _logger.LogInformation($"Create Department request succeeded. Department created with ID: {createdepartment.Data.Id}" );
-
+           
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status201Created,
-                    Message = createdepartment.Message,
-                    Data = createdepartment.Data
+                    Message = "Department created successfully",
+                    Data = createdepartment
                 });
-            }
-            _logger.LogWarning($"Create Department request failed. Reason: {createdepartment.Message}");
-
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                Message = createdepartment.Message
-            });                           
+                                 
         }
 
       [HttpPut]
@@ -241,25 +195,11 @@ namespace UserManagement.API.Controllers
                         Message = "Department not found"
                     });
                 }
-
-                // Validate the update command
-                var validationResult = await _updateDepartmentCommandValidator.ValidateAsync(command);
-                if (!validationResult.IsValid)
-                {
-                    _logger.LogWarning($"Validation failed for Update Department request. Errors: {validationResult.Errors}" );
-
-                    return BadRequest(new
-                    {
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Validation failed",
-                        Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                    });
-                }          
+         
 
                 // Update the department
-                var updateResult = await Mediator.Send(command);
-                if (updateResult.IsSuccess)
-                {
+                 await Mediator.Send(command);
+               
                     _logger.LogInformation($"Department with ID { command.Id} updated successfully.");
 
                     return Ok(new
@@ -268,15 +208,7 @@ namespace UserManagement.API.Controllers
                         Message = "Department updated successfully"
                     
                     });
-                }
-
-                _logger.LogWarning($"Failed to update Department with ID {command.Id}. Reason: {updateResult.Message}" );
-
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = updateResult.Message
-                });
+             
             
         }
 
@@ -303,26 +235,18 @@ namespace UserManagement.API.Controllers
                 _logger.LogInformation($"Department with ID {id} found. Proceeding with deletion.");
 
                 // Attempt to delete the department
-                var result = await Mediator.Send(new DeleteDepartmentCommand { Id = id });
+                 await Mediator.Send(new DeleteDepartmentCommand { Id = id });
 
-                if (result.IsSuccess)
-                {
+              
                     _logger.LogInformation($"Department with ID {id} deleted successfully.");
 
                     return Ok(new
                     {
-                        Message = result.Message,
+                        Message = "Department deleted successfully",
                         StatusCode = StatusCodes.Status200OK
                       
                     });
-                }
-                _logger.LogWarning($"Failed to delete Department with ID {id}. Reason: {result.Message}" );
-
-                return BadRequest(new
-                {
-                    Message = result.Message,
-                    StatusCode = StatusCodes.Status400BadRequest
-                });
+          
 
 
      

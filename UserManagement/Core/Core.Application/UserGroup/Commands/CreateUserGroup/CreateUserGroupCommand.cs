@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.UserGroup.Commands.CreateUserGroup
 {
-    public class CreateUserGroupCommand : IRequest<ApiResponseDTO<UserGroupDto>>  
+    public class CreateUserGroupCommand : IRequest<UserGroupDto>
      {
           public string? GroupCode { get; set; }
           public string? GroupName { get; set; } 

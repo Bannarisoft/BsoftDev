@@ -19,15 +19,13 @@ namespace UserManagement.API.Controllers
     public class TimeZonesController : ApiControllerBase
     {
         private readonly ILogger<TimeZonesController> _logger;
-        private readonly ApplicationDbContext _dbContext;
         private readonly IMediator _mediator;
 
-        public TimeZonesController(ILogger<TimeZonesController> logger, IMediator mediator, ApplicationDbContext dbContext)
+        public TimeZonesController(ILogger<TimeZonesController> logger, IMediator mediator)
          : base(mediator)
         {
             _logger = logger;
             _mediator = mediator;
-            _dbContext = dbContext;
         }
         [HttpGet]
         public async Task<IActionResult> GetAllTimeZonesAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
@@ -80,22 +78,14 @@ namespace UserManagement.API.Controllers
 
         var result = await Mediator.Send(new GetTimeZoneByIdQuery { TimeZoneId = id });
 
-        if (result.IsSuccess)
-        {
-              _logger.LogInformation($"TimeZoneId {result.Data} Listed successfully.");
+     
               return Ok(new
              {
-                 message = result.Message,
+                 message = "TimeZone Fetched Successfully",
                  statusCode = StatusCodes.Status200OK,
-                 data = result.Data
+                 data = result
              }); 
-        }
-        _logger.LogWarning($"TimeZoneId {result.Data} Not found.");
-        return NotFound(new
-        {
-            message = result.Message,
-            statusCode = StatusCodes.Status404NotFound
-        });
+       
    
 }
         [HttpGet("by-name")]
@@ -104,22 +94,14 @@ namespace UserManagement.API.Controllers
         // Fetch entities based on search pattern
         var result = await Mediator.Send(new GetTimeZonesAutocompleteQuery { SearchPattern = TimeZoneName?? string.Empty });
        _logger.LogInformation($"Search pattern {TimeZoneName} cannot be empty.");
-       if (result.IsSuccess)
-        {
-        _logger.LogInformation($"TimeZone {result.Data.Count} Listed successfully.");
+    
          return Ok(new  
             {
-                message = result.Message,
+                message = "TimeZone List",
                 statusCode = StatusCodes.Status200OK,
-                data = result.Data
+                data = result
             });
-        }
-        _logger.LogInformation($"No TimeZone Record in search of {TimeZoneName} not found in DB.");
-        return NotFound(new
-        {
-            message = result.Message,
-            statusCode = StatusCodes.Status404NotFound
-        });                  
+                     
 }
    
     }

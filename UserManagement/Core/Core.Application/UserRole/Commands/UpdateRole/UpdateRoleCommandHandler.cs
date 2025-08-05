@@ -12,10 +12,11 @@ using Core.Application.Common.HttpResponse;
 using Core.Domain.Events;
 using Microsoft.Extensions.Logging;
 using Core.Domain.Enums.Common;
+using FluentValidation;
 
 namespace Core.Application.UserRole.Commands.UpdateRole
 {
-    public class UpdateRoleCommandHandler  : IRequestHandler<UpdateRoleCommand ,ApiResponseDTO<UserRoleDto>> 
+    public class UpdateRoleCommandHandler  : IRequestHandler<UpdateRoleCommand ,bool>
     {
 
 
@@ -34,7 +35,7 @@ namespace Core.Application.UserRole.Commands.UpdateRole
             _logger = logger;
         }
 
-        public async Task<ApiResponseDTO<UserRoleDto>> Handle(UpdateRoleCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(UpdateRoleCommand request, CancellationToken cancellationToken)
         {
             
             _logger.LogInformation($"Starting UpdateUserRoleCommandHandler for request: {request}" );
@@ -44,11 +45,8 @@ namespace Core.Application.UserRole.Commands.UpdateRole
             if (userrole == null)
             {
                 _logger.LogWarning($"User Role with ID {request.Id} not found.");
-                return new ApiResponseDTO<UserRoleDto>
-                {
-                    IsSuccess = false,
-                    Message = "User Role not found"
-                };
+                throw new ValidationException("User Role not found");
+               
             }
 
             _logger.LogInformation($"User Role with ID {request.Id} retrieved successfully.");
@@ -61,21 +59,15 @@ namespace Core.Application.UserRole.Commands.UpdateRole
             if (result <= 0)
             {
                 _logger.LogWarning($"Failed to update User Role with ID {request.Id}.");
-                return new ApiResponseDTO<UserRoleDto>
-                {
-                    IsSuccess = false,
-                    Message = "Failed to update User Role"
-                };
+                throw new Exception("Failed to update User Role");
+             
             }
 
                var duplicateCheck = await _IUserRoleRepository.ExistsByNameupdateAsync(request.RoleName, request.Id);
                 if (duplicateCheck)
                 {
-                    return new ApiResponseDTO<UserRoleDto>
-                    {
-                    IsSuccess = false,
-                    Message = " User Role Name  Already Exists "
-                    };
+                    throw new ValidationException(" User Role Name  Already Exists");
+                  
                 }
 
             _logger.LogInformation($"User Role with ID {request.Id} updated successfully." );
@@ -97,12 +89,7 @@ namespace Core.Application.UserRole.Commands.UpdateRole
             await _mediator.Publish(domainEvent, cancellationToken);
             _logger.LogInformation($"AuditLogsDomainEvent published for User Role ID {userrole.Id}." );
 
-            return new ApiResponseDTO<UserRoleDto>
-            {
-                IsSuccess = true,
-                Message = "User Role updated successfully"
-               
-            };             
+            return result > 0;             
        }
         
 

@@ -6,7 +6,7 @@ using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Country.Queries.GetCountries
 {
-    public class GetCountryQueryHandler : IRequestHandler<GetCountryQuery, List<CountryDto>>
+    public class GetCountryQueryHandler : IRequestHandler<GetCountryQuery, ApiResponseDTO<List<CountryDto>>>
     {
         private readonly ICountryQueryRepository _countryRepository;
         private readonly IMapper _mapper;

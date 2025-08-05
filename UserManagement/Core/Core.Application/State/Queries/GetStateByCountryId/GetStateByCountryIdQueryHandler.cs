@@ -4,10 +4,11 @@ using AutoMapper;
 using Core.Application.Common.Interfaces.IState;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
+using FluentValidation;
 
 namespace Core.Application.State.Queries.GetStateByCountryId
 {
-    public class GetStateByCountryIdQueryHandler : IRequestHandler<GetStateByCountryIdQuery, ApiResponseDTO<List<StateDto>>>    
+    public class GetStateByCountryIdQueryHandler : IRequestHandler<GetStateByCountryIdQuery, List<StateDto>>
     {
         private readonly IStateQueryRepository _stateRepository;
         private readonly IMapper _mapper;
@@ -19,16 +20,13 @@ namespace Core.Application.State.Queries.GetStateByCountryId
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<List<StateDto>>> Handle(GetStateByCountryIdQuery request, CancellationToken cancellationToken)
+        public async Task<List<StateDto>> Handle(GetStateByCountryIdQuery request, CancellationToken cancellationToken)
         {            
             var state = await _stateRepository.GetStateByCountryIdAsync(request.Id);            
             if (state is null || !state.Any())
-            {                
-                 return new ApiResponseDTO<List<StateDto>>
-                {
-                    IsSuccess = false,
-                    Message = "No States found matching the search pattern."
-                };
+            {    
+                throw new ValidationException("No States found matching the search pattern.");            
+             
             }                        
              var stateDto = _mapper.Map<List<StateDto>>(state); 
             //Domain Event
@@ -40,12 +38,7 @@ namespace Core.Application.State.Queries.GetStateByCountryId
                 module:"State"
             );
             await _mediator.Publish(domainEvent, cancellationToken);            
-            return new ApiResponseDTO<List<StateDto>>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = stateDto
-            };   
+            return stateDto;   
         }
     }
 }

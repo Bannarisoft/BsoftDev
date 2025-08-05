@@ -25,18 +25,14 @@ namespace UserManagement.API.Controllers
     {
       
         
-          private readonly ApplicationDbContext _dbContext;
+          
           private readonly ILogger<FinancialYearController> _logger;
-          private readonly IValidator<CreateFinancialYearCommand> _createFinancialYearCommandValidator;
-          private readonly IValidator<UpdateFinancialYearCommand> _updateFinancialYearCommandValidator;
    
 
-        public FinancialYearController(ISender mediator ,ApplicationDbContext dbContext , ILogger<FinancialYearController> logger , IValidator<CreateFinancialYearCommand> createFinancialYearCommandValidator, IValidator<UpdateFinancialYearCommand> updateFinancialYearCommandValidator) : base(mediator)
+        public FinancialYearController(ISender mediator , ILogger<FinancialYearController> logger ) : base(mediator)
         {
-            _dbContext = dbContext;
+            
             _logger = logger;
-            _createFinancialYearCommandValidator = createFinancialYearCommandValidator;
-            _updateFinancialYearCommandValidator =updateFinancialYearCommandValidator;
 
         }
         [HttpGet]
@@ -79,19 +75,11 @@ namespace UserManagement.API.Controllers
         {
             _logger.LogInformation($"Fetching FinancialYear with ID {id} request started." );
             var financialyr = await Mediator.Send(new GetFinancialYearByIdQuery  { Id = id });
-            if (financialyr == null || financialyr.Data == null)
-            {
-                _logger.LogInformation($"FinancialYear with ID {id} not found in the database.");
-                return NotFound(new
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = financialyr?.Message ?? "FinancialYear not found."
-                });
-            }
+          
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                Data = financialyr.Data
+                Data = financialyr
             });
         } 
 
@@ -103,24 +91,15 @@ namespace UserManagement.API.Controllers
             var query = new GetFinancialYearAutoCompleteQuery { SearchTerm = year ?? string.Empty };
             var result = await Mediator.Send(query);
 
-            if (result.IsSuccess)
-            {
+          
                 _logger.LogInformation($"Financial years found for search pattern: {year}. Returning data.");
 
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status200OK,
-                    Data = result.Data
+                    Data = result
                 });
-            }
-
-            _logger.LogWarning($"No financial years found for search pattern: {year}");
-
-            return NotFound(new
-            {
-                StatusCode = StatusCodes.Status404NotFound,
-                Message = "No matching financial years found."
-            });
+           
         }
 
        
@@ -131,40 +110,18 @@ namespace UserManagement.API.Controllers
         {
                 _logger.LogInformation($"Create Financial Year request started with data: {command}");
 
-            // Validate the command
-            var validationResult = await _createFinancialYearCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                _logger.LogWarning("Validation failed for Create Financial Year request. Errors: {@Errors}", validationResult.Errors);
-
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Validation failed",
-                    Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
+          
 
             // Process the command
             var createFinancialYear = await Mediator.Send(command);
-            if (createFinancialYear.IsSuccess)
-            {
-                _logger.LogInformation($"Create Financial Year request succeeded. Financial Year created with ID: {createFinancialYear.Data.Id}");
-
+        
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status201Created,
-                    Message = createFinancialYear.Message,
-                    Data = createFinancialYear.Data
+                    Message = "Financial Year created successfully",
+                    Data = createFinancialYear
                 });
-            }
-            _logger.LogWarning($"Create FinancialYear request failed. Reason: {createFinancialYear.Message}" );
-
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                Message = createFinancialYear.Message
-            });
+          
             
                
         }
@@ -193,18 +150,7 @@ namespace UserManagement.API.Controllers
             }
 
 
-                var validationResult = await _updateFinancialYearCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                _logger.LogWarning($"Validation failed for Update Financial Year request. Errors: {validationResult.Errors}" );
-
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Validation failed",
-                    Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
+         
 
                       if (command == null)
             {
@@ -212,9 +158,8 @@ namespace UserManagement.API.Controllers
                 return BadRequest("Command is null before sending to Mediator.");
             }
             // Update the department
-            var updateResult = await Mediator.Send(command);
-            if (updateResult.IsSuccess)
-            {
+             await Mediator.Send(command);
+       
                 _logger.LogInformation($"Financial Year  with ID {command.Id} updated successfully." );
 
                 return Ok(new
@@ -223,15 +168,7 @@ namespace UserManagement.API.Controllers
                     Message = "Financial Year  updated successfully"
                   
                 });
-            }
-
-            _logger.LogWarning($"Failed to update Financial Year  with ID {command.Id}. Reason: {updateResult.Message}" );
-
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                Message = updateResult.Message
-            });
+         
         
 
             }
@@ -259,27 +196,17 @@ namespace UserManagement.API.Controllers
                 _logger.LogInformation($"FinancialYear with ID {id} found. Proceeding with deletion.");
 
                 // Attempt to delete the department
-                var result = await Mediator.Send( new DeleteFinancialYearCommand { Id=id} );
+                 await Mediator.Send( new DeleteFinancialYearCommand { Id=id} );
 
-                if (result.IsSuccess)
-                {
                     _logger.LogInformation($"FinancialYear with ID {id} deleted successfully." );
 
                     return Ok(new
                     {
-                        Message = result.Message,
+                        Message = "FinancialYear deleted successfully",
                         StatusCode = StatusCodes.Status200OK
                       
                     });
-                }
-
-                _logger.LogWarning($"Failed to delete FinancialYear with ID {id}. Reason: {result.Message}");
-
-                return BadRequest(new
-                {
-                    Message = result.Message,
-                    StatusCode = StatusCodes.Status400BadRequest
-                });
+             
 
 
      

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Core.Application.UserRole.Commands.DeleteRole
 {
-    public class DeleteRoleCommand :IRequest<ApiResponseDTO<int>> 
+    public class DeleteRoleCommand :IRequest<int>
     
     {
         public int Id { get; set; } 

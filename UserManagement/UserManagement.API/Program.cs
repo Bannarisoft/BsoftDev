@@ -6,6 +6,8 @@ using UserManagement.API.Configurations;
 using UserManagement.API.GrpcServices;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using System.Security.Claims;
+using MediatR;
+using BackgroundService.Application.Notification.Common.Behaviors;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,7 +43,7 @@ builder.Services.AddSagaInfrastructure(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration, builder.Environment);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
-
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 // Register gRPC
 builder.Services.AddGrpc();
 

@@ -6,10 +6,11 @@ using Core.Application.Common.Interfaces.IState;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
 using Core.Domain.Enums.Common;
+using FluentValidation;
 
 namespace Core.Application.State.Commands.UpdateState
 {    
-    public class UpdateStateCommandHandler : IRequestHandler<UpdateStateCommand, ApiResponseDTO<StateDto>>
+    public class UpdateStateCommandHandler : IRequestHandler<UpdateStateCommand, bool>
     {
         private readonly IStateCommandRepository _stateRepository;
         private readonly IMapper _mapper;
@@ -23,34 +24,25 @@ namespace Core.Application.State.Commands.UpdateState
             _stateQueryRepository = stateQueryRepository;
             _mediator = mediator;
         }        
-        public async Task<ApiResponseDTO<StateDto>> Handle(UpdateStateCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(UpdateStateCommand request, CancellationToken cancellationToken)
         {
             var state = await _stateQueryRepository.GetByIdAsync(request.Id);
-             if (state is null)                
-                return new ApiResponseDTO<StateDto>
-                {
-                    IsSuccess = false,
-                    Message = "State not found"
-                };
+             if (state is null)        
+             throw new ValidationException("State not found");        
+               
 
             var oldStateName = state.StateName;
             state.StateName = request.StateName;
             if (state is null || state.IsDeleted is Enums.IsDelete.Deleted)
-            {                
-                return new ApiResponseDTO<StateDto>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid StateID. The specified State does not exist or is inactive."
-                };
+            {
+                throw new ValidationException("Invalid StateID. The specified State does not exist or is inactive.");     
+              
             }
             var countryExists = await _stateRepository.CountryExistsAsync(request.CountryId);
             if (!countryExists)
-            {                
-                return new ApiResponseDTO<StateDto>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid CountryID. The specified Country does not exist or is inactive."
-                };
+            {       
+                 throw new ValidationException("Invalid CountryID. The specified Country does not exist or is inactive.");        
+              
             }
             if ((byte)state.IsActive != request.IsActive)
             {    
@@ -58,30 +50,20 @@ namespace Core.Application.State.Commands.UpdateState
                 await _stateRepository.UpdateAsync(state.Id, state);
                 if (request.IsActive is 0)
                 {
-                    return new ApiResponseDTO<StateDto>
-                    {
-                        IsSuccess = true,
-                        Message = "StateCode DeActivated."
-                    };
+                    
+                    return true;
                 }
                 else{
-                    return new ApiResponseDTO<StateDto>
-                    {
-                        IsSuccess = true,
-                        Message = "StateCode Activated."
-                    }; 
+                    return true; 
                 }                                     
             }
             var stateExists = await _stateRepository.GetStateByCodeAsync(request.StateName ?? string.Empty,request.StateCode ??string.Empty, request.CountryId);            
             if (stateExists.Id !=0)
             {              
                 if ((byte)stateExists.IsActive == request.IsActive)
-                {                    
-                    return new ApiResponseDTO<StateDto>
-                    {
-                        IsSuccess = false,
-                        Message = $"StateCode already exists and is {(Enums.Status) request.IsActive}."
-                    };                                 
+                {             
+                    throw new ValidationException($"StateCode already exists and is {(Enums.Status)request.IsActive}.");       
+                                                
                 }               
             }
             var updatedStateEntity = _mapper.Map<States>(request);          
@@ -103,25 +85,16 @@ namespace Core.Application.State.Commands.UpdateState
                 await _mediator.Publish(domainEvent, cancellationToken);
                 if(updateResult>0)
                 {
-                    return new ApiResponseDTO<StateDto>
-                    {
-                        IsSuccess = true,
-                        Message = "State updated successfully.",
-                        Data = stateDto
-                    };
+                    return true;
                 }
-                return new ApiResponseDTO<StateDto>
-                {
-                    IsSuccess = false,
-                    Message = "State not updated."
-                };
+                throw new Exception("State not updated.");
+              
             }
+            
             else
             {
-                return new ApiResponseDTO<StateDto>{
-                IsSuccess = false,
-                Message = "State not found."
-                };
+                throw new ValidationException("State not found.");
+             
             }                
         }    
     }
