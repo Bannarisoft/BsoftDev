@@ -9,7 +9,7 @@ using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Divisions.Queries.GetDivisionById
 {
-    public class GetDivisionByIdQuery : IRequest<ApiResponseDTO<DivisionDTO>>
+    public class GetDivisionByIdQuery : IRequest<DivisionDTO>
     {
         public int Id { get; set; }
     }

@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.State.Queries.GetStateAutoComplete
 {
-    public class GetStateAutoCompleteQuery : IRequest<ApiResponseDTO<List<StateAutoCompleteDTO>>>
+    public class GetStateAutoCompleteQuery : IRequest<List<StateAutoCompleteDTO>>
     {
         public string? SearchPattern { get; set; }
     }

@@ -17,18 +17,11 @@ namespace UserManagement.API.Controllers
     [Route("api/[controller]")]
     public class CustomFieldController : ApiControllerBase
     {
-        private readonly IValidator<CreateCustomFieldCommand> _createCustomFieldCommandValidator;
-        private readonly IValidator<UpdateCustomFieldCommand> _updateCustomFieldCommandValidator;
-        private readonly IValidator<DeleteCustomFieldCommand> _deleteCustomFieldCommandValidator;
-        public CustomFieldController(ISender mediator, 
-                                    IValidator<CreateCustomFieldCommand> createCustomFieldCommandValidator,
-                                    IValidator<UpdateCustomFieldCommand> updateCustomFieldCommandValidator,
-                                    IValidator<DeleteCustomFieldCommand> deleteCustomFieldCommandValidator) 
+        public CustomFieldController(ISender mediator 
+                                    ) 
         : base(mediator)
         {
-            _createCustomFieldCommandValidator = createCustomFieldCommandValidator;
-            _updateCustomFieldCommandValidator = updateCustomFieldCommandValidator;
-            _deleteCustomFieldCommandValidator = deleteCustomFieldCommandValidator;
+           
         }
            [HttpGet]
         public async Task<IActionResult> GetAllCustomFieldsAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
@@ -54,35 +47,17 @@ namespace UserManagement.API.Controllers
         public async Task<IActionResult> CreateAsync(CreateCustomFieldCommand command)
         {
             
-            var validationResult = await _createCustomFieldCommandValidator.ValidateAsync(command);
-            
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new 
-                {
-                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-                });
-            }
+        
             var response = await Mediator.Send(command);
-            if(response.IsSuccess)
-            {
+           
                 return Ok(new 
                 { 
                     StatusCode=StatusCodes.Status201Created, 
-                    message = response.Message, 
+                    message = "CustomField created successfully", 
                     errors = "", 
-                    data = response.Data 
+                    data = response 
                 });
-            }
-             
-
-            return BadRequest( new 
-            { 
-                StatusCode=StatusCodes.Status400BadRequest, 
-                message = response.Message, 
-                errors = "" 
-            }); 
+          
             
         }
          [HttpGet("{id}")]
@@ -92,54 +67,28 @@ namespace UserManagement.API.Controllers
                
             var customField = await Mediator.Send(new GetCustomFieldByIdQuery { Id = id});
           
-             if(customField == null)
-            {
-                return NotFound( new 
-                { 
-                    StatusCode=StatusCodes.Status404NotFound, 
-                    message = $"CustomField ID {id} not found.", 
-                    errors = "" 
-                });
-            }
+         
             return Ok(new 
             { 
                 StatusCode=StatusCodes.Status200OK, 
-                data = customField.Data
+                data = customField
             });
         }
 
         [HttpPut]
         public async Task<IActionResult> Update( UpdateCustomFieldCommand command )
         {
-            var validationResult = await _updateCustomFieldCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                 return BadRequest(new 
-                {
-                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-                });
-            }
+          
 
              var response = await Mediator.Send(command);
-             if(response.IsSuccess)
-             {
+           
                  return Ok(new 
                  { 
                     StatusCode=StatusCodes.Status200OK, 
-                    message = response.Message, 
+                    message = "CustomField updated successfully", 
                     errors = "" 
                 });
-             }
             
-           
-
-            return BadRequest( new 
-            { 
-                StatusCode=StatusCodes.Status400BadRequest, 
-                message = response.Message, 
-                errors = "" 
-            }); 
         }
 
 
@@ -148,34 +97,18 @@ namespace UserManagement.API.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var command = new DeleteCustomFieldCommand { Id = id };
-             var validationResult = await  _deleteCustomFieldCommandValidator.ValidateAsync(command);
-               if (!validationResult.IsValid)
-                {
-                    return BadRequest(new 
-                {
-                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-                });
-                }
-           var updatedCustomField = await Mediator.Send(command);
+            
+            await Mediator.Send(command);
 
-           if(updatedCustomField.IsSuccess)
-           {
+          
             return Ok(new 
             { 
                 StatusCode=StatusCodes.Status200OK, 
-                message = updatedCustomField.Message, 
+                message = "CustomField deleted successfully", 
                 errors = "" 
             });
               
-           }
-
-            return BadRequest(new 
-            { 
-                StatusCode=StatusCodes.Status400BadRequest, 
-                message = updatedCustomField.Message, 
-                errors = "" 
-            });
+         
             
         }
     }

@@ -11,7 +11,7 @@ using Core.Application.Common.Interfaces;
 
 namespace Core.Application.Companies.Queries.GetCompanyAutoComplete
 {
-    public class GetCompanyAutoCompleteQueryHandler : IRequestHandler<GetCompanyAutoCompleteQuery,ApiResponseDTO<List<CompanyAutoCompleteDTO>>>
+    public class GetCompanyAutoCompleteQueryHandler : IRequestHandler<GetCompanyAutoCompleteQuery,List<CompanyAutoCompleteDTO>>
     { 
         private readonly ICompanyQueryRepository _companyRepository;
         private readonly IMapper _mapper;
@@ -24,7 +24,7 @@ namespace Core.Application.Companies.Queries.GetCompanyAutoComplete
              _mediator = mediator;
              _ipAddressService = ipAddressService;
          }  
-          public async Task<ApiResponseDTO<List<CompanyAutoCompleteDTO>>> Handle(GetCompanyAutoCompleteQuery request, CancellationToken cancellationToken)
+          public async Task<List<CompanyAutoCompleteDTO>> Handle(GetCompanyAutoCompleteQuery request, CancellationToken cancellationToken)
           {
              var groupcode = _ipAddressService.GetGroupcode();
 
@@ -33,12 +33,7 @@ namespace Core.Application.Companies.Queries.GetCompanyAutoComplete
                     var Adminresult = await _companyRepository.GetCompany_SuperAdmin(request.SearchPattern);
                     var Admincompany = _mapper.Map<List<CompanyAutoCompleteDTO>>(Adminresult);
 
-                    return new ApiResponseDTO<List<CompanyAutoCompleteDTO>>
-                   {
-                       IsSuccess = true,
-                       Message = "Success",
-                       Data = Admincompany
-                   }; 
+                    return Admincompany; 
                 }
                
             var userId = _ipAddressService.GetUserId();
@@ -53,7 +48,7 @@ namespace Core.Application.Companies.Queries.GetCompanyAutoComplete
                      module:"Company"
                  );
                  await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<CompanyAutoCompleteDTO>> { IsSuccess = true, Message = "Success", Data = company };            
+            return company;            
 
          } 
     }

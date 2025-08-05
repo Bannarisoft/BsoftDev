@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.Units.Commands.DeleteUnit
 {
-    public class DeleteUnitCommand : IRequest<ApiResponseDTO<int>>
+    public class DeleteUnitCommand : IRequest<int>
     {
             public int UnitId { get; set; }
     }

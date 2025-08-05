@@ -6,10 +6,11 @@ using Core.Application.Common.Interfaces.ICity;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
 using Core.Domain.Enums.Common;
+using FluentValidation;
 
 namespace Core.Application.City.Commands.UpdateCity
 {       
-    public class UpdateCityCommandHandler : IRequestHandler<UpdateCityCommand, ApiResponseDTO<CityDto>>
+    public class UpdateCityCommandHandler : IRequestHandler<UpdateCityCommand, CityDto>
     {
         private readonly ICityCommandRepository _cityRepository;
         private readonly ICityQueryRepository _cityQueryRepository;
@@ -23,36 +24,27 @@ namespace Core.Application.City.Commands.UpdateCity
             _cityQueryRepository = cityQueryRepository;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<CityDto>> Handle(UpdateCityCommand request, CancellationToken cancellationToken)
+        public async Task<CityDto> Handle(UpdateCityCommand request, CancellationToken cancellationToken)
         {
             var city = await _cityQueryRepository.GetByIdAsync(request.Id);
             if (city is null)
-                return new ApiResponseDTO<CityDto>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid CityID. The specified City does not exist or is inactive."
-                };
+            throw new ValidationException("Invalid CityID. The specified City does not exist or is inactive.");
+             
 
             var oldCityName = city.CityName;
             city.CityName = request.CityName;
 
             if (city is null || city.IsDeleted is Enums.IsDelete.Deleted )
             {
-                return new ApiResponseDTO<CityDto>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid CityID. The specified City does not exist or is deleted."
-                };
+                throw new ValidationException("Invalid CityID. The specified City does not exist or is deleted.");
+              
             }
 
             var stateExists = await _cityRepository.StateExistsAsync(request.StateId);
             if (!stateExists)
             {
-                return new ApiResponseDTO<CityDto>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid StateId. The specified state does not exist or is inactive."
-                };
+                throw new ValidationException("Invalid StateId. The specified state does not exist or is inactive.");
+             
             }
             if ((byte)city.IsActive != request.IsActive)
             {    
@@ -60,18 +52,12 @@ namespace Core.Application.City.Commands.UpdateCity
                 await _cityRepository.UpdateAsync(city.Id, city);
                 if (request.IsActive is 0)
                 {
-                    return new ApiResponseDTO<CityDto>
-                    {
-                        IsSuccess = true,
-                        Message = "CityCode DeActivated."
-                    };
+                    throw new ValidationException("CityCode DeActivated.");
+                   
                 }
                 else{
-                    return new ApiResponseDTO<CityDto>
-                    {
-                        IsSuccess = true,
-                        Message = "CityCode Activated."
-                    }; 
+                    throw new ValidationException("CityCode Activated.");
+                   
                 }                                     
             }
             // Check if the city name already exists in the same state
@@ -79,12 +65,9 @@ namespace Core.Application.City.Commands.UpdateCity
             if (cityExistsByName.Id !=0)
             {  
                 if ((byte)cityExistsByName.IsActive == request.IsActive)
-                {                     
-                    return new ApiResponseDTO<CityDto>
-                    {
-                        IsSuccess = false,
-                        Message = $"CityCode already exists and is {(Enums.Status) request.IsActive}."
-                    };
+                {     
+                    throw new ValidationException($"CityCode already exists and is {(Enums.Status)request.IsActive}.");                
+                
                     
                 }               
             }
@@ -106,25 +89,15 @@ namespace Core.Application.City.Commands.UpdateCity
                 await _mediator.Publish(domainEvent, cancellationToken);
                 if(updateResult>0)
                 {
-                    return new ApiResponseDTO<CityDto>
-                    {
-                        IsSuccess = true,
-                        Message = "City updated successfully.",
-                        Data = cityDto
-                    };
+                    return  cityDto;
                 }
-                return new ApiResponseDTO<CityDto>
-                {
-                    IsSuccess = false,
-                    Message = "City not updated."
-                };                
+                throw new Exception("City not updated.");
+                        
             }
             else
             {
-                return new ApiResponseDTO<CityDto>{
-                    IsSuccess = false,
-                    Message = "City not found."
-                };
+                throw new ValidationException("City not found.");
+             
             }
             
         }

@@ -10,7 +10,7 @@ using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.AdminSecuritySettings.Commands.DeleteAdminSecuritySettings
 {
-    public class DeleteAdminSecuritySettingsCommand : IRequest<ApiResponseDTO<int>> 
+    public class DeleteAdminSecuritySettingsCommand : IRequest<int>
     {
 
          public int Id { get; set; }      

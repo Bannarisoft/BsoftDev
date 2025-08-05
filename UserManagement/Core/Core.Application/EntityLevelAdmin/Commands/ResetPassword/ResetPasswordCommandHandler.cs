@@ -7,11 +7,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IUser;
 using Core.Application.Common.Utilities;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.EntityLevelAdmin.Commands.ResetPassword
 {
-    public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand, ApiResponseDTO<bool>>
+    public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand, bool>
     {
          private readonly IMediator _mediator;
         private readonly IMapper _mapper;
@@ -24,37 +25,24 @@ namespace Core.Application.EntityLevelAdmin.Commands.ResetPassword
             _userRepository = userRepository;
             _userQueryRepository = userQueryRepository;
         }
-        public async Task<ApiResponseDTO<bool>> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
         {
              
               var existingUser = await _userQueryRepository.GetByUsernameAsync(request.Email);
             if (existingUser == null)
             {
-                return new ApiResponseDTO<bool>
-                {
-                    IsSuccess = false,
-                    Message = "User not found."
-                    
-                };
+                throw new ValidationException("User not found.");
+             
             }
             _mapper.Map(request, existingUser);
 
              var RowsUpdated = await _userRepository.SetAdminPassword(request.UserId, existingUser);
              if(RowsUpdated > 0)
              {
-                 return new ApiResponseDTO<bool>
-                {
-                    IsSuccess = true,
-                    Message = "Password updated successfully."
-                    
-                };
+                 return RowsUpdated > 0;
              }
-              return new ApiResponseDTO<bool>
-                {
-                    IsSuccess = false,
-                    Message = "Password update failed."
-                    
-                };
+             throw new Exception("Password update failed.");
+          
         }
     }
 }

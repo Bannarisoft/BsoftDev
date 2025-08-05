@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.Language.Queries.GetLanguageById
 {
-    public class GetLanguageByIdQuery : IRequest<ApiResponseDTO<LanguageDTO>>
+    public class GetLanguageByIdQuery : IRequest<LanguageDTO>
     {
         public int Id { get; set; }
     }

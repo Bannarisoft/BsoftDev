@@ -7,10 +7,11 @@ using MediatR;
 using Core.Domain.Entities;
 using Core.Application.Common.HttpResponse;
 using Microsoft.Extensions.Logging;
+using FluentValidation;
 
 namespace Core.Application.AdminSecuritySettings.Commands.UpdateAdminSecuritySettings
 {
-    public class UpdateAdminSecuritySettingsCommandHandler      : IRequestHandler<UpdateAdminSecuritySettingsCommand ,ApiResponseDTO<int>>
+    public class UpdateAdminSecuritySettingsCommandHandler      : IRequestHandler<UpdateAdminSecuritySettingsCommand ,int>
     {
        public readonly IAdminSecuritySettingsCommandRepository _IAdminSecuritySettingsCommandRepository;
        private readonly IMapper _Imapper; 
@@ -28,7 +29,7 @@ namespace Core.Application.AdminSecuritySettings.Commands.UpdateAdminSecuritySet
              _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(UpdateAdminSecuritySettingsCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(UpdateAdminSecuritySettingsCommand request, CancellationToken cancellationToken)
         {
              // Fetch the existing adminSecuritySettings by ID
                 var adminSecSettings  = await _IAdminSecuritySettingsQueryRepository.GetAdminSecuritySettingsByIdAsync(request.Id);
@@ -37,11 +38,8 @@ namespace Core.Application.AdminSecuritySettings.Commands.UpdateAdminSecuritySet
                 {
                  
                    _logger.LogWarning($" Admin Settings with ID {request.Id} not found.");
-                return new ApiResponseDTO<int >
-                {
-                    IsSuccess = false,
-                    Message = "AdminSecuritySettings not found/AdminSecuritySettings is deleted "
-                };
+                   throw new ValidationException("AdminSecuritySettings not found/AdminSecuritySettings is deleted ");
+             
                 }                
               var adminsettingsentity = _Imapper.Map<Core.Domain.Entities.AdminSecuritySettings>(request);
 
@@ -50,11 +48,8 @@ namespace Core.Application.AdminSecuritySettings.Commands.UpdateAdminSecuritySet
              if (result == -1) // Entity not found
             {
                 _logger.LogWarning($"Failed to update AdminSecuritySettings with ID {request.Id }.");
-                return new ApiResponseDTO<int>
-                {
-                    IsSuccess = false,
-                    Message = "Failed to update AdminSecuritySettings"
-                };
+                throw new Exception("Failed to update AdminSecuritySettings");
+               
             }
 
             _logger.LogInformation($"AdminSecuritySettings with ID { request.Id} updated successfully.");
@@ -75,13 +70,7 @@ namespace Core.Application.AdminSecuritySettings.Commands.UpdateAdminSecuritySet
                  await _mediator.Publish(domainEvent, cancellationToken);
             _logger.LogInformation($"AuditLogsDomainEvent published for AdminSecuritySettings ID {adminSecSettings.Id}.");
 
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,
-                Message = "AdminSecuritySettings updated successfully",
-                Data=result
-               
-            };
+            return result;
 
         
         }

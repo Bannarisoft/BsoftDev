@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.Modules.Queries.GetModuleAutoComplete
 {
-    public class GetModuleAutoCompleteQueryHandler : IRequestHandler<GetModuleAutoCompleteQuery,ApiResponseDTO<List<ModuleAutoCompleteDTO>>>
+    public class GetModuleAutoCompleteQueryHandler : IRequestHandler<GetModuleAutoCompleteQuery,List<ModuleAutoCompleteDTO>>
     {
         private readonly IModuleQueryRepository _moduleQueryRepository;
         private readonly IMapper _mapper;
@@ -24,7 +24,7 @@ namespace Core.Application.Modules.Queries.GetModuleAutoComplete
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<List<ModuleAutoCompleteDTO>>> Handle(GetModuleAutoCompleteQuery request, CancellationToken cancellationToken)
+        public async Task<List<ModuleAutoCompleteDTO>> Handle(GetModuleAutoCompleteQuery request, CancellationToken cancellationToken)
         {
              
              
@@ -39,7 +39,7 @@ namespace Core.Application.Modules.Queries.GetModuleAutoComplete
                     module:"Module"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<ModuleAutoCompleteDTO>> { IsSuccess = true, Message = "Success", Data = module };  
+            return module;  
         }
     }
 }

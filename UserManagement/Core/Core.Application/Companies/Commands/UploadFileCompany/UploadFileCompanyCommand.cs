@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Core.Application.Companies.Commands.UploadFileCompany
 {
-    public class UploadFileCompanyCommand : IRequest<ApiResponseDTO<GetCompanyDTO>>
+    public class UploadFileCompanyCommand : IRequest<GetCompanyDTO>
     {
         public IFormFile? File { get; set; }
     }

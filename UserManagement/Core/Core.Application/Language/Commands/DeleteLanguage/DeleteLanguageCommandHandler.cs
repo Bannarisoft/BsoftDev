@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.Language.Commands.DeleteLanguage
 {
-    public class DeleteLanguageCommandHandler : IRequestHandler<DeleteLanguageCommand, ApiResponseDTO<bool>>
+    public class DeleteLanguageCommandHandler : IRequestHandler<DeleteLanguageCommand, bool>
     {
         private readonly ILanguageCommand _languageCommand;
         private readonly IMediator _mediator;
@@ -25,7 +25,7 @@ namespace Core.Application.Language.Commands.DeleteLanguage
             _mapper = mapper;
         }
 
-        public async Task<ApiResponseDTO<bool>> Handle(DeleteLanguageCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DeleteLanguageCommand request, CancellationToken cancellationToken)
         {
             
             var language  = _mapper.Map<Core.Domain.Entities.Language>(request);
@@ -46,10 +46,10 @@ namespace Core.Application.Language.Commands.DeleteLanguage
                     );               
                     await _mediator.Publish(domainEvent, cancellationToken); 
 
-                    return new ApiResponseDTO<bool>{IsSuccess = true, Message = "Language deleted successfully."};
+                    return languageresult;
                 }
-
-                return new ApiResponseDTO<bool>{IsSuccess = false, Message = "Language not deleted."};
+                throw new Exception("Language not deleted.");
+                
         }
     }
 }

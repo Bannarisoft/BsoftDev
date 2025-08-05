@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Core.Application.Entity.Commands.CreateEntity
 {
-    public class CreateEntityCommand :IRequest<ApiResponseDTO<int>> 
+    public class CreateEntityCommand :IRequest<int>
     {
 
     public string? EntityName { get; set; }

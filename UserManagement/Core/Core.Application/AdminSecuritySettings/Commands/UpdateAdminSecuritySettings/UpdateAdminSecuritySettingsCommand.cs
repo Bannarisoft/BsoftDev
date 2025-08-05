@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Core.Application.AdminSecuritySettings.Commands.UpdateAdminSecuritySettings
 {
-    public class UpdateAdminSecuritySettingsCommand :  IRequest<ApiResponseDTO<int>> 
+    public class UpdateAdminSecuritySettingsCommand :  IRequest<int>
     {
          public int Id { get; set; }
     public int PasswordHistoryCount { get; set; }

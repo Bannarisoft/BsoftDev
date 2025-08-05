@@ -14,20 +14,11 @@ namespace UserManagement.API.Controllers
     [Route("api/[controller]")]
     
     public class CountryController : ApiControllerBase
-    {
-         private readonly IValidator<CreateCountryCommand> _createCountryCommandValidator;
-         private readonly IValidator<UpdateCountryCommand> _updateCountryCommandValidator;  
-         private readonly IValidator<DeleteCountryCommand> _deleteCountryCommandValidator;       
+    {      
          
-       public CountryController(ISender mediator, 
-                             IValidator<CreateCountryCommand> createCountryCommandValidator, 
-                             IValidator<UpdateCountryCommand> updateCountryCommandValidator, 
-                             IValidator<DeleteCountryCommand> deleteCountryCommandValidator) 
+       public CountryController(ISender mediator) 
          : base(mediator)
-        {        
-            _createCountryCommandValidator = createCountryCommandValidator;    
-            _updateCountryCommandValidator = updateCountryCommandValidator;   
-            _deleteCountryCommandValidator = deleteCountryCommandValidator;              
+        {                  
         }
         [HttpGet]        
         public async Task<IActionResult> GetAllCountriesAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
@@ -63,63 +54,32 @@ namespace UserManagement.API.Controllers
                 });
             }            
             var result = await Mediator.Send(new GetCountryByIdQuery { Id = id });            
-            if (!result.IsSuccess)
-            {                
-                return NotFound(new 
-                { 
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message
-                });
-            }
+         
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                data = result.Data
+                data = result
             });
         }
         [HttpPost]          
         public async Task<IActionResult> CreateAsync(CreateCountryCommand  command)
         { 
-            var validationResult = await _createCountryCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {   
-                    StatusCode=StatusCodes.Status400BadRequest,
-                    message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }                    
+                             
             var result = await Mediator.Send(command);
-            if (result.IsSuccess)
-            {
+           
                 return Ok(new 
                 { 
                     StatusCode=StatusCodes.Status201Created,
-                    message = result.Message, 
-                    data = result.Data
+                    message = "Country Created Successfully", 
+                    data = result
                 });
-            }                      
-            return BadRequest(new 
-            { 
-                StatusCode=StatusCodes.Status400BadRequest,
-                message = result.Message 
-            });
+           
                        
         }
         [HttpPut]      
         public async Task<IActionResult> UpdateAsync( UpdateCountryCommand command)
         {
-            var validationResult = await _updateCountryCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
+            
             if (command.Id<=0)
             {
                 return BadRequest(new
@@ -129,37 +89,21 @@ namespace UserManagement.API.Controllers
                 });
             }        
             var result = await Mediator.Send(command);
-            if (result.IsSuccess)
-            {
+           
                 return Ok(new 
                 { 
                     StatusCode=StatusCodes.Status201Created,
-                    message = result.Message, 
-                    data = result.Data 
+                    message = "Country Updated Successfully", 
+                    data = result 
                 });
-            }
-            else
-            {            
-                return BadRequest(new 
-                { 
-                    StatusCode=StatusCodes.Status400BadRequest,
-                    message = result.Message 
-                });
-            }
+            
+           
         }
         [HttpDelete("{id}")]   
         public async Task<IActionResult> DeleteAsync(int id)
         {
              var command = new DeleteCountryCommand { Id = id };
-             var validationResult = await  _deleteCountryCommandValidator.ValidateAsync(command);
-               if (!validationResult.IsValid)
-                {
-                    return BadRequest(new
-                    {
-                        message = validationResult.Errors.Select(e => e.ErrorMessage).FirstOrDefault(),
-                        statusCode = StatusCodes.Status400BadRequest
-                    });
-                } 
+           
             if (id <= 0)
             {
                 return BadRequest(new
@@ -168,20 +112,13 @@ namespace UserManagement.API.Controllers
                     message = "Invalid Country ID"
                 });
             }            
-              var result = await Mediator.Send(command);                 
-            if (!result.IsSuccess)
-            {                
-                return NotFound(new 
-                { 
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message
-                });
-            }
+               await Mediator.Send(command);                 
+         
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
                 data =$"Country ID {id} Deleted" ,
-                message = result.Message
+                message = "Country Deleted Successfully"
             });
         }
 
@@ -189,20 +126,12 @@ namespace UserManagement.API.Controllers
         public async Task<IActionResult> GetCountry([FromQuery] string? name)
         {
             var result = await Mediator.Send(new GetCountryAutoCompleteQuery { SearchPattern = name });
-            if (!result.IsSuccess)
-            {
-                return NotFound(new 
-                { 
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message,
-                    data = result.Data
-                 }); 
-            }
+       
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                message = result.Message,
-                data = result.Data
+                message = "Country List",
+                data = result
             });
         } 
     }

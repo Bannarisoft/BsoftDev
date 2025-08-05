@@ -6,11 +6,12 @@ using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.ILanguage;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.Language.Commands.UpdateLanguage
 {
-    public class UpdateLanguageCommandHandler : IRequestHandler<UpdateLanguageCommand, ApiResponseDTO<bool>>
+    public class UpdateLanguageCommandHandler : IRequestHandler<UpdateLanguageCommand, bool>
     {
         private readonly ILanguageCommand _languageCommand;
         private readonly IMapper _imapper;
@@ -25,13 +26,14 @@ namespace Core.Application.Language.Commands.UpdateLanguage
             _languageQuery = languageQuery;
         }
 
-        public async Task<ApiResponseDTO<bool>> Handle(UpdateLanguageCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(UpdateLanguageCommand request, CancellationToken cancellationToken)
         {
             var existingLanguage = await _languageQuery.GetByLanguagenameAsync(request.Name, request.Id);
 
             if (existingLanguage != null)
             {
-                return new ApiResponseDTO<bool>{IsSuccess = false, Message = "Language already exists"};
+                throw new ValidationException("Language already exists");
+                
             }
             var language  = _imapper.Map<Core.Domain.Entities.Language>(request);
          
@@ -51,10 +53,9 @@ namespace Core.Application.Language.Commands.UpdateLanguage
                     );               
                     await _mediator.Publish(domainEvent, cancellationToken); 
 
-                    return new ApiResponseDTO<bool>{IsSuccess = true, Message = "Language updated successfully."};
+                    return languageresult;
                 }
-
-                return new ApiResponseDTO<bool>{IsSuccess = false, Message = "Language not updated."};
+            throw new Exception("Language not updated.");
         }
     }
 }

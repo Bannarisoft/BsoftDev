@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Core.Application.Entity.Commands.DeleteEntity
 {
-    public class DeleteEntityCommand : IRequest<ApiResponseDTO<int>> 
+    public class DeleteEntityCommand : IRequest<int>
     {
         public int EntityId { get; set; }
     

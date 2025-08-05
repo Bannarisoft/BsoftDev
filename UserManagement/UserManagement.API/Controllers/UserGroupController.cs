@@ -14,20 +14,11 @@ namespace UserManagement.API.Controllers
     [Microsoft.AspNetCore.Components.Route("api/[controller]")]
 
     public class UserGroupController  : ApiControllerBase
-    {
-         private readonly IValidator<CreateUserGroupCommand> _createUserGroupCommandValidator;
-         private readonly IValidator<UpdateUserGroupCommand> _updateUserGroupCommandValidator;  
-         private readonly IValidator<DeleteUserGroupCommand> _deleteUserGroupCommandValidator;   
-         public UserGroupController(ISender mediator,   
-                    IValidator<CreateUserGroupCommand> createUserGroupCommandValidator, 
-                    IValidator<UpdateUserGroupCommand> updateUserGroupCommandValidator, 
-                    IValidator<DeleteUserGroupCommand> deleteUserGroupCommandValidator
+    { 
+         public UserGroupController(ISender mediator
                 ) 
          : base(mediator)
         {        
-            _createUserGroupCommandValidator = createUserGroupCommandValidator;    
-            _updateUserGroupCommandValidator = updateUserGroupCommandValidator;   
-            _deleteUserGroupCommandValidator = deleteUserGroupCommandValidator; 
         }
            [HttpGet]        
         public async Task<IActionResult> GetAllCountriesAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
@@ -63,63 +54,32 @@ namespace UserManagement.API.Controllers
                 });
             }            
             var result = await Mediator.Send(new GetUserGroupByIdQuery { Id = id });            
-            if (!result.IsSuccess)
-            {                
-                return NotFound(new 
-                { 
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message
-                });
-            }
+          
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                data = result.Data
+                data = result
             });
         }
         [HttpPost]          
         public async Task<IActionResult> CreateAsync(CreateUserGroupCommand  command)
         { 
-            var validationResult = await _createUserGroupCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {   
-                    StatusCode=StatusCodes.Status400BadRequest,
-                    message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }                    
+                             
             var result = await Mediator.Send(command);
-            if (result.IsSuccess)
-            {
+           
                 return Ok(new 
                 { 
                     StatusCode=StatusCodes.Status201Created,
-                    message = result.Message, 
-                    data = result.Data
+                    message = "UserGroup created successfully", 
+                    data = result
                 });
-            }                      
-            return BadRequest(new 
-            { 
-                StatusCode=StatusCodes.Status400BadRequest,
-                message = result.Message 
-            });
+           
                        
         }
         [HttpPut]      
         public async Task<IActionResult> UpdateAsync( UpdateUserGroupCommand command)
         {
-            var validationResult = await _updateUserGroupCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
+           
             if (command.Id<=0)
             {
                 return BadRequest(new
@@ -129,37 +89,20 @@ namespace UserManagement.API.Controllers
                 });
             }        
             var result = await Mediator.Send(command);
-            if (result.IsSuccess)
-            {
+          
                 return Ok(new 
                 { 
                     StatusCode=StatusCodes.Status201Created,
-                    message = result.Message, 
-                    data = result.Data 
+                    message = "UserGroup updated successfully", 
+                    data = result 
                 });
-            }
-            else
-            {            
-                return BadRequest(new 
-                { 
-                    StatusCode=StatusCodes.Status400BadRequest,
-                    message = result.Message 
-                });
-            }
+           
         }
         [HttpDelete("{id}")]   
         public async Task<IActionResult> DeleteAsync(int id)
         {
              var command = new DeleteUserGroupCommand { Id = id };
-             var validationResult = await  _deleteUserGroupCommandValidator.ValidateAsync(command);
-               if (!validationResult.IsValid)
-                {
-                    return BadRequest(new
-                    {
-                        message = validationResult.Errors.Select(e => e.ErrorMessage).FirstOrDefault(),
-                        statusCode = StatusCodes.Status400BadRequest
-                    });
-                } 
+          
             if (id <= 0)
             {
                 return BadRequest(new
@@ -168,20 +111,13 @@ namespace UserManagement.API.Controllers
                     message = "Invalid Country ID"
                 });
             }            
-              var result = await Mediator.Send(command);                 
-            if (!result.IsSuccess)
-            {                
-                return NotFound(new 
-                { 
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message
-                });
-            }
+               await Mediator.Send(command);                 
+           
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
                 data =$"Country ID {id} Deleted" ,
-                message = result.Message
+                message = "Country Deleted Successfully"
             });
         }
 
@@ -189,20 +125,12 @@ namespace UserManagement.API.Controllers
         public async Task<IActionResult> GetUserGroup([FromQuery] string? name)
         {
             var result = await Mediator.Send(new GetUserGroupAutoCompleteQuery { SearchPattern = name });
-            if (!result.IsSuccess)
-            {
-                return NotFound(new 
-                { 
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message,
-                    data = result.Data
-                 }); 
-            }
+         
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                message = result.Message,
-                data = result.Data
+                message = "Country List",
+                data = result
             });
         } 
     }

@@ -18,13 +18,11 @@ namespace UserManagement.API.Controllers
     [Route("api/[controller]")]
     public class LanguageController : ApiControllerBase
     {
-        private readonly IValidator<CreateLanguageCommand> _createLanguageCommandValidator;
-        private readonly IValidator<UpdateLanguageCommand> _updateLanguageCommandValidator;
-        public LanguageController(ISender mediator, IValidator<CreateLanguageCommand> createLanguageCommandValidator, IValidator<UpdateLanguageCommand> updateLanguageCommandValidator) 
+       
+        public LanguageController(ISender mediator
+       ) 
         : base(mediator)
         {
-            _createLanguageCommandValidator = createLanguageCommandValidator;
-            _updateLanguageCommandValidator = updateLanguageCommandValidator;
         }
           [HttpGet]
         public async Task<IActionResult> GetAllLanguagesAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
@@ -51,24 +49,11 @@ namespace UserManagement.API.Controllers
         public async Task<IActionResult> CreateAsync(CreateLanguageCommand command)
         {
             
-            var validationResult = await _createLanguageCommandValidator.ValidateAsync(command);
-            
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new 
-                {
-                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-                });
-            }
+           
             var response = await Mediator.Send(command);
-            if(response.IsSuccess)
-            {
-                return Ok(new { StatusCode=StatusCodes.Status201Created, message = response.Message, errors = "", data = response.Data });
-            }
-             
-
-            return BadRequest( new { StatusCode=StatusCodes.Status400BadRequest, message = response.Message, errors = "" }); 
+           
+                return Ok(new { StatusCode=StatusCodes.Status201Created, message = "Language created successfully", errors = "", data = response });
+  
             
         }
          [HttpGet("{id}")]
@@ -78,22 +63,13 @@ namespace UserManagement.API.Controllers
            
             var language = await Mediator.Send(new GetLanguageByIdQuery() { Id = id});
           
-             if(language == null)
-            {
-                return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = $"Language ID {id} not found.", errors = "" });
-            }
-            return Ok(new { StatusCode=StatusCodes.Status200OK, data = language.Data});
+            return Ok(new { StatusCode=StatusCodes.Status200OK, data = language});
         }
 
         [HttpPut]
         public async Task<IActionResult> Update( UpdateLanguageCommand command )
         {
             
-            var validationResult = await _updateLanguageCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(validationResult.Errors);
-            }
           
 
              var languageExists = await Mediator.Send(new GetLanguageByIdQuery { Id = command.Id });
@@ -103,15 +79,11 @@ namespace UserManagement.API.Controllers
                  return NotFound(new { StatusCode=StatusCodes.Status404NotFound, message = $"Language ID {command.Id} not found.", errors = "" }); 
              }
 
-             var response = await Mediator.Send(command);
-             if(response.IsSuccess)
-             {
-                 return Ok(new { StatusCode=StatusCodes.Status200OK, message = response.Message, errors = "" });
-             }
+              await Mediator.Send(command);
             
-           
-
-            return BadRequest( new { StatusCode=StatusCodes.Status400BadRequest, message = response.Message, errors = "" }); 
+                 return Ok(new { StatusCode=StatusCodes.Status200OK, message = "Language updated successfully", errors = "" });
+             
+            
         }
 
 
@@ -120,15 +92,11 @@ namespace UserManagement.API.Controllers
         public async Task<IActionResult> Delete(int id)
         {
            
-           var updatedLanguage = await Mediator.Send(new DeleteLanguageCommand { Id = id });
+            await Mediator.Send(new DeleteLanguageCommand { Id = id });
 
-           if(updatedLanguage.IsSuccess)
-           {
-            return Ok(new { StatusCode=StatusCodes.Status200OK, message = updatedLanguage.Message, errors = "" });
-              
-           }
-
-            return BadRequest(new { StatusCode=StatusCodes.Status400BadRequest, message = updatedLanguage.Message, errors = "" });
+          
+            return Ok(new { StatusCode=StatusCodes.Status200OK, message = "Language deleted successfully", errors = "" });
+          
             
         }
          [HttpGet("by-name")]
@@ -136,7 +104,7 @@ namespace UserManagement.API.Controllers
         {
            
             var languages = await Mediator.Send(new GetLanguageAutoCompleteQuery {SearchPattern = name});
-            return Ok( new { StatusCode=StatusCodes.Status200OK, data = languages.Data });
+            return Ok( new { StatusCode=StatusCodes.Status200OK, data = languages });
         }
       
     }

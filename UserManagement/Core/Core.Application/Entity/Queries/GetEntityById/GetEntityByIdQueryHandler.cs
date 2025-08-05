@@ -9,10 +9,11 @@ using Core.Domain.Events;
 
 using Core.Application.Common.HttpResponse;
 using Microsoft.Extensions.Logging;
+using FluentValidation;
 
 namespace Core.Application.Entity.Queries.GetEntityById
 {
-    public class GetEntityByIdQueryHandler : IRequestHandler<GetEntityByIdQuery, ApiResponseDTO<GetEntityDTO>>
+    public class GetEntityByIdQueryHandler : IRequestHandler<GetEntityByIdQuery, GetEntityDTO>
     {
         private readonly IEntityQueryRepository _entityRepository;        
         private readonly IMapper _mapper;
@@ -28,7 +29,7 @@ namespace Core.Application.Entity.Queries.GetEntityById
          
     }
 
-    public async Task<ApiResponseDTO<GetEntityDTO>>  Handle(GetEntityByIdQuery request, CancellationToken cancellationToken)
+    public async Task<GetEntityDTO>  Handle(GetEntityByIdQuery request, CancellationToken cancellationToken)
     {
                 _logger.LogInformation($"Fetching Entity Request started: {request.EntityId}");
                  var entitylist = await _entityRepository.GetByIdAsync(request.EntityId);
@@ -36,11 +37,8 @@ namespace Core.Application.Entity.Queries.GetEntityById
                 if (entitylist is null)
                 {
                      _logger.LogWarning($"No Entity Record {request.EntityId} not found in DB.");
-                     return new ApiResponseDTO<GetEntityDTO>
-                     {
-                         IsSuccess = false,
-                         Message = "Entity not found"
-                     };
+                     throw new ValidationException("Entity not found");
+                    
                 }
                 var entityDto = _mapper.Map<GetEntityDTO>(entitylist);
                 //Domain Event
@@ -53,12 +51,7 @@ namespace Core.Application.Entity.Queries.GetEntityById
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
                 _logger.LogInformation($"Entity {entityDto.EntityName} Listed successfully.");
-                return new ApiResponseDTO<GetEntityDTO>
-                {
-                    IsSuccess = true,
-                    Message = "Entity Fetched Successfully",
-                    Data = entityDto
-                };
+                return entityDto;
       
  
      }

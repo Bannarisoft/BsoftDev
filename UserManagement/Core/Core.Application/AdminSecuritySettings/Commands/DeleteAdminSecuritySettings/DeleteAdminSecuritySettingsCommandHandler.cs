@@ -12,11 +12,12 @@ using Core.Application.Common.Interfaces.IAdminSecuritySettings;
 using System.Threading;
 using Core.Application.Common.HttpResponse;
 using Microsoft.Extensions.Logging;
+using FluentValidation;
 
 
 namespace Core.Application.AdminSecuritySettings.Commands.DeleteAdminSecuritySettings
 {
-    public class DeleteAdminSecuritySettingsCommandHandler  : IRequestHandler< DeleteAdminSecuritySettingsCommand  ,ApiResponseDTO<int>>
+    public class DeleteAdminSecuritySettingsCommandHandler  : IRequestHandler< DeleteAdminSecuritySettingsCommand  ,int>
     {
           private readonly IAdminSecuritySettingsCommandRepository _IadminSecuritySettingsCommandRepository;  
        private readonly IMapper _Imapper;          
@@ -36,7 +37,7 @@ namespace Core.Application.AdminSecuritySettings.Commands.DeleteAdminSecuritySet
 
       }
 
-     public async Task<ApiResponseDTO<int>> Handle(DeleteAdminSecuritySettingsCommand deleteAdminSecuritySettingsCommand, CancellationToken cancellationToken)
+     public async Task<int> Handle(DeleteAdminSecuritySettingsCommand deleteAdminSecuritySettingsCommand, CancellationToken cancellationToken)
       {       
 
           _logger.LogInformation($"DeleteAdmin SecuritySettingsCommandHandler started for Admin Security Settings ID: {deleteAdminSecuritySettingsCommand.Id}");
@@ -46,12 +47,8 @@ namespace Core.Application.AdminSecuritySettings.Commands.DeleteAdminSecuritySet
             if (adminSecuritySettings is null)
             {
                 _logger.LogWarning($"Admin Security Settings with ID { deleteAdminSecuritySettingsCommand.Id} not found.");
-                return new ApiResponseDTO<int>
-                {
-                    IsSuccess = false,
-                    Message = "Admin Security Settings not found",
-                    Data = 0
-                };
+                throw new ValidationException("Admin Security Settings not found");
+                
             }
 
               _logger.LogInformation($"Admin Security Settings with ID { deleteAdminSecuritySettingsCommand.Id} found. Proceeding with deletion.");
@@ -63,12 +60,7 @@ namespace Core.Application.AdminSecuritySettings.Commands.DeleteAdminSecuritySet
             if (result <= 0)
             {
                 _logger.LogWarning($"Failed to delete Admin Security Settings with ID { deleteAdminSecuritySettingsCommand.Id}.");
-                return new ApiResponseDTO<int>
-                {
-                    IsSuccess = false,
-                    Message = "Failed to delete Admin Security Settings",
-                    Data = result
-                };
+                return result;
             }
 
             _logger.LogInformation($"Admin Security Settings with ID { deleteAdminSecuritySettingsCommand.Id} deleted successfully.");
@@ -85,12 +77,7 @@ namespace Core.Application.AdminSecuritySettings.Commands.DeleteAdminSecuritySet
             await _mediator.Publish(domainEvent, cancellationToken);
             _logger.LogInformation($"AuditLogsDomainEvent published for Admin Security Settings ID { deleteAdminSecuritySettingsCommand.Id}.");
 
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,
-                Message = "Admin Security Settings deleted successfully",
-                Data = result
-            };  
+            return result;  
    
       }
 

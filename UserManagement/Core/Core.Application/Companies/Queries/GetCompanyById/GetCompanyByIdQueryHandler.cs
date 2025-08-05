@@ -15,7 +15,7 @@ using Core.Domain.Events;
 
 namespace Core.Application.Companies.Queries.GetCompanyById
 {
-    public class GetCompanyByIdQueryHandler : IRequestHandler<GetCompanyByIdQuery,ApiResponseDTO<GetByIdDTO>>
+    public class GetCompanyByIdQueryHandler : IRequestHandler<GetCompanyByIdQuery,GetByIdDTO>
     {
           private readonly ICompanyQueryRepository _companyRepository;
         private readonly IMapper _mapper;
@@ -26,7 +26,7 @@ namespace Core.Application.Companies.Queries.GetCompanyById
              _mapper =mapper;
              _mediator = mediator;
         } 
-        public async Task<ApiResponseDTO<GetByIdDTO>> Handle(GetCompanyByIdQuery request, CancellationToken cancellationToken)
+        public async Task<GetByIdDTO> Handle(GetCompanyByIdQuery request, CancellationToken cancellationToken)
         {
            
             var result = await _companyRepository.GetByIdAsync(request.CompanyId);
@@ -47,7 +47,7 @@ namespace Core.Application.Companies.Queries.GetCompanyById
                      module:"Company"
                  );
                  await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<GetByIdDTO> { IsSuccess = true, Message = "Success", Data = company };
+            return company;
         }
     }
 }

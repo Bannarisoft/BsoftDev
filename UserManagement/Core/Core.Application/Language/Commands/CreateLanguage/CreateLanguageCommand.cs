@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.Language.Commands.CreateLanguage
 {
-    public class CreateLanguageCommand : IRequest<ApiResponseDTO<LanguageDTO>>
+    public class CreateLanguageCommand : IRequest<LanguageDTO>
     {
         public string Code { get; set; }
         public string Name { get; set; }

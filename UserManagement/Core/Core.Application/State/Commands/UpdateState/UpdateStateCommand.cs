@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.State.Commands.UpdateState
 {
-       public class UpdateStateCommand : IRequest<ApiResponseDTO<StateDto>>
+       public class UpdateStateCommand : IRequest<bool>
        {
               public int Id { get; set; }
               public string? StateCode { get; set; }

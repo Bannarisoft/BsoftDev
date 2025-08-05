@@ -16,91 +16,56 @@ namespace UserManagement.API.Controllers
     [Route("api/[controller]")]
     public class AdminController : ApiControllerBase
     {
-        private readonly IValidator<ResetPasswordCommand> _setAdminPasswordCommandValidator;
-        public AdminController(ISender mediator, IValidator<ResetPasswordCommand> setAdminPasswordCommandValidator) 
+        
+        public AdminController(ISender mediator) 
         : base(mediator)
         {
-            _setAdminPasswordCommandValidator = setAdminPasswordCommandValidator;
+            
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateEntityLevelAdminCommand command)
         {
             
-            var response = await Mediator.Send(command);
-            if(response.IsSuccess)
-            {
+                 await Mediator.Send(command);
+         
                 return Ok(new 
                 { 
                     StatusCode=StatusCodes.Status201Created, 
-                    message = response.Message
+                    message = "Admin created successfully",
                 });
-            }
-             
-
-            return BadRequest(new 
-            { 
-                StatusCode=StatusCodes.Status400BadRequest, 
-                message = response.Message, 
-                errors = "" 
-            }); 
+           
             
         }
+
          [HttpPost("SendOTP")]
         public async Task<IActionResult> SendOTP(SendOTPCommand command)
         {
              
             var response = await Mediator.Send(command);
-            if(response.IsSuccess)
-            {
+           
                 return Ok(new 
                 { 
                     StatusCode=StatusCodes.Status200OK, 
-                    message = response.Message,
-                    data =response.Data
+                    message = "OTP sent successfully",
+                    data =response
                 });
-            }
-             
-
-            return BadRequest(new 
-            { 
-                StatusCode=StatusCodes.Status400BadRequest, 
-                message = response.Message, 
-                errors = "" 
-            }); 
+          
             
         }
          [HttpPut("SetAdminPassword")]
         public async Task<IActionResult> SetAdminPassword(ResetPasswordCommand command)
         {
-              var validationResult = await _setAdminPasswordCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new 
-                { 
-                    StatusCode=StatusCodes.Status400BadRequest, 
-                    message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-                });
-            }
+          
             
-            var response = await Mediator.Send(command);
-            if(response.IsSuccess)
-            {
+             await Mediator.Send(command);
+       
                 return Ok(new 
                 { 
                     StatusCode=StatusCodes.Status200OK, 
-                    message = response.Message
+                    message = "Password reset successfully",
                 });
-            }
-             
-
-            return BadRequest(new 
-            { 
-                StatusCode=StatusCodes.Status400BadRequest, 
-                message = response.Message, 
-                errors = "" 
-            }); 
+           
             
         }
     }

@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.Menu.Queries.GetParentMenu
 {
-    public class GetParentMenuQuery : IRequest<ApiResponseDTO<List<ParentMenuDto>>>
+    public class GetParentMenuQuery : IRequest<List<ParentMenuDto>>
     {
         public string? SearchPattern { get; set; }
     }

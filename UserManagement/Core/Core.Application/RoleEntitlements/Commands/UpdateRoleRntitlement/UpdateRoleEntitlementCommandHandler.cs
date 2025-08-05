@@ -14,7 +14,7 @@ using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement
 {
-    public class UpdateRoleEntitlementCommandHandler : IRequestHandler<UpdateRoleEntitlementCommand, ApiResponseDTO<bool>>
+    public class UpdateRoleEntitlementCommandHandler : IRequestHandler<UpdateRoleEntitlementCommand, bool>
     {
      private readonly IRoleEntitlementCommandRepository _roleEntitlementCommanderepository;
      private readonly IRoleEntitlementQueryRepository _roleEntitlementQueryrepository;
@@ -33,7 +33,7 @@ namespace Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement
 
     }
 
-    public async Task<ApiResponseDTO<bool>> Handle(UpdateRoleEntitlementCommand request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(UpdateRoleEntitlementCommand request, CancellationToken cancellationToken)
     {
         
         var roleId = request.RoleId;
@@ -66,11 +66,8 @@ namespace Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement
 
         if (!role)
         {
-            return new ApiResponseDTO<bool>
-            {
-                IsSuccess = false,
-                Message = "Role entitlements update failed."
-            };
+            throw new Exception("Role entitlements update failed.");
+           
         }
         var domainEvent = new AuditLogsDomainEvent(
             actionDetail: "Update",
@@ -81,11 +78,7 @@ namespace Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement
         );
         await _mediator.Publish(domainEvent, cancellationToken);
 
-        return new ApiResponseDTO<bool>
-        {
-            IsSuccess = true,
-            Message = "Role entitlements updated successfully."
-        };
+        return true;
   
     }
     }

@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.CompanySettings.Commands.CreateCompanySettings
 {
-    public class CreateCompanySettingsCommandHandler : IRequestHandler<CreateCompanySettingsCommand, ApiResponseDTO<int>>
+    public class CreateCompanySettingsCommandHandler : IRequestHandler<CreateCompanySettingsCommand, int>
     {
         private readonly ICompanyCommandSettings _icompanyCommandSettings;
         private readonly IMediator _mediator;
@@ -21,7 +21,7 @@ namespace Core.Application.CompanySettings.Commands.CreateCompanySettings
             _mediator = mediator;
             _imapper = imapper;
         }
-        public async Task<ApiResponseDTO<int>> Handle(CreateCompanySettingsCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateCompanySettingsCommand request, CancellationToken cancellationToken)
         {
             var companySettings = _imapper.Map<Core.Domain.Entities.CompanySettings>(request);
             
@@ -38,9 +38,10 @@ namespace Core.Application.CompanySettings.Commands.CreateCompanySettings
                  );
                  await _mediator.Publish(domainEvent, cancellationToken);
                  
-                return new ApiResponseDTO<int>{IsSuccess = true, Message = "Company Settings created successfully", Data = CompanySettingsId};
+                return CompanySettingsId;
             }
-            return new ApiResponseDTO<int>{IsSuccess = false, Message = "Company Settings not created"};
+            throw new Exception("Company Settings not created");
+            
         }
     }
 }

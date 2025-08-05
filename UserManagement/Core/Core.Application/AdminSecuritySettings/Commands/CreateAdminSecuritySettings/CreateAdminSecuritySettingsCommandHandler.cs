@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Application.AdminSecuritySettings.Commands.CreateAdminSecuritySettings
 {
-    public class CreateAdminSecuritySettingsCommandHandler  :IRequestHandler<CreateAdminSecuritySettingsCommand, ApiResponseDTO<int>>
+    public class CreateAdminSecuritySettingsCommandHandler  :IRequestHandler<CreateAdminSecuritySettingsCommand, int>
     {
         private readonly IAdminSecuritySettingsCommandRepository _adminSecuritySettingsCommandRepository;
         private readonly IMapper _mapper;
@@ -30,7 +30,7 @@ namespace Core.Application.AdminSecuritySettings.Commands.CreateAdminSecuritySet
             _logger=logger;
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(CreateAdminSecuritySettingsCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateAdminSecuritySettingsCommand request, CancellationToken cancellationToken)
         {        
              _logger.LogInformation("Processing CreateAdminSecuritySettingsCommand request.");
 
@@ -58,12 +58,7 @@ namespace Core.Application.AdminSecuritySettings.Commands.CreateAdminSecuritySet
                 _logger.LogDebug("Mapped AdminSecuritySettings entity to AdminSecuritySettingsDto.");
 
             
-                 return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,
-                Message = "AdminSecuritySettings created successfully",
-                Data = AdminSettingsDto.Id
-            };
+                 return  AdminSettingsDto.Id;
     
        
        

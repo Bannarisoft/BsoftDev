@@ -9,10 +9,11 @@ using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IDivision;
 using Core.Application.Common.HttpResponse;
 using Core.Domain.Events;
+using FluentValidation;
 
 namespace Core.Application.Divisions.Commands.CreateDivision
 {
-    public class CreateDivisionCommandHandler : IRequestHandler<CreateDivisionCommand, ApiResponseDTO<DivisionDTO>>
+    public class CreateDivisionCommandHandler : IRequestHandler<CreateDivisionCommand, DivisionDTO>
     {
          private readonly IDivisionCommandRepository _divisionRepository;
         private readonly IMapper _imapper;
@@ -27,13 +28,14 @@ namespace Core.Application.Divisions.Commands.CreateDivision
             _divisionQueryRepository = divisionQueryRepository;
         }
 
-        public async Task<ApiResponseDTO<DivisionDTO>> Handle(CreateDivisionCommand request, CancellationToken cancellationToken)
+        public async Task<DivisionDTO> Handle(CreateDivisionCommand request, CancellationToken cancellationToken)
         {
               var existingDivision = await _divisionQueryRepository.GetByDivisionnameAsync(request.Name);
 
                if (existingDivision != null)
                {
-                   return new ApiResponseDTO<DivisionDTO>{IsSuccess = false, Message = "Division already exists"};
+                throw new ValidationException("Division already exists");
+                   
                }
            
                  var division  = _imapper.Map<Division>(request);
@@ -52,10 +54,10 @@ namespace Core.Application.Divisions.Commands.CreateDivision
                  );
                  await _mediator.Publish(domainEvent, cancellationToken);
                  
-                    return new ApiResponseDTO<DivisionDTO>{IsSuccess = true, Message = "Division created successfully", Data = divisionMap};
+                    return divisionMap;
                 }
-               
-                    return new ApiResponseDTO<DivisionDTO>{IsSuccess = false, Message = "Division not created"};
+               throw new Exception("Division not created");
+                    
            
         }
     }

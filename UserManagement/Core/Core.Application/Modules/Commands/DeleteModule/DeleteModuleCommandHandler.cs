@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Application.Modules.Commands.DeleteModule
 {
-    public class DeleteModuleCommandHandler  : IRequestHandler<DeleteModuleCommand,ApiResponseDTO<bool>>
+    public class DeleteModuleCommandHandler  : IRequestHandler<DeleteModuleCommand,bool>
     {
         private readonly IModuleCommandRepository _moduleRepository;
         private readonly IModuleQueryRepository _moduleQueryRepository;
@@ -26,7 +26,7 @@ namespace Core.Application.Modules.Commands.DeleteModule
 
     }
 
-    public async Task<ApiResponseDTO<bool>> Handle(DeleteModuleCommand request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(DeleteModuleCommand request, CancellationToken cancellationToken)
     {
         if (request == null)
         {
@@ -39,23 +39,15 @@ namespace Core.Application.Modules.Commands.DeleteModule
             if (module == null || module.IsDeleted)
             {
                 _logger.LogWarning("Module with ID {ModuleId} not found or already deleted.", request.ModuleId);
-                return new ApiResponseDTO<bool>
-                {
-                    IsSuccess = false,
-                    Message = "Module not found or already deleted.",
-                };
+                throw new ValidationException("Module not found or already deleted.");
+               
             }
 
         await _moduleRepository.DeleteModuleAsync(request.ModuleId);
         await _moduleRepository.SaveChangesAsync();
             _logger.LogInformation("Module with ID {ModuleId} successfully marked as deleted.", request.ModuleId);
 
-            return new ApiResponseDTO<bool>
-            {
-                IsSuccess = true,
-                Message = "Module deleted successfully.",
-                Data = true
-            };
+            return true;
     }
     }
 }

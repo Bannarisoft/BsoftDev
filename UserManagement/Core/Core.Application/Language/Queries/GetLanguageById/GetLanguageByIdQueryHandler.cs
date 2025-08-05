@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.Language.Queries.GetLanguageById
 {
-    public class GetLanguageByIdQueryHandler : IRequestHandler<GetLanguageByIdQuery,ApiResponseDTO<LanguageDTO>>
+    public class GetLanguageByIdQueryHandler : IRequestHandler<GetLanguageByIdQuery,LanguageDTO>
     {
         private readonly ILanguageQuery _languageQuery;
         private readonly IMapper _mapper;
@@ -24,7 +24,7 @@ namespace Core.Application.Language.Queries.GetLanguageById
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<LanguageDTO>> Handle(GetLanguageByIdQuery request, CancellationToken cancellationToken)
+        public async Task<LanguageDTO> Handle(GetLanguageByIdQuery request, CancellationToken cancellationToken)
         {
              var result = await _languageQuery.GetByIdAsync(request.Id);
              var language = _mapper.Map<LanguageDTO>(result);
@@ -38,7 +38,7 @@ namespace Core.Application.Language.Queries.GetLanguageById
                     module:"Language"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-             return new ApiResponseDTO<LanguageDTO> { IsSuccess = true, Message = "Success", Data = language };
+             return language;
         }
     }
 }

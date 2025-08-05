@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Application.Modules.Commands.CreateModule
 {
-    public class CreateModuleCommandHandler : IRequestHandler<CreateModuleCommand, ApiResponseDTO<int>>
+    public class CreateModuleCommandHandler : IRequestHandler<CreateModuleCommand, int>
     {
         private readonly IModuleCommandRepository _moduleRepository;
         private readonly IMapper _mapper;
@@ -30,7 +30,7 @@ namespace Core.Application.Modules.Commands.CreateModule
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     }
-    public async Task<ApiResponseDTO<int>> Handle(CreateModuleCommand request, CancellationToken cancellationToken)
+    public async Task<int> Handle(CreateModuleCommand request, CancellationToken cancellationToken)
     {
         if (request == null)
             {
@@ -71,12 +71,7 @@ namespace Core.Application.Modules.Commands.CreateModule
             _logger.LogInformation("Module successfully created with ID: {ModuleId}", module.Id);
 
 
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,
-                Message = "Module created successfully.",
-                Data = module.Id
-            };
+            return module.Id;
     }
     }
 }

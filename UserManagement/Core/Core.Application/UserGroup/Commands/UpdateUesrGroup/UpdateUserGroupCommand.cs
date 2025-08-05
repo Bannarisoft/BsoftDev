@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.UserGroup.Commands.UpdateUesrGroup
 {
-    public class UpdateUserGroupCommand : IRequest<ApiResponseDTO<UserGroupDto>>
+    public class UpdateUserGroupCommand : IRequest<bool>
        {
               public int Id { get; set; }
               public string? GroupCode { get; set; }

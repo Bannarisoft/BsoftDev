@@ -13,7 +13,7 @@ using MediatR;
 
 namespace Core.Application.RoleEntitlements.Queries.GetRoleEntitlementById
 {
-    public class GetEntitlementByIdQueryHandler : IRequestHandler<GetRoleEntitlementByIdQuery, ApiResponseDTO<GetByIdRoleEntitlementDTO>>
+    public class GetEntitlementByIdQueryHandler : IRequestHandler<GetRoleEntitlementByIdQuery, GetByIdRoleEntitlementDTO>
     {
         private readonly IRoleEntitlementQueryRepository _roleEntitlementRepository;
         private readonly IMapper _mapper;
@@ -25,7 +25,7 @@ namespace Core.Application.RoleEntitlements.Queries.GetRoleEntitlementById
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<GetByIdRoleEntitlementDTO>> Handle(GetRoleEntitlementByIdQuery request, CancellationToken cancellationToken)
+        public async Task<GetByIdRoleEntitlementDTO> Handle(GetRoleEntitlementByIdQuery request, CancellationToken cancellationToken)
         {
               var (roleId, roleModules, parentMenus, childMenus, roleMenuPrivileges) = await _roleEntitlementRepository.GetByIdAsync(request.Id);
 
@@ -41,12 +41,7 @@ namespace Core.Application.RoleEntitlements.Queries.GetRoleEntitlementById
             await _mediator.Publish(domainEvent, cancellationToken);
            var result = _mapper.Map<GetByIdRoleEntitlementDTO>((roleId.Id, roleModules, parentMenus, childMenus, roleMenuPrivileges));
 
-                 return new ApiResponseDTO<GetByIdRoleEntitlementDTO>
-                 {
-                     IsSuccess = true,
-                     Message = "Role Entitlement data retrieved successfully",
-                     Data = result
-                 };          
+                 return result;          
 
         }
      

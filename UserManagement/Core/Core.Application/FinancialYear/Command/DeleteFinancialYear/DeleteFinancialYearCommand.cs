@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.FinancialYear.Command.DeleteFinancialYear
 {
-    public class DeleteFinancialYearCommand :IRequest<ApiResponseDTO<int>> 
+    public class DeleteFinancialYearCommand :IRequest<int>
     {
 
           public int Id { get; set; }
