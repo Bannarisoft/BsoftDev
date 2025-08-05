@@ -106,5 +106,14 @@ namespace InventoryManagement.Infrastructure.Repositories.UOMs
             return uoms.ToList();
         }
 
+           public async Task<bool> NotFoundAsync(int id)
+        {
+             var query = "SELECT COUNT(1) FROM Inventory.MiscMaster WHERE Id = @Id AND IsDeleted = 0";
+             
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
+                return count > 0;
+        } 
+
+
     }
 }

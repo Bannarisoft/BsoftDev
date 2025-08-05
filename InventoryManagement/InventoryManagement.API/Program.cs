@@ -1,6 +1,7 @@
 using Core.Application;
 using Core.Application.Common.Behaviors;
 using InventoryManagement.API.Configurations;
+using InventoryManagement.API.GrpcServices;
 using InventoryManagement.API.Middleware;
 using InventoryManagement.API.Validation.Common;
 using InventoryManagement.Infrastructure;
@@ -64,6 +65,7 @@ app.UseMiddleware<LoggingMiddleware>();
 app.UseAuthorization();
 app.UseEndpoints(endpoints =>
 {
+    endpoints.MapGrpcService<MiscMasterGrpcService>().EnableGrpcWeb();
     endpoints.MapControllers();
 });
 app.Run();

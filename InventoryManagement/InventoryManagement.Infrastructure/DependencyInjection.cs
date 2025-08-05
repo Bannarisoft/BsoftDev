@@ -7,6 +7,7 @@ using Core.Application.Common.Interfaces.IMiscTypeMaster;
 using Core.Application.Common.Interfaces.Item.ItemCategory;
 using Core.Application.Common.Interfaces.Item.ItemGroup;
 using Core.Application.Common.Interfaces.IUOM;
+using Core.Application.Common.Interfaces.IUOMConversion;
 using Core.Application.Common.Mappings;
 using Core.Domain.Entities.Item;
 using Infrastructure.Data;
@@ -17,6 +18,7 @@ using InventoryManagement.Infrastructure.Repositories.Item.ItemCategory;
 using InventoryManagement.Infrastructure.Repositories.Item.ItemGroup;
 using InventoryManagement.Infrastructure.Repositories.MiscMaster;
 using InventoryManagement.Infrastructure.Repositories.MiscTypeMaster;
+using InventoryManagement.Infrastructure.Repositories.UOMConversion;
 using InventoryManagement.Infrastructure.Repositories.UOMs;
 using InventoryManagement.Infrastructure.Services;
 using Microsoft.Data.SqlClient;
@@ -113,6 +115,8 @@ namespace InventoryManagement.Infrastructure
             services.AddScoped<IHSNMasterCommandRepository, HSNMasterCommandRepository>();
             services.AddScoped<IUOMQueryRepository , UOMQueryRepository>();     
             services.AddScoped<IUOMCommandRepository, UOMCommandRepository>();
+            services.AddScoped<IUOMConversionQueryRepository , UOMConversionQueryRepository>();
+            services.AddScoped<IUOMConversionCommandRepository, UOMConversionCommandRepository>();
 
 
             // Miscellaneous services
@@ -124,7 +128,10 @@ namespace InventoryManagement.Infrastructure
             // AutoMapper profiles
           services.AddAutoMapper(
                  typeof(MiscTypeMasterProfile),
-                typeof(MiscMasterProfile)
+                typeof(MiscMasterProfile),               
+                typeof(HSNMasterProfile),
+                typeof(UOMProfile),
+                typeof(UOMConversionProfile)
                 
             );
             return services;

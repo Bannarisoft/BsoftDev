@@ -446,6 +446,66 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.ToTable("UOM", "Inventory");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.UOMConversion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("ConversionValue")
+                        .HasColumnType("decimal(18,6)");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("FromUOMId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsActive");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("ToUOMId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FromUOMId");
+
+                    b.HasIndex("ToUOMId");
+
+                    b.ToTable("UOMConversion", "Inventory");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.HSNMaster", b =>
                 {
                     b.HasOne("Core.Domain.Entities.MiscMaster", "GstCategory")
@@ -512,6 +572,25 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.Navigation("UOMType");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.UOMConversion", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.UOM", "FromUOM")
+                        .WithMany("FromUOMConversions")
+                        .HasForeignKey("FromUOMId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.UOM", "ToUOM")
+                        .WithMany("ToUOMConversions")
+                        .HasForeignKey("ToUOMId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("FromUOM");
+
+                    b.Navigation("ToUOM");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.Item.ItemCategory", b =>
                 {
                     b.Navigation("ChildCategories");
@@ -534,6 +613,13 @@ namespace InventoryManagement.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>
                 {
                     b.Navigation("MiscMaster");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.UOM", b =>
+                {
+                    b.Navigation("FromUOMConversions");
+
+                    b.Navigation("ToUOMConversions");
                 });
 #pragma warning restore 612, 618
         }

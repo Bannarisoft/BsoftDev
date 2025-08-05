@@ -16,7 +16,8 @@ namespace Core.Domain.Entities
         // Foreign Key relationship with MiscMaster
         public MiscMaster UOMType { get; set; } = null!;
 
-      
+        public ICollection<UOMConversion>? FromUOMConversions { get; set; }
+        public ICollection<UOMConversion>? ToUOMConversions { get; set; }
 
     }
 }
