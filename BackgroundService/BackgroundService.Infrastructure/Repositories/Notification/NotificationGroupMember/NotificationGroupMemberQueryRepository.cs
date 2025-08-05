@@ -20,55 +20,96 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
             _dbConnection = dbConnection;
             _ipAddressService = iPAddressService;
         }
+        public async Task<NotificationGroupDto> GetByIdAsync(int id)
+        {
+            var UnitId = _ipAddressService.GetUnitId();
+
+            const string query = @"
+                SELECT  
+                    NG.Id AS GroupId,
+                    NG.GroupName,
+                    ISNULL(NGM.UserId, 0) AS UserId,
+                    U.UserName
+                FROM [AppNotification].[NotificationGroup] NG
+                LEFT JOIN [AppNotification].[NotificationGroupMembers] NGM 
+                    ON NG.Id = NGM.GroupId AND NGM.IsDeleted = 0
+                LEFT JOIN Bannari.AppSecurity.Users U 
+                    ON U.UserId = NGM.UserId
+                WHERE NG.Id = @GroupId 
+                AND NG.UnitId = @UnitId 
+                AND NG.ISDeleted = 0 and NG.IsActive = 1;
+            ";
+
+            // Fetch data using a flat structure
+            var result = await _dbConnection.QueryAsync<NotificationGroupFlatDto>(
+                query,
+                new { GroupId = id, UnitId }
+            );
+
+            if (!result.Any())
+                return null;
+
+            // Build NotificationGroupDto manually
+            var groupDto = new NotificationGroupDto
+            {
+                GroupId = result.First().GroupId,
+                GroupName = result.First().GroupName,
+                Users = result
+                    .Where(r => r.UserId != 0)
+                    .Select(r => new UserDto
+                    {
+                        UserId = r.UserId,
+                        UserName = r.UserName
+                    })
+                    .ToList()
+            };
+
+            return groupDto;
+        }
+
         public async Task<bool> AlreadyExistsAsync(int GroupId, int UserId, int? id = null)
         {
-                var query = @"SELECT COUNT(1) 
+            var query = @"SELECT COUNT(1) 
                           FROM [AppNotification].[NotificationGroupMembers]
                           WHERE GroupId = @GroupId AND UserId = @UserId AND IsDeleted = 0";
 
-                var parameters = new DynamicParameters(new { GroupId, UserId });
+            var parameters = new DynamicParameters(new { GroupId, UserId });
 
-                if (id is not null)
-                {
-                    query += " AND Id != @Id";
-                    parameters.Add("Id", id);
-                }
+            if (id is not null)
+            {
+                query += " AND Id != @Id";
+                parameters.Add("Id", id);
+            }
 
-                var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
-                return count > 0;
+            var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
+            return count > 0;
         }
 
-      public async Task<(List<NotificationGroupMemberDto>, int)> GetAllNotificationGroupAsync(int pageNumber, int pageSize, string? searchTerm)
+        public async Task<(List<NotificationGroupDto>, int)> GetAllNotificationGroupAsync(
+            int pageNumber, int pageSize, string? searchTerm)
         {
             var UnitId = _ipAddressService.GetUnitId();
             const string dataQuery = @"
                 SELECT  
-                    NGM.Id AS Id, 
                     NGM.GroupId,
-                    NGM.UserId,
-                    U.UserName,
                     NG.GroupName,
-                    NGM.IsActive, 
-                    NGM.CreatedBy, 
-                    NGM.CreatedDate, 
-                    NGM.CreatedByName, 
-                    NGM.ModifiedBy, 
-                    NGM.ModifiedDate, 
-                    NGM.ModifiedByName
+                    NGM.UserId,
+                    U.UserName
                 FROM [AppNotification].[NotificationGroupMembers] NGM
                 INNER JOIN [AppNotification].[NotificationGroup] NG ON NG.Id = NGM.GroupId
                 LEFT JOIN Bannari.AppSecurity.Users U ON U.UserId = NGM.UserId
-                WHERE NG.UnitId=@UnitId AND  NGM.IsDeleted = 0 and NGM.IsActive = 1 and NG.IsActive = 1
+                WHERE NG.UnitId=@UnitId 
+                AND NGM.IsDeleted = 0              
                 AND (@Search IS NULL OR NG.GroupName LIKE @Search)
                 ORDER BY NG.GroupName
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
             ";
 
             const string countQuery = @"
-                SELECT COUNT(*) 
+                SELECT COUNT(DISTINCT NG.Id) 
                 FROM [AppNotification].[NotificationGroupMembers] NGM
                 INNER JOIN [AppNotification].[NotificationGroup] NG ON NG.Id = NGM.GroupId
-                WHERE  NG.UnitId=@UnitId AND  NGM.IsDeleted = 0 
+                WHERE NG.UnitId=@UnitId AND NGM.IsDeleted = 0 
                 AND (@Search IS NULL OR NG.GroupName LIKE @Search);
             ";
 
@@ -80,24 +121,45 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
                 PageSize = pageSize
             };
 
-            var result = await _dbConnection.QueryAsync<NotificationGroupMemberDto>(
+            var rawData = await _dbConnection.QueryAsync<NotificationGroupMemberDto>(
                 dataQuery,
                 parameters
             );
 
             var totalCount = await _dbConnection.ExecuteScalarAsync<int>(countQuery, parameters);
 
-            return (result.ToList(), totalCount);
-        }
+            // ✅ Group users under their GroupId
+            var groupedResult = rawData
+                .GroupBy(x => new { x.GroupId, x.GroupName })
+                .Select(g => new NotificationGroupDto
+                {
+                    GroupId = g.Key.GroupId,
+                    GroupName = g.Key.GroupName,
+                    Users = g.Select(u => new UserDto
+                    {
+                        UserId = u.UserId,
+                        UserName = u.UserName
+                    }).ToList()
+                })
+                .ToList();
 
+            return (groupedResult, totalCount);
+        }
 
 
         public async Task<bool> NotFoundAsync(int groupId)
         {
             var query = "SELECT COUNT(1) FROM [AppNotification].[NotificationGroupMembers] WHERE GroupId = @Id AND IsDeleted = 0";
-             
+
             var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = groupId });
             return count > 0;
+        }
+        internal class NotificationGroupFlatDto
+        {
+            public int GroupId { get; set; }
+            public string? GroupName { get; set; }
+            public int UserId { get; set; }
+            public string? UserName { get; set; }
         }
     }
 }

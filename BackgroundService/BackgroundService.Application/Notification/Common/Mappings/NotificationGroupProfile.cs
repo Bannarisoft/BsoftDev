@@ -24,8 +24,7 @@ namespace BackgroundService.Application.Notification.Common.Mappings
             CreateMap<DeleteNotificationGroupCommand, Domain.Entities.Notification.NotificationGroup>()
             .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));
 
-            CreateMap<Domain.Entities.Notification.NotificationGroup, NotificationGroupDto>()
-            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == Status.Active ? 1 : 0));
+            CreateMap<Domain.Entities.Notification.NotificationGroup, NotificationGroupDto>();
 
             CreateMap<Domain.Entities.Notification.NotificationGroup, GetNotificationGroupAutoCompleteDto>();
         }
