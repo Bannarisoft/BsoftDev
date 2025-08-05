@@ -4,12 +4,13 @@ using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IDivision;
 using Core.Domain.Entities;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 
 namespace Core.Application.Divisions.Commands.UpdateDivision
 {
-    public class UpdateDivisionCommandHandler : IRequestHandler<UpdateDivisionCommand, ApiResponseDTO<bool>>
+    public class UpdateDivisionCommandHandler : IRequestHandler<UpdateDivisionCommand, bool>
     {
         private readonly IDivisionCommandRepository _divisionRepository;
         private readonly IMapper _imapper;
@@ -22,13 +23,14 @@ namespace Core.Application.Divisions.Commands.UpdateDivision
             _mediator = mediator;
             _divisionQueryRepository = divisionQueryRepository;
         }
-          public async Task<ApiResponseDTO<bool>> Handle(UpdateDivisionCommand request, CancellationToken cancellationToken)
+          public async Task<bool> Handle(UpdateDivisionCommand request, CancellationToken cancellationToken)
         {
                 var existingDivision = await _divisionQueryRepository.GetByDivisionnameAsync(request.Name, request.Id);
 
                 if (existingDivision != null)
                 {
-                    return new ApiResponseDTO<bool>{IsSuccess = false, Message = "Division already exists"};
+                    throw new ValidationException("Division already exists");
+                    
                 }
                  var division  = _imapper.Map<Division>(request);
          
@@ -46,12 +48,10 @@ namespace Core.Application.Divisions.Commands.UpdateDivision
               
                 if(divisionresult)
                 {
-                    return new ApiResponseDTO<bool>{IsSuccess = true, Message = "Division updated successfully."};
+                    return divisionresult;
                 }
-
-                return new ApiResponseDTO<bool>{IsSuccess = false, Message = "Division not updated."};
-           
-           
+            throw new Exception("Division not updated.");
+                
             
         }
         

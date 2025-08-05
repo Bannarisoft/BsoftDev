@@ -4,10 +4,11 @@ using MediatR;
 using Core.Application.Common.Interfaces.ICountry;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
+using FluentValidation;
 
 namespace Core.Application.Country.Queries.GetCountryAutoComplete
 {
-    public class GetCountryAutoCompleteQueryHandler : IRequestHandler<GetCountryAutoCompleteQuery, ApiResponseDTO<List<CountryAutoCompleteDTO>>>
+    public class GetCountryAutoCompleteQueryHandler : IRequestHandler<GetCountryAutoCompleteQuery, List<CountryAutoCompleteDTO>>
     {
         private readonly ICountryQueryRepository _countryRepository;
         private readonly IMapper _mapper;
@@ -20,17 +21,14 @@ namespace Core.Application.Country.Queries.GetCountryAutoComplete
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<List<CountryAutoCompleteDTO>>> Handle(GetCountryAutoCompleteQuery request, CancellationToken cancellationToken)
+        public async Task<List<CountryAutoCompleteDTO>> Handle(GetCountryAutoCompleteQuery request, CancellationToken cancellationToken)
         {   
                    
             var result = await _countryRepository.GetByCountryNameAsync(request.SearchPattern ?? string.Empty);
             if (result is null || result.Count is 0)
             {
-                return new ApiResponseDTO<List<CountryAutoCompleteDTO>>
-                {
-                    IsSuccess = false,
-                    Message = "No countries found matching the search pattern."
-                };
+                throw new ValidationException("No countries found matching the search pattern.");
+             
             }
             var countryDto = _mapper.Map<List<CountryAutoCompleteDTO>>(result);
             //Domain Event
@@ -42,12 +40,7 @@ namespace Core.Application.Country.Queries.GetCountryAutoComplete
                 module:"Country"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<CountryAutoCompleteDTO>>
-            {
-                IsSuccess = true,
-                Message = "Countries found successfully.",
-                Data = countryDto
-            };                        
+            return countryDto;                        
         }
     }
   

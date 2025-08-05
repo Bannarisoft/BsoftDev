@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Application.Modules.Commands.UpdateModule
 {
-    public class UpdateModuleCommandHandler: IRequestHandler<UpdateModuleCommand,ApiResponseDTO<bool>>
+    public class UpdateModuleCommandHandler: IRequestHandler<UpdateModuleCommand,bool>
     {
     private readonly IModuleCommandRepository _moduleRepository;
     private readonly IModuleQueryRepository _moduleQueryRepository;
@@ -28,7 +28,7 @@ namespace Core.Application.Modules.Commands.UpdateModule
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<ApiResponseDTO<bool>> Handle(UpdateModuleCommand request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(UpdateModuleCommand request, CancellationToken cancellationToken)
     {
            if (request == null)
     {
@@ -42,11 +42,8 @@ namespace Core.Application.Modules.Commands.UpdateModule
     if (module == null || module.IsDeleted)
     {
         _logger.LogWarning("Module with ID {ModuleId} not found or has been deleted.", request.ModuleId);
-        return new ApiResponseDTO<bool>
-        {
-            IsSuccess = false,
-            Message = "Module not found or has been deleted."
-        };
+        throw new ValidationException("Module not found or has been deleted.");
+       
     }
 
     var oldModuleName = module.ModuleName; // Store the old name
@@ -79,12 +76,7 @@ namespace Core.Application.Modules.Commands.UpdateModule
 
     _logger.LogInformation("Module with ID {ModuleId} successfully updated.", request.ModuleId);
 
-    return new ApiResponseDTO<bool>
-    {
-        IsSuccess = true,
-        Message = "Module updated successfully.",
-        Data = true
-    };
+    return true;
     }
 }
 }

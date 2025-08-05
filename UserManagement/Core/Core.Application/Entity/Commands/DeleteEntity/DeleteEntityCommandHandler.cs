@@ -5,12 +5,13 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IEntity;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Core.Application.Entity.Commands.DeleteEntity
 {
-    public class DeleteEntityCommandHandler  : IRequestHandler<DeleteEntityCommand,  ApiResponseDTO<int>>
+    public class DeleteEntityCommandHandler  : IRequestHandler<DeleteEntityCommand,  int>
     {
         private readonly IEntityCommandRepository _ientityRepository;
 
@@ -29,7 +30,7 @@ namespace Core.Application.Entity.Commands.DeleteEntity
             _IentityQueryRepository = IentityQueryRepository;
             
         }
-        public async Task<ApiResponseDTO<int>> Handle(DeleteEntityCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(DeleteEntityCommand request, CancellationToken cancellationToken)
         {       
        
        _logger.LogInformation($"Starting Entity Deletion process for EntityId: {request.EntityId}");
@@ -38,11 +39,8 @@ namespace Core.Application.Entity.Commands.DeleteEntity
             if (existingEntity is null )
             {
                 _logger.LogWarning($"Entity ID {request.EntityId} not found.");
-                return new ApiResponseDTO<int>
-                {
-                    IsSuccess = false,
-                    Message = "Entity Id not found / Entity is deleted ."
-                };
+                throw new ValidationException("Entity Id not found / Entity is deleted .");
+               
             }
         
         var entity = _Imapper.Map<Core.Domain.Entities.Entity>(request);
@@ -52,7 +50,8 @@ namespace Core.Application.Entity.Commands.DeleteEntity
         if (result == -1) 
         {
             _logger.LogInformation($"EntityId {request.EntityId} not found.");
-            return new ApiResponseDTO<int> { IsSuccess = false, Message = "Entity not found."};
+            throw new ValidationException("Entity not found.");
+            
         }
         //Domain Event
         var domainEvent = new AuditLogsDomainEvent(
@@ -64,12 +63,7 @@ namespace Core.Application.Entity.Commands.DeleteEntity
         );            
         await _mediator.Publish(domainEvent, cancellationToken);
         _logger.LogInformation($"Successfully completed Entity Deletion process for EntityId: {request.EntityId}");
-         return new ApiResponseDTO<int>
-         {
-             IsSuccess = true,
-             Message = "Entity Soft Deleted Successfully",
-             Data = result
-         };
+         return  result;
    
 }
          

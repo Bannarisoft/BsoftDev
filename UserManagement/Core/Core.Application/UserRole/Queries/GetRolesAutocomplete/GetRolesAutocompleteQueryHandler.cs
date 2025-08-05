@@ -12,10 +12,11 @@ using Core.Application.Common.Interfaces.IUserRole;
 using Core.Application.Common.HttpResponse;
 using Core.Domain.Events;
 using Microsoft.Extensions.Logging;
+using FluentValidation;
 
 namespace Core.Application.UserRole.Queries.GetRolesAutocomplete
 {
-    public class GetRolesAutocompleteQueryHandler : IRequestHandler<GetRolesAutocompleteQuery, ApiResponseDTO<List<GetUserRoleAutocompleteDto>>>
+    public class GetRolesAutocompleteQueryHandler : IRequestHandler<GetRolesAutocompleteQuery, List<GetUserRoleAutocompleteDto>>
     {
         private readonly IUserRoleQueryRepository _userRoleRepository;
      private readonly IMapper _mapper;
@@ -36,7 +37,7 @@ namespace Core.Application.UserRole.Queries.GetRolesAutocomplete
 
         }
 
-        public async Task<ApiResponseDTO<List<GetUserRoleAutocompleteDto>>> Handle(GetRolesAutocompleteQuery request, CancellationToken cancellationToken)
+        public async Task<List<GetUserRoleAutocompleteDto>> Handle(GetRolesAutocompleteQuery request, CancellationToken cancellationToken)
         {
              var groupcode = _ipAddressService.GetGroupcode();
 
@@ -45,12 +46,7 @@ namespace Core.Application.UserRole.Queries.GetRolesAutocomplete
                     var Adminresult = await _userRoleRepository.GetRoles_SuperAdmin(request.SearchTerm);
                     var AdminRoleDto = _mapper.Map<List<GetUserRoleAutocompleteDto>>(Adminresult);
 
-                    return new ApiResponseDTO<List<GetUserRoleAutocompleteDto>>
-                   {
-                       IsSuccess = true,
-                       Message = "Success",
-                       Data = AdminRoleDto
-                   }; 
+                    return AdminRoleDto; 
                 }
 
                   _logger.LogInformation($"Handling GetUserRoleAutoCompleteSearchQuery with search pattern: {request.SearchTerm}");
@@ -60,12 +56,8 @@ namespace Core.Application.UserRole.Queries.GetRolesAutocomplete
                 if (result is null || !result.Any())
                 {
                     _logger.LogWarning($"No UserRole found for search pattern: {request.SearchTerm}" );
-                    return new ApiResponseDTO<List<GetUserRoleAutocompleteDto>>
-                    {
-                        IsSuccess = false,
-                        Message = "No matching UserRole found",
-                        Data = new List<GetUserRoleAutocompleteDto>()
-                    };
+                    throw new ValidationException("No matching UserRole found");
+                 
                 }
 
                 _logger.LogInformation($"UserRole found for search pattern: {request.SearchTerm}. Mapping results to DTO.");
@@ -85,12 +77,7 @@ namespace Core.Application.UserRole.Queries.GetRolesAutocomplete
 
                 _logger.LogInformation($"Domain event published for search pattern: {request.SearchTerm}");
 
-                return new ApiResponseDTO<List<GetUserRoleAutocompleteDto>>
-                {
-                    IsSuccess = true,
-                    Message = "Success",
-                    Data = userRoleDto
-                };
+                return userRoleDto;
 
                
 

@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Core.Application.Divisions.Queries.GetDivisionAutoComplete
 {
-    public class GetDivisionAutoCompleteQuery : IRequest<ApiResponseDTO<List<DivisionAutoCompleteDTO>>>
+    public class GetDivisionAutoCompleteQuery : IRequest<List<DivisionAutoCompleteDTO>>
     {
         
         public string? SearchPattern { get; set; }

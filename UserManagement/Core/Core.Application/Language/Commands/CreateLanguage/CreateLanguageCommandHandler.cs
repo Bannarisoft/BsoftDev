@@ -7,11 +7,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.ILanguage;
 using Core.Application.Language.Queries.GetLanguages;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.Language.Commands.CreateLanguage
 {
-    public class CreateLanguageCommandHandler : IRequestHandler<CreateLanguageCommand, ApiResponseDTO<LanguageDTO>>
+    public class CreateLanguageCommandHandler : IRequestHandler<CreateLanguageCommand, LanguageDTO>
     {
         private readonly ILanguageCommand _languageCommand;
         private readonly IMapper _imapper;
@@ -25,13 +26,14 @@ namespace Core.Application.Language.Commands.CreateLanguage
             _languageQuery = languageQuery;
         }
 
-        public async Task<ApiResponseDTO<LanguageDTO>> Handle(CreateLanguageCommand request, CancellationToken cancellationToken)
+        public async Task<LanguageDTO> Handle(CreateLanguageCommand request, CancellationToken cancellationToken)
         {
             var existingLanguage = await _languageQuery.GetByLanguagenameAsync(request.Name);
 
               if (existingLanguage != null)
               {
-                  return new ApiResponseDTO<LanguageDTO>{IsSuccess = false, Message = "Language already exists"};
+                throw new ValidationException("Language already exists");
+                  
               }
                 var language  = _imapper.Map<Core.Domain.Entities.Language>(request);
 
@@ -52,10 +54,10 @@ namespace Core.Application.Language.Commands.CreateLanguage
                  );
                  await _mediator.Publish(domainEvent, cancellationToken);
                  
-                    return new ApiResponseDTO<LanguageDTO>{IsSuccess = true, Message = "Language created successfully", Data = divisionMap};
+                    return divisionMap;
                 }
-               
-                    return new ApiResponseDTO<LanguageDTO>{IsSuccess = false, Message = "Language not created"};
+               throw new ValidationException("Language not created");
+                    
         }
     }
 }

@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Core.Application.CompanySettings.Commands.UpdateCompanySettings
 {
-    public class UpdateCompanySettingsCommandHandler : IRequestHandler<UpdateCompanySettingsCommand, ApiResponseDTO<bool>>
+    public class UpdateCompanySettingsCommandHandler : IRequestHandler<UpdateCompanySettingsCommand, bool>
     {
         private readonly ICompanyCommandSettings _icompanyCommandSettings;
         private readonly IMediator _mediator;
@@ -21,7 +21,7 @@ namespace Core.Application.CompanySettings.Commands.UpdateCompanySettings
             _mediator = mediator;
             _imapper = imapper;
         }
-        public async Task<ApiResponseDTO<bool>> Handle(UpdateCompanySettingsCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(UpdateCompanySettingsCommand request, CancellationToken cancellationToken)
         {
             var companySettings = _imapper.Map<Core.Domain.Entities.CompanySettings>(request);
 
@@ -29,10 +29,10 @@ namespace Core.Application.CompanySettings.Commands.UpdateCompanySettings
 
             if(CompanySettingResponse)
             {
-                return new ApiResponseDTO<bool>{IsSuccess=true, Message="Company Settings updated successfully"};
+                return CompanySettingResponse;
             }
-
-            return new ApiResponseDTO<bool>{IsSuccess=false, Message="Company Settings not updated"};
+            throw new Exception("Company Settings not updated");
+            
         }
     }
 }

@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.CustomFields.Commands.UpdateCustomField
 {
-    public class UpdateCustomFieldCommand : IRequest<ApiResponseDTO<bool>>
+    public class UpdateCustomFieldCommand : IRequest<bool>
     {
         public int Id { get; set; }
         public string? LabelName { get; set; }

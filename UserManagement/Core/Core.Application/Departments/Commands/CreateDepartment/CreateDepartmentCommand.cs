@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Core.Application.Departments.Commands.CreateDepartment
 {
 
-    public class CreateDepartmentCommand : IRequest<ApiResponseDTO<DepartmentDto>>
+    public class CreateDepartmentCommand : IRequest<DepartmentDto>
     {
 
         public string? ShortName { get; set; }

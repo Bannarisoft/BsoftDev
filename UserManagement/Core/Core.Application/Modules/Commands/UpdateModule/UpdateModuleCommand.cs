@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Core.Application.Modules.Commands.UpdateModule
 {
-    public class UpdateModuleCommand : IRequest<ApiResponseDTO<bool>>
+    public class UpdateModuleCommand : IRequest<bool>
     {
     public int ModuleId { get; set; }
     public string? ModuleName { get; set; }

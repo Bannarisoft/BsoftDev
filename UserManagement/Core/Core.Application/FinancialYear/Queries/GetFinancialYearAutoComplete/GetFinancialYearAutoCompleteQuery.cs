@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.FinancialYear.Queries.GetFinancialYearAutoComplete
 {
-    public class GetFinancialYearAutoCompleteQuery : IRequest<ApiResponseDTO<List<GetFinancialYearAutoCompleteDto>>> 
+    public class GetFinancialYearAutoCompleteQuery : IRequest<List<GetFinancialYearAutoCompleteDto>>
     {
           public string? SearchTerm  { get; set; } 
         

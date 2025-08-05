@@ -4,11 +4,12 @@ using Core.Application.Common.Interfaces.IUserGroup;
 using Core.Application.UserGroup.Queries.GetUserGroup;
 using Core.Domain.Enums.Common;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.UserGroup.Commands.UpdateUesrGroup
 {
-    public class UpdateUserGroupCommandHandler  : IRequestHandler<UpdateUserGroupCommand,ApiResponseDTO<UserGroupDto>>    
+    public class UpdateUserGroupCommandHandler  : IRequestHandler<UpdateUserGroupCommand,bool>
     {
         private readonly IUserGroupCommandRepository _userGroupRepository;
         private readonly IMapper _mapper;
@@ -22,24 +23,18 @@ namespace Core.Application.UserGroup.Commands.UpdateUesrGroup
             _userGroupQueryRepository = userGroupQueryRepository;
             _mediator = mediator;
         }       
-        public async Task<ApiResponseDTO<UserGroupDto>> Handle(UpdateUserGroupCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(UpdateUserGroupCommand request, CancellationToken cancellationToken)
         {
             var userGroup = await _userGroupQueryRepository.GetByIdAsync(request.Id);
             if (userGroup is null)
-                return new ApiResponseDTO<UserGroupDto>
-                {
-                    IsSuccess = false,
-                    Message = "UserGroup not found"
-                };
+            throw new ValidationException("UserGroup not found");
+              
             var oldGroupName = userGroup.GroupName;
             userGroup.GroupName = request.GroupName;
             if (userGroup is null || userGroup.IsDeleted is Enums.IsDelete.Deleted)
             {
-                return new ApiResponseDTO<UserGroupDto>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid UserGroupID. The specified UserGroup does not exist or is inactive."
-                };
+                throw new ValidationException("Invalid UserGroupID. The specified UserGroup does not exist or is inactive.");
+           
             }   
                       
             if ((byte)userGroup.IsActive != request.IsActive)
@@ -48,18 +43,10 @@ namespace Core.Application.UserGroup.Commands.UpdateUesrGroup
                 await _userGroupRepository.UpdateAsync(userGroup.Id, userGroup);
                 if (request.IsActive is 0)
                 {
-                    return new ApiResponseDTO<UserGroupDto>
-                    {
-                        IsSuccess = true,
-                        Message = "UserGroupCode DeActivated."
-                    };
+                    return true;
                 }
                 else{
-                    return new ApiResponseDTO<UserGroupDto>
-                    {
-                        IsSuccess = true,
-                        Message = "UserGroupCode Activated."
-                    }; 
+                    return true; 
                 }                                     
             }
         
@@ -82,26 +69,15 @@ namespace Core.Application.UserGroup.Commands.UpdateUesrGroup
                 await _mediator.Publish(domainEvent, cancellationToken);
                 if(updateResult>0)
                 {
-                    return new ApiResponseDTO<UserGroupDto>
-                    {
-                        IsSuccess = true,
-                        Message = "UserGroup updated successfully",
-                        Data = userGroupDto
-                    };
+                    return true;
                 }
-                return new ApiResponseDTO<UserGroupDto>
-                {
-                    IsSuccess = false,
-                    Message = "UserGroup not updated."
-                }; 
+                throw new Exception("UserGroup not updated.");
+              
             }
             else
             {
-                return new ApiResponseDTO<UserGroupDto>
-                {
-                    IsSuccess = false,
-                    Message = "UserGroup update failed"
-                };
+                throw new Exception("UserGroup update failed");
+               
             }                   
         }
     }

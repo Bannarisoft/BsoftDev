@@ -11,12 +11,13 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Core.Domain.Events;
 using Microsoft.EntityFrameworkCore;
+using FluentValidation;
 
 
 
 namespace Core.Application.FinancialYear.Command.CreateFinancialYear
 {
-    public class CreateFinancialYearCommandHandler :IRequestHandler<CreateFinancialYearCommand, ApiResponseDTO<FinancialYearDto>>
+    public class CreateFinancialYearCommandHandler :IRequestHandler<CreateFinancialYearCommand, FinancialYearDto>
     {
 
 
@@ -38,7 +39,7 @@ namespace Core.Application.FinancialYear.Command.CreateFinancialYear
             
 
         } 
-                public async Task<ApiResponseDTO<FinancialYearDto>> Handle(CreateFinancialYearCommand request, CancellationToken cancellationToken)
+                public async Task<FinancialYearDto> Handle(CreateFinancialYearCommand request, CancellationToken cancellationToken)
           {
             _logger.LogInformation($"Starting CreateFinancialYearCommandHandler for request: {request}" );
            
@@ -53,11 +54,8 @@ namespace Core.Application.FinancialYear.Command.CreateFinancialYear
             if (existingFinancialYear != null)
             {
                 _logger.LogWarning($"FinancialYear with start year {request.StartYear} already exists." );
-                return new ApiResponseDTO<FinancialYearDto>
-                {
-                    IsSuccess = false,
-                    Message = "FinancialYear with start year already exists."
-                };
+                throw new ValidationException("FinancialYear with start year already exists.");
+              
             }
             // Map request to entity
             var financialYearEntity = _mapper.Map<Core.Domain.Entities.FinancialYear>(request);
@@ -70,11 +68,8 @@ namespace Core.Application.FinancialYear.Command.CreateFinancialYear
              if (createdfinancialYear is null)
             {
                 _logger.LogWarning($"Failed to create FinancialYear. FinancialYear entity: {financialYearEntity}");
-                return new ApiResponseDTO<FinancialYearDto>
-                {
-                    IsSuccess = false,
-                    Message = "FinancialYear not created"
-                };
+                throw new Exception("FinancialYear not created");
+            
             }
             _logger.LogInformation($"FinancialYear successfully created with ID: {financialYearEntity.Id}");
 
@@ -95,12 +90,7 @@ namespace Core.Application.FinancialYear.Command.CreateFinancialYear
 
             _logger.LogInformation($"Returning success response for FinancialYear ID: { financialYearEntity.Id}");
 
-            return new ApiResponseDTO<FinancialYearDto>
-            {
-                IsSuccess = true,
-                Message = "FinancialYear created successfully",
-                Data = financialYearDto
-        };
+            return financialYearDto;
         }                 
     }
 }

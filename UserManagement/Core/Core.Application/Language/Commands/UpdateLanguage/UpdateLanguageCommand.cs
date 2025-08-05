@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.Language.Commands.UpdateLanguage
 {
-    public class UpdateLanguageCommand : IRequest<ApiResponseDTO<bool>>
+    public class UpdateLanguageCommand : IRequest<bool>
     {
         public int Id { get; set; }
         public string? Code { get; set; }

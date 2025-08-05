@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.RoleEntitlements.Queries.GetRolePrivileges
 {
-    public class GetRolePrivilegesQuery : IRequest<ApiResponseDTO<List<ModuleDTO>>>
+    public class GetRolePrivilegesQuery : IRequest<List<ModuleDTO>>
     {
         public int UserId { get; set; }
     }

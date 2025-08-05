@@ -7,11 +7,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IProfile;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.SwitchProfile.Queries.GetUnitProfile
 {
-    public class GetUnitProfileQueryHandler : IRequestHandler<GetUnitProfileQuery, ApiResponseDTO<List<GetUnitProfileDTO>>>
+    public class GetUnitProfileQueryHandler : IRequestHandler<GetUnitProfileQuery, List<GetUnitProfileDTO>>
     {
         private readonly IProfileQuery _iProfileQuery;
         private readonly IMapper _mapper;
@@ -24,19 +25,15 @@ namespace Core.Application.SwitchProfile.Queries.GetUnitProfile
             _ipAddressService = ipAddressService;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<List<GetUnitProfileDTO>>> Handle(GetUnitProfileQuery request, CancellationToken cancellationToken)
+        public async Task<List<GetUnitProfileDTO>> Handle(GetUnitProfileQuery request, CancellationToken cancellationToken)
         {
             var userId = _ipAddressService.GetUserId();
             var result = await _iProfileQuery.GetUnit(userId);
 
               if (result is null || !result.Any() || result.Count == 0) 
                 {
-                      
-                     return new ApiResponseDTO<List<GetUnitProfileDTO>>
-                     {
-                         IsSuccess = false,
-                         Message = "Unit not found."
-                     };
+                      throw new ValidationException("Unit not found.");
+                   
                 }
                 var unitDto = _mapper.Map<List<GetUnitProfileDTO>>(result);
 
@@ -50,12 +47,7 @@ namespace Core.Application.SwitchProfile.Queries.GetUnitProfile
             await _mediator.Publish(domainEvent, cancellationToken);
 
             
-            return new ApiResponseDTO<List<GetUnitProfileDTO>>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = unitDto
-            }; 
+            return unitDto; 
         }
     }
 }

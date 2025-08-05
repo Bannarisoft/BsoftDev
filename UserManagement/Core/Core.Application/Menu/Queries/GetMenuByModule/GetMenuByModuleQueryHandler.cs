@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.Menu.Queries.GetMenuByModule
 {
-    public class GetMenuByModuleQueryHandler : IRequestHandler<GetMenuByModuleQuery, ApiResponseDTO<List<MenuDTO>>>
+    public class GetMenuByModuleQueryHandler : IRequestHandler<GetMenuByModuleQuery, List<MenuDTO>>
     {
         private readonly IMenuQuery _menuQuery;
         private readonly IMapper _mapper;
@@ -21,7 +21,7 @@ namespace Core.Application.Menu.Queries.GetMenuByModule
             _mapper = mapper;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<List<MenuDTO>>> Handle(GetMenuByModuleQuery request, CancellationToken cancellationToken)
+        public async Task<List<MenuDTO>> Handle(GetMenuByModuleQuery request, CancellationToken cancellationToken)
         {
               var menus = await _menuQuery.GetParentMenus(request.ModuleId);
             var menusList = _mapper.Map<List<MenuDTO>>(menus);
@@ -35,12 +35,7 @@ namespace Core.Application.Menu.Queries.GetMenuByModule
                     module:"Menu"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<MenuDTO>> 
-            { 
-                IsSuccess = true, 
-                Message = "Success", 
-                Data = menusList 
-                };
+            return menusList;
         }
     }
 }

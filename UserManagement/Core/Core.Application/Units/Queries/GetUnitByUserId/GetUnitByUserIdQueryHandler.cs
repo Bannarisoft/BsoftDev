@@ -8,10 +8,11 @@ using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
 using Microsoft.Extensions.Logging;
 using Core.Application.Common.Interfaces;
+using FluentValidation;
 
 namespace Core.Application.Units.Queries.GetUnitByUserId
 {
-    public class GetUnitByUserIdQueryHandler : IRequestHandler<GetUnitByUserIdQuery, ApiResponseDTO<List<UnitAutoCompleteDTO>>>
+    public class GetUnitByUserIdQueryHandler : IRequestHandler<GetUnitByUserIdQuery, List<UnitAutoCompleteDTO>>
     {
          private readonly IUnitQueryRepository _unitRepository;        
         private readonly IMapper _mapper;
@@ -30,18 +31,15 @@ namespace Core.Application.Units.Queries.GetUnitByUserId
             _ipAddressService = ipAddressService;
         }
 
-        public async Task<ApiResponseDTO<List<UnitAutoCompleteDTO>>> Handle(GetUnitByUserIdQuery request, CancellationToken cancellationToken)
+        public async Task<List<UnitAutoCompleteDTO>> Handle(GetUnitByUserIdQuery request, CancellationToken cancellationToken)
         { 
             //var userId = _ipAddressService.GetUserId();
             var result = await _unitRepository.GetUnitByUserId(request.UserId,request.CompanyId);
               if (result is null || !result.Any() || result.Count == 0) 
                 {
                       _logger.LogWarning($"No Unit Record found in DB.");
-                     return new ApiResponseDTO<List<UnitAutoCompleteDTO>>
-                     {
-                         IsSuccess = false,
-                         Message = "Unit not found."
-                     };
+                      throw new ValidationException("Unit not found.");
+                    
                 }
 
             var unitDto = _mapper.Map<List<UnitAutoCompleteDTO>>(result);
@@ -57,12 +55,7 @@ namespace Core.Application.Units.Queries.GetUnitByUserId
             await _mediator.Publish(domainEvent, cancellationToken);
 
             _logger.LogInformation($"Unit {result.Count} Listed successfully.");
-            return new ApiResponseDTO<List<UnitAutoCompleteDTO>>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = unitDto
-            };                                    
+            return unitDto;                                    
         }
     }
 }

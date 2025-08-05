@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.Menu.Commands.UpdateMenu
 {
-    public class UpdateMenuCommandHandler : IRequestHandler<UpdateMenuCommand, ApiResponseDTO<bool>>
+    public class UpdateMenuCommandHandler : IRequestHandler<UpdateMenuCommand, bool>
     {
         private readonly IMenuCommand _menuCommand;
         private readonly IMapper _imapper;
@@ -21,7 +21,7 @@ namespace Core.Application.Menu.Commands.UpdateMenu
             _imapper = imapper;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<bool>> Handle(UpdateMenuCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(UpdateMenuCommand request, CancellationToken cancellationToken)
         {
             var Menu  = _imapper.Map<Core.Domain.Entities.Menu>(request);
          
@@ -39,10 +39,10 @@ namespace Core.Application.Menu.Commands.UpdateMenu
               
                 if(MenuResult)
                 {
-                    return new ApiResponseDTO<bool>{IsSuccess = true, Message = "Menu updated successfully."};
+                    return MenuResult;
                 }
-
-                return new ApiResponseDTO<bool>{IsSuccess = false, Message = "Menu not updated."};
+                throw new Exception("Menu not updated.");
+                
         }
     }
 }

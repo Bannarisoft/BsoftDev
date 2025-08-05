@@ -4,7 +4,7 @@ using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.City.Commands.CreateCity
 {     
-    public class CreateCityCommand : IRequest<ApiResponseDTO<CityDto>>  
+    public class CreateCityCommand : IRequest<CityDto>
     {
         public int StateId { get; set; }
         public string? CityCode { get; set; } 

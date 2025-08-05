@@ -10,7 +10,7 @@ using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Companies.Commands.DeleteCompany
 {
-    public class DeleteCompanyCommand : IRequest<ApiResponseDTO<bool>>
+    public class DeleteCompanyCommand : IRequest<bool>
     {
         public int Id { get; set; }
     }

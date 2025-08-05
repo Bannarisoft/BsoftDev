@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.Menu.Commands.DeleteMenu
 {
-    public class DeleteMenuCommandHandler : IRequestHandler<DeleteMenuCommand, ApiResponseDTO<bool>>
+    public class DeleteMenuCommandHandler : IRequestHandler<DeleteMenuCommand, bool>
     {
         private readonly IMenuCommand _menuCommand;
         private readonly IMapper _imapper;
@@ -21,7 +21,7 @@ namespace Core.Application.Menu.Commands.DeleteMenu
             _imapper = imapper;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<bool>> Handle(DeleteMenuCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DeleteMenuCommand request, CancellationToken cancellationToken)
         {
              var Menu  = _imapper.Map<Core.Domain.Entities.Menu>(request);
             var MenuResult = await _menuCommand.DeleteAsync(request.Id, Menu);
@@ -39,10 +39,9 @@ namespace Core.Application.Menu.Commands.DeleteMenu
 
                  if(MenuResult)
                 {
-                    return new ApiResponseDTO<bool>{IsSuccess = true, Message = "Menu deleted successfully."};
+                    return MenuResult;
                 }
-
-                return new ApiResponseDTO<bool>{IsSuccess = false, Message = "Menu not deleted."};
+            throw new Exception("Menu not deleted.");
         }
     }
 }

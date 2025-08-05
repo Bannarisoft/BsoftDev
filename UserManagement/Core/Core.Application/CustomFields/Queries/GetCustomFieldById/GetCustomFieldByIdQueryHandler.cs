@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.CustomFields.Queries.GetCustomFieldById
 {
-    public class GetCustomFieldByIdQueryHandler : IRequestHandler<GetCustomFieldByIdQuery, ApiResponseDTO<CustomFieldByIdDTO>>
+    public class GetCustomFieldByIdQueryHandler : IRequestHandler<GetCustomFieldByIdQuery, CustomFieldByIdDTO>
     {
         private readonly ICustomFieldQuery _customFieldQuery;
          private readonly IMapper _mapper;
@@ -22,7 +22,7 @@ namespace Core.Application.CustomFields.Queries.GetCustomFieldById
             _mapper = mapper;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<CustomFieldByIdDTO>> Handle(GetCustomFieldByIdQuery request, CancellationToken cancellationToken)
+        public async Task<CustomFieldByIdDTO> Handle(GetCustomFieldByIdQuery request, CancellationToken cancellationToken)
         {
              var (CustomField,CustomFieldMenu,CustomFieldUnit,CustomFieldOption) = await _customFieldQuery.GetByIdAsync(request.Id);
             var customField = _mapper.Map<CustomFieldByIdDTO>(CustomField);
@@ -51,7 +51,7 @@ namespace Core.Application.CustomFields.Queries.GetCustomFieldById
                 //     module:"Custom Field"
                 // );
                 // await _mediator.Publish(domainEvent, cancellationToken);
-          return new ApiResponseDTO<CustomFieldByIdDTO> { IsSuccess = true, Message = "Success", Data = customField };
+          return  customField;
         }
     }
 }

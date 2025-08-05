@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.Currency.Commands.UpdateCurrency
 {
-    public class UpdateCurrencyCommand  : IRequest<ApiResponseDTO<int>>
+    public class UpdateCurrencyCommand  : IRequest<int>
     {
         public int Id { get; set; }
        // public string? Code { get; set; }

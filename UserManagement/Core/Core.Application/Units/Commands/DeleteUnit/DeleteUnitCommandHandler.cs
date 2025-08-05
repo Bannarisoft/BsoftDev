@@ -4,10 +4,11 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Core.Application.Common.Interfaces.IUnit;
 using Core.Application.Common.HttpResponse;
+using FluentValidation;
 
 namespace Core.Application.Units.Commands.DeleteUnit
 {
-    public class DeleteUnitCommandHandler : IRequestHandler<DeleteUnitCommand,ApiResponseDTO<int>>
+    public class DeleteUnitCommandHandler : IRequestHandler<DeleteUnitCommand,int>
     {
           private readonly IUnitCommandRepository _iunitRepository;
           private readonly IUnitQueryRepository _IunitQueryRepository;
@@ -22,7 +23,7 @@ namespace Core.Application.Units.Commands.DeleteUnit
             _IunitQueryRepository = IunitQueryRepository;
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(DeleteUnitCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(DeleteUnitCommand request, CancellationToken cancellationToken)
         {
               _logger.LogInformation($"Starting Deletion process for UnitId: {request.UnitId}");
               // 🔹 First, check if the ID exists in the database
@@ -30,27 +31,21 @@ namespace Core.Application.Units.Commands.DeleteUnit
             if (existingunitId is null)
             {
                 _logger.LogWarning($"Unit ID {request.UnitId} not found.");
-                return new ApiResponseDTO<int>
-                {
-                    IsSuccess = false,
-                    Message = "Unit Id not found / Unit is deleted ."
-                };
+                throw new ValidationException("Unit Id not found / Unit is deleted .");
+               
             }
               var unit = _Imapper.Map<Core.Domain.Entities.Unit>(request);
               var result =await _iunitRepository.DeleteUnitAsync(request.UnitId,unit);
                if (result == -1) // Unit not found
                 {   
                     _logger.LogInformation($"Unit {request.UnitId} not found.");
-                    return new ApiResponseDTO<int> { IsSuccess = false, Message = "Unit not found." };
+                    throw new ValidationException("Unit not found.");
+                    
                 }
               _logger.LogInformation($"Completed Deletion process for UnitId: {request.UnitId}");
               var unitId = unit.Id;
               _logger.LogInformation($"Unit {unitId} deleted successfully", unitId);
-              return new ApiResponseDTO<int> { 
-                IsSuccess = true, 
-                Message = "Unit deleted successfully", 
-                Data = unitId 
-                };
+              return unitId;
        
         }
 

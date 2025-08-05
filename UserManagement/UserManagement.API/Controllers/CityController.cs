@@ -16,17 +16,11 @@ namespace UserManagement.API.Controllers
     
     public class CityController : ApiControllerBase
     {
-         private readonly IValidator<CreateCityCommand> _createCityCommandValidator;
-         private readonly IValidator<UpdateCityCommand> _updateCityCommandValidator;
          
          
-       public CityController(ISender mediator, 
-                             IValidator<CreateCityCommand> createCityCommandValidator, 
-                             IValidator<UpdateCityCommand> updateCityCommandValidator) 
+       public CityController(ISender mediator) 
          : base(mediator)
-        {        
-            _createCityCommandValidator = createCityCommandValidator;    
-            _updateCityCommandValidator = updateCityCommandValidator;    
+        {           
              
         }
         [HttpGet]                
@@ -63,68 +57,32 @@ namespace UserManagement.API.Controllers
                 });
             }
             var result = await Mediator.Send(new GetCityByIdQuery { Id = id });            
-            if (result is null )
-            {                
-                return NotFound(new 
-                { 
-                    StatusCode=StatusCodes.Status404NotFound,
-                    message = "CityId {id} not found", 
-                });
-            }
+           
             return Ok(new 
             {
                 StatusCode=StatusCodes.Status200OK,
-                data = result.Data
+                data = result
             });   
         }
 
         [HttpPost]               
         public async Task<IActionResult> CreateAsync(CreateCityCommand  command)
         { 
-            var validationResult = await _createCityCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode=StatusCodes.Status400BadRequest,
-                    message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }        
+              
             var result = await Mediator.Send(command);
-            if (result.IsSuccess)
-            {
+           
                 return Ok(new 
                 { 
                     StatusCode=StatusCodes.Status201Created,
-                    message = result.Message, 
-                    data = result.Data
+                    message = "City Created Successfully", 
+                    data = result
                 });
-            }  
-            else
-            {      
-                return BadRequest(new 
-                { 
-                    StatusCode=StatusCodes.Status400BadRequest,
-                    message = result.Message
-                });
-            } 
+           
         }
         [HttpPut]        
         public async Task<IActionResult> UpdateAsync(UpdateCityCommand command)
         {         
-            var validationResult = await _updateCityCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(
-                    new
-                    {
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        message = "Validation failed",
-                        errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                    }
-                );
-            }
+          
             if (command.StateId<=0)
             {
                 return BadRequest(
@@ -136,20 +94,13 @@ namespace UserManagement.API.Controllers
                 );
             } 
             var result = await Mediator.Send(command);
-            if (result.IsSuccess)
-            {
+           
                 return Ok(new 
                 {   StatusCode=StatusCodes.Status200OK,
-                    message = result.Message, 
-                    City = result.Data
+                    message = "City Updated Successfully", 
+                    City = result
                 });
-            }
-                
-                return BadRequest( new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = result.Message
-                });
+            
                 
         }
         [HttpDelete("{id}")]        
@@ -164,19 +115,12 @@ namespace UserManagement.API.Controllers
                 });
             }            
               var result = await Mediator.Send(new DeleteCityCommand { Id = id });                 
-            if (!result.IsSuccess)
-            {                
-                return NotFound(new 
-                { 
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message
-                });
-            }
+         
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
                 data =$"City ID {id} Deleted" ,
-                message = result.Message
+                message = result
             });
         }
              
@@ -184,19 +128,12 @@ namespace UserManagement.API.Controllers
         public async Task<IActionResult> GetCity([FromQuery] string? name)
         {          
             var result = await Mediator.Send(new GetCityAutoCompleteQuery {SearchPattern = name}); // Pass `searchPattern` to the constructor
-            if (!result.IsSuccess)
-            {
-                return NotFound(new 
-                { 
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message
-                }); 
-            }
+          
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                message = result.Message,
-                data = result.Data
+                message = "City List",
+                data = result
             });
         }    
         [HttpGet("by-state/{stateid}")]

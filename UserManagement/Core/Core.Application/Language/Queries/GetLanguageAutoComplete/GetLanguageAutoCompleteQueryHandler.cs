@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.Language.Queries.GetLanguageAutoComplete
 {
-    public class GetLanguageAutoCompleteQueryHandler : IRequestHandler<GetLanguageAutoCompleteQuery,ApiResponseDTO<List<LanguageAutoCompleteDTO>>>
+    public class GetLanguageAutoCompleteQueryHandler : IRequestHandler<GetLanguageAutoCompleteQuery,List<LanguageAutoCompleteDTO>>
     {
         private readonly ILanguageQuery _languageQuery;
         private readonly IMapper _mapper;
@@ -23,7 +23,7 @@ namespace Core.Application.Language.Queries.GetLanguageAutoComplete
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<List<LanguageAutoCompleteDTO>>> Handle(GetLanguageAutoCompleteQuery request, CancellationToken cancellationToken)
+        public async Task<List<LanguageAutoCompleteDTO>> Handle(GetLanguageAutoCompleteQuery request, CancellationToken cancellationToken)
         {
             var result = await _languageQuery.GetLanguage(request.SearchPattern);
             var languages = _mapper.Map<List<LanguageAutoCompleteDTO>>(result);
@@ -36,7 +36,7 @@ namespace Core.Application.Language.Queries.GetLanguageAutoComplete
                     module:"Language"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<LanguageAutoCompleteDTO>> { IsSuccess = true, Message = "Success", Data = languages };   
+            return languages;   
         }
     }
 }

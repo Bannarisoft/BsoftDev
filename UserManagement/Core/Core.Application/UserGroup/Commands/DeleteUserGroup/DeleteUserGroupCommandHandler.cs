@@ -4,11 +4,12 @@ using Core.Application.Common.Interfaces.IUserGroup;
 using Core.Application.UserGroup.Queries.GetUserGroup;
 using Core.Domain.Enums.Common;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.UserGroup.Commands.DeleteUserGroup
 {
-    public class DeleteUserGroupCommandHandler : IRequestHandler<DeleteUserGroupCommand, ApiResponseDTO<UserGroupDto>>
+    public class DeleteUserGroupCommandHandler : IRequestHandler<DeleteUserGroupCommand, UserGroupDto>
     {
         private readonly IUserGroupCommandRepository _userGroupRepository;
         private readonly IUserGroupQueryRepository _userGroupQueryRepository;
@@ -22,16 +23,13 @@ namespace Core.Application.UserGroup.Commands.DeleteUserGroup
             _userGroupQueryRepository = userGroupQueryRepository;
             _mediator = mediator;
         }       
-        public async Task<ApiResponseDTO<UserGroupDto>> Handle(DeleteUserGroupCommand request, CancellationToken cancellationToken)
+        public async Task<UserGroupDto> Handle(DeleteUserGroupCommand request, CancellationToken cancellationToken)
         {
             var userGroup = await _userGroupQueryRepository.GetByIdAsync(request.Id);
             if (userGroup is null || userGroup.IsDeleted is Enums.IsDelete.Deleted)
             {
-                return new ApiResponseDTO<UserGroupDto>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid GroupID. The specified GroupName does not exist or is inactive."
-                };
+                throw new ValidationException("Invalid GroupID. The specified GroupName does not exist or is inactive.");
+             
             }         
           
             var userGroupDelete = _mapper.Map<Core.Domain.Entities.UserGroup>(request);
@@ -48,18 +46,10 @@ namespace Core.Application.UserGroup.Commands.DeleteUserGroup
                     module:"UserGroup"
                 );               
                 await _mediator.Publish(domainEvent, cancellationToken);              
-                return new ApiResponseDTO<UserGroupDto>
-                {
-                    IsSuccess = true,
-                    Message = "UserGroup deleted successfully.",
-                    Data = userGroupDto
-                };
+                return userGroupDto;
             }
-            return new ApiResponseDTO<UserGroupDto>
-            {
-                IsSuccess = false,
-                Message = "UserGroup deletion failed."
-            };          
+            throw new Exception("UserGroup deletion failed.");
+                 
         }
     }
 }

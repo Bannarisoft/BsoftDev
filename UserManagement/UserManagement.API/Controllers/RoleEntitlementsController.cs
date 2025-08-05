@@ -28,22 +28,15 @@ public class RoleEntitlementsController : ApiControllerBase
     // {
     // }
 
-    private readonly IValidator<CreateRoleEntitlementCommand> _createRoleEntitlementCommandValidator;
-         private readonly IValidator<UpdateRoleEntitlementCommand> _updateRoleEntitlementCommandValidator;
-         private readonly ApplicationDbContext _dbContext;
+         
          private readonly ILogger<RoleEntitlementsController> _logger;
 
          
        public RoleEntitlementsController(ISender mediator, 
-                             IValidator<CreateRoleEntitlementCommand> createRoleEntitlementCommandValidator, 
-                             IValidator<UpdateRoleEntitlementCommand> updateRoleEntitlementCommandValidator, 
-                             ApplicationDbContext dbContext,
                              ILogger<RoleEntitlementsController> logger) 
          : base(mediator)
         {        
-            _createRoleEntitlementCommandValidator = createRoleEntitlementCommandValidator;
-            _updateRoleEntitlementCommandValidator = updateRoleEntitlementCommandValidator;    
-            _dbContext = dbContext;  
+            
             _logger = logger;
         }
         [HttpGet("{id}")]        
@@ -58,18 +51,11 @@ public class RoleEntitlementsController : ApiControllerBase
                 });
             }            
             var result = await Mediator.Send(new GetRoleEntitlementByIdQuery { Id = id });            
-            if (!result.IsSuccess)
-            {                
-                return NotFound(new 
-                { 
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message
-                });
-            }
+          
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                data = result.Data
+                data = result
             });
         }
 
@@ -78,22 +64,15 @@ public class RoleEntitlementsController : ApiControllerBase
     {
    
          var response = await Mediator.Send(command);
-       if (response.IsSuccess)
-            {
+      
                 
                 return Ok(new 
                 { 
                     StatusCode = StatusCodes.Status201Created, 
-                    message = response.Message, 
-                    data = response.Data 
+                    message = "Role Entitlement created successfully", 
+                    data = response 
                 });
-            }
-                
-        return BadRequest(new 
-        { 
-            StatusCode = StatusCodes.Status400BadRequest, 
-            message = response.Message
-        }); 
+        
              
     }
 
@@ -108,22 +87,14 @@ public class RoleEntitlementsController : ApiControllerBase
                  Message = "Invalid request. All ModuleMenus must have the same RoleId as the provided RoleId."
              });
          }
-          var response = await Mediator.Send(command);
-       if (response.IsSuccess)
-            {
-                
+           await Mediator.Send(command);
+   
                 return Ok(new 
                 { 
                     StatusCode = StatusCodes.Status200OK, 
-                    message = response.Message
+                    message = "Role Entitlement updated successfully",
                 });
-            }
-                
-        return BadRequest(new 
-        { 
-            StatusCode = StatusCodes.Status400BadRequest, 
-            message = response.Message
-        }); 
+           
     }
 
         [HttpGet("roleprivileges/{UserId}")]
@@ -139,49 +110,9 @@ public class RoleEntitlementsController : ApiControllerBase
             return Ok( new 
             { 
                 StatusCode=StatusCodes.Status200OK,
-                 data = roleprivileges.Data.ToList()
+                 data = roleprivileges.ToList()
                  });
         }
-    // [HttpDelete("{id}")]        
-    //     public async Task<IActionResult> DeleteAsync(int id)
-    //     {
-    //         if (id <= 0)
-    //         {
-    //             return BadRequest(new
-    //         {
-    //                 StatusCode = StatusCodes.Status400BadRequest,
-    //                 message = "Invalid RoleEntitlement ID"
-    //             });
-    //         }
-    //         var result = await Mediator.Send(new DeleteRoleEntitlementCommand { Id= id });                 
-    //         if (!result.IsSuccess)
-    //         {          
-    //              _logger.LogWarning($"Deletion failed for RoleEntitlement {id}: {result?.Message ?? "Unknown error"}.");
-    
-    //             return NotFound(new 
-    //             { 
-    //                 StatusCode = StatusCodes.Status404NotFound,
-    //                 message = result.Message
-    //             });
-    //         }
-    //         _logger.LogInformation($"RoleEntitlement {id} deleted successfully.");
-
-    //         return Ok(new
-    //         {
-    //             StatusCode = StatusCodes.Status200OK,
-    //             data =$"RoleEntitlement ID {id} Deleted" 
-    //         });
- 
-    //     }
-    // [HttpGet("by-name/{name}")]
-    // public async Task<IActionResult> GetRoleEntitlements(string name)
-    // {
-    //     var query = new GetRoleEntitlementsQuery { RoleName = name };
-    //         _logger.LogWarning("RoleEntitlement Listed successfully: {RoleName}", query);
-
-    //     var result = await Mediator.Send(query);
-    //     return Ok( new { StatusCode=StatusCodes.Status200OK, data = result });
-
-    // }   
+      
 }
 }

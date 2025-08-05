@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.INotifications;
 using Core.Domain.Events;
+using FluentValidation;
 using Hangfire;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -27,18 +28,15 @@ namespace Core.Application.Notification.Queries
            
         }
 
-       public async Task<ApiResponseDTO<NotificationResponse>> Handle(NotificationRequest request, CancellationToken cancellationToken)
+       public async Task<NotificationResponse> Handle(NotificationRequest request, CancellationToken cancellationToken)
         {
         _logger.LogInformation($"Handling user login request for Username: {request.Username}");
         var username = request.Username;
         if (string.IsNullOrWhiteSpace(request.Username))
             {
                 _logger.LogWarning("Invalid Username.");
-                return new ApiResponseDTO<NotificationResponse>
-                {
-                    IsSuccess = false,
-                    Message = "Username required."
-                };
+                throw new ValidationException("Username required.");
+              
             }
          _logger.LogInformation($"User {request.Username} found. Retrieving Password expiry details...");
 
@@ -49,11 +47,8 @@ namespace Core.Application.Notification.Queries
         if (lastPasswordChangeDate == null)
         {
             _logger.LogWarning($"Password last change date not found for Username: {request.Username}");
-            return new ApiResponseDTO<NotificationResponse>
-            {
-                IsSuccess = true,
-                Message = "Password last change date not found /Invalid Username."
-            };
+            throw new ValidationException("Password last change date not found /Invalid Username.");
+         
         }
         _logger.LogInformation($"Getting Last Password Change Date for Username: {lastPasswordChangeDate}");
 
@@ -72,40 +67,32 @@ namespace Core.Application.Notification.Queries
         _logger.LogInformation($"Fetching Password Expiry Details and Alert Days Details pwdExpiryDays: {pwdExpiryDays}. PwdExpiryAlertDays: {pwdExpiryAlertDays}");
         
         var passwordAge = (DateTime.Now - lastPasswordChangeDate).Value.Days;
-     
-        // handle case where password has expired
-        if (passwordAge >= pwdExpiryDays)
-        {
-            _logger.LogWarning($"Password has expired for Username: {request.Username}");
-            return new ApiResponseDTO<NotificationResponse>
+
+            // handle case where password has expired
+            if (passwordAge >= pwdExpiryDays)
             {
-                IsSuccess=false,
-                Message = "Your password has expired. Please update your password to regain access.."
-            };
-        }
-        
-        // handle case where password is near expiry
-        else if(passwordAge >= pwdExpiryDays - pwdExpiryAlertDays)
-        {   
-            int daysLeft = pwdExpiryDays - passwordAge;
-            _logger.LogWarning($"Your password will expire in {daysLeft} days. Please update your password to avoid any disruptions.", request.Username);
-               
-            return new ApiResponseDTO<NotificationResponse>
-            {   IsSuccess=false,
-                Message = $"Your password will expire in {daysLeft} days. Please update your password to avoid any disruptions."
-            };
+
+                _logger.LogWarning($"Password has expired for Username: {request.Username}");
+            throw new ValidationException("Your password has expired. Please update your password to regain access..");
          
         }
-        // handle case where password is still valid
-        else
-        {
-        _logger.LogInformation($"Password is still valid for Username: {request.Username}");
-        return new ApiResponseDTO<NotificationResponse>
-        {
-            IsSuccess=false,
-            Message="Your password is still valid."
-        };
-        }
+
+            // handle case where password is near expiry
+            else if (passwordAge >= pwdExpiryDays - pwdExpiryAlertDays)
+            {
+                int daysLeft = pwdExpiryDays - passwordAge;
+                _logger.LogWarning($"Your password will expire in {daysLeft} days. Please update your password to avoid any disruptions.", request.Username);
+                throw new ValidationException($"Your password will expire in {daysLeft} days. Please update your password to avoid any disruptions.");
+            
+
+            }
+            // handle case where password is still valid
+            else
+            {
+                _logger.LogInformation($"Password is still valid for Username: {request.Username}");
+                throw new ValidationException("Your password is still valid.");
+               
+            }
     }
        
     }

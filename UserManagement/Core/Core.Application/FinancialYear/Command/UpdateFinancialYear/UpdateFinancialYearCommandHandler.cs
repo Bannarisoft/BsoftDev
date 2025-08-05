@@ -10,10 +10,11 @@ using Microsoft.Extensions.Logging;
 using Core.Domain.Events;
 using Core.Application.FinancialYear.Queries.GetFinancialYear;
 using Core.Application.FinancialYear.Command.UpdateFinancialYear;
+using FluentValidation;
 
 namespace Core.Application.FinancialYear.Command.UpdateFinancialYear
 {
-    public class UpdateFinancialYearCommandHandler  :  IRequestHandler<UpdateFinancialYearCommand, ApiResponseDTO<int>>
+    public class UpdateFinancialYearCommandHandler  :  IRequestHandler<UpdateFinancialYearCommand, int>
     {
        
         private readonly IFinancialYearCommandRepository _financialYearCommandRepository;
@@ -32,7 +33,7 @@ namespace Core.Application.FinancialYear.Command.UpdateFinancialYear
              
         }
 
-         public async Task<ApiResponseDTO<int>> Handle(UpdateFinancialYearCommand request, CancellationToken cancellationToken)
+         public async Task<int> Handle(UpdateFinancialYearCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation($"Starting UpdateFinancialYearCommandHandler for request: {request}" );              
            
@@ -43,7 +44,8 @@ namespace Core.Application.FinancialYear.Command.UpdateFinancialYear
             if (result <= 0) // Entity not found
             {
                 _logger.LogInformation($"FinancialYear {request.Id} not found." );
-                return new ApiResponseDTO<int> { IsSuccess = false, Message = "FinancialYear not found." };
+                throw new ValidationException("FinancialYear not found.");
+                
             }
 
             //Domain Event
@@ -56,12 +58,7 @@ namespace Core.Application.FinancialYear.Command.UpdateFinancialYear
             );
             await _mediator.Publish(domainEvent);
             _logger.LogInformation($"Successfully completed UpdateFinancialYearCommandHandler for request: {request.Id}" );
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = result
-            };
+            return result;
 
         }
 

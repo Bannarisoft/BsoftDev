@@ -8,10 +8,11 @@ using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
 using Microsoft.Extensions.Logging;
 using Core.Application.Common.Interfaces;
+using FluentValidation;
 
 namespace Core.Application.Entity.Queries.GetEntityAutoComplete
 {
-    public class GetEntityAutocompleteQueryHandler : IRequestHandler<GetEntityAutocompleteQuery, ApiResponseDTO<List<EntityAutoCompleteDto>>>
+    public class GetEntityAutocompleteQueryHandler : IRequestHandler<GetEntityAutocompleteQuery, List<EntityAutoCompleteDto>>
     {
         private readonly IEntityQueryRepository _entityRepository;        
         private readonly IMapper _mapper;
@@ -30,7 +31,7 @@ namespace Core.Application.Entity.Queries.GetEntityAutoComplete
          _ipAddressService = ipAddressService;
     }
 
-    public async Task<ApiResponseDTO<List<EntityAutoCompleteDto>>> Handle(GetEntityAutocompleteQuery request, CancellationToken cancellationToken)
+    public async Task<List<EntityAutoCompleteDto>> Handle(GetEntityAutocompleteQuery request, CancellationToken cancellationToken)
     {
 
             var groupcode = _ipAddressService.GetGroupcode();
@@ -40,12 +41,7 @@ namespace Core.Application.Entity.Queries.GetEntityAutoComplete
                     var Adminresult = await _entityRepository.GetByEntityName_SuperAdmin(request.SearchPattern);
                     var Admindivision = _mapper.Map<List<EntityAutoCompleteDto>>(Adminresult);
 
-                    return new ApiResponseDTO<List<EntityAutoCompleteDto>>
-                   {
-                       IsSuccess = true,
-                       Message = "Success",
-                       Data = Admindivision
-                   }; 
+                    return Admindivision; 
                 }
                  _logger.LogInformation($"Search pattern started: {request.SearchPattern}");
                 var entities = await _entityRepository.GetByEntityNameAsync(request.SearchPattern);
@@ -53,11 +49,8 @@ namespace Core.Application.Entity.Queries.GetEntityAutoComplete
                 if (entities is null || !entities.Any() || entities.Count == 0)
                 {
                  _logger.LogWarning($"No Entity Record {request.SearchPattern} not found in DB.");
-                     return new ApiResponseDTO<List<EntityAutoCompleteDto>>
-                     {
-                         IsSuccess = false,
-                         Message = "No entity found"
-                     };
+                 throw new ValidationException("No entity found");
+                 
                 }
                 var entityDto = _mapper.Map<List<EntityAutoCompleteDto>>(entities);
                 //Domain Event
@@ -70,12 +63,7 @@ namespace Core.Application.Entity.Queries.GetEntityAutoComplete
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
                  _logger.LogInformation($"Entity {entities.Count} Listed successfully.");
-                return new ApiResponseDTO<List<EntityAutoCompleteDto>>
-                {
-                    IsSuccess = true,
-                    Message = "Success",
-                    Data = entityDto
-                };
+                return entityDto;
            
             }            
 

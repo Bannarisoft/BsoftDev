@@ -7,11 +7,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IDepartment;
 using Core.Application.Common.Interfaces.IDepartmentGroup;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.DepartmentGroup.Queries.GetDepartmentGroupById
 {
-  public class GetDepartmentGroupByIdQueryHandler : IRequestHandler<GetDepartmentGroupByIdQuery, ApiResponseDTO<DepartmentGroupByIdDto>>
+  public class GetDepartmentGroupByIdQueryHandler : IRequestHandler<GetDepartmentGroupByIdQuery, DepartmentGroupByIdDto>
   {
     private readonly IDepartmentGroupQueryRepository _departmentGroupRepository;
     private readonly IMapper _mapper;
@@ -25,19 +26,14 @@ namespace Core.Application.DepartmentGroup.Queries.GetDepartmentGroupById
 
     }
 
-        public async Task<ApiResponseDTO<DepartmentGroupByIdDto>> Handle(GetDepartmentGroupByIdQuery request, CancellationToken cancellationToken)
+        public async Task<DepartmentGroupByIdDto> Handle(GetDepartmentGroupByIdQuery request, CancellationToken cancellationToken)
         {
                var departmentGroup = await _departmentGroupRepository.GetDepartmentGroupByIdAsync(request.Id);
                     
                     if (departmentGroup == null)
                     {
-                       
-                        return new ApiResponseDTO<DepartmentGroupByIdDto>
-                        {
-                            IsSuccess = false,
-                            Message = "Department not found.",
-                            Data = null
-                        };
+                       throw new ValidationException("epartment not found.");
+                     
                     }
             
 
@@ -52,7 +48,7 @@ namespace Core.Application.DepartmentGroup.Queries.GetDepartmentGroupById
                 );
 
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<DepartmentGroupByIdDto> { IsSuccess = true, Message = "Success", Data = deptDto };
+            return deptDto;
 
                
         }

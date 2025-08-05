@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.FinancialYear.Command.UpdateFinancialYear
 {
-    public class UpdateFinancialYearCommand : IRequest<ApiResponseDTO<int>>
+    public class UpdateFinancialYearCommand : IRequest<int>
     {
 
          public int Id { get; set; }

@@ -6,10 +6,11 @@ using Core.Application.Common;
 using Core.Application.Common.Interfaces.ICountry;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
+using FluentValidation;
 
 namespace Core.Application.Country.Queries.GetCountryById
 {
-    public class GetCountryByIdQueryHandler : IRequestHandler<GetCountryByIdQuery, ApiResponseDTO<CountryDto>>
+    public class GetCountryByIdQueryHandler : IRequestHandler<GetCountryByIdQuery, CountryDto>
     {
         private readonly ICountryQueryRepository _countryRepository;
         private readonly IMapper _mapper;
@@ -22,16 +23,13 @@ namespace Core.Application.Country.Queries.GetCountryById
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<CountryDto>> Handle(GetCountryByIdQuery request, CancellationToken cancellationToken)
+        public async Task<CountryDto> Handle(GetCountryByIdQuery request, CancellationToken cancellationToken)
         {           
             var country = await _countryRepository.GetByIdAsync(request.Id);
             if (country is null)
             {
-                return new ApiResponseDTO<CountryDto>
-                {
-                    IsSuccess = false,
-                    Message = "Country not found"
-                };
+                throw new ValidationException("Country not found");
+             
             }            
             var countryDto = _mapper.Map<CountryDto>(country);
                 
@@ -44,12 +42,7 @@ namespace Core.Application.Country.Queries.GetCountryById
                 module:"Country"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<CountryDto>
-            {
-                IsSuccess = true,
-                Message = "Country fetched successfully",
-                Data = countryDto
-            };           
+            return  countryDto;           
         }
     }
 }

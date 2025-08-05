@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.Menu.Commands.UpdateMenu
 {
-    public class UpdateMenuCommand : IRequest<ApiResponseDTO<bool>>
+    public class UpdateMenuCommand : IRequest<bool>
     {
         public int Id { get; set; }
         public string MenuName { get; set; }

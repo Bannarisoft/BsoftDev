@@ -6,11 +6,12 @@ using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Companies.Queries.GetCompanies;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.Companies.Commands.UploadFileCompany
 {
-    public class UploadFileCompanyCommandHandler : IRequestHandler<UploadFileCompanyCommand, ApiResponseDTO<GetCompanyDTO>>
+    public class UploadFileCompanyCommandHandler : IRequestHandler<UploadFileCompanyCommand, GetCompanyDTO>
     {
          private readonly IFileUploadService _ifileUploadService;
          private readonly IMediator _mediator;
@@ -23,7 +24,7 @@ namespace Core.Application.Companies.Commands.UploadFileCompany
             _imapper = imapper;
         }
 
-        public async Task<ApiResponseDTO<GetCompanyDTO>> Handle(UploadFileCompanyCommand request, CancellationToken cancellationToken)
+        public async Task<GetCompanyDTO> Handle(UploadFileCompanyCommand request, CancellationToken cancellationToken)
         {
             // var existingFile = await _ifileUploadService.GetFileSession();
             // if(existingFile != "Not Found")
@@ -38,7 +39,8 @@ namespace Core.Application.Companies.Commands.UploadFileCompany
              var uploadResult = await _ifileUploadService.UploadFileAsync(request.File,  uploadPath);
              if (!uploadResult.IsSuccess)
              {
-                 return new ApiResponseDTO<GetCompanyDTO>{IsSuccess = false, Message = "File not uploaded"};
+                throw new ValidationException("File not uploaded");
+                 
              }
 
                 var response = new GetCompanyDTO
@@ -47,7 +49,7 @@ namespace Core.Application.Companies.Commands.UploadFileCompany
                      LogoBase64 = uploadResult.logoBase64
                  };
             //   await _ifileUploadService.SetFileSession( uploadResult.FilePath);
-             return new ApiResponseDTO<GetCompanyDTO>{IsSuccess = true, Data =  response};
+             return response;
         }
     }
 }

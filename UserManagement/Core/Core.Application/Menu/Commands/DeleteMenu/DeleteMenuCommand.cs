@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.Menu.Commands.DeleteMenu
 {
-    public class DeleteMenuCommand : IRequest<ApiResponseDTO<bool>>
+    public class DeleteMenuCommand : IRequest<bool>
     {
         public int Id { get; set; }
     }

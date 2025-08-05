@@ -13,7 +13,7 @@ using Core.Domain.Events;
 
 namespace Core.Application.UserRole.Commands.DeleteRole
 {
-    public class DeleteRoleCommandHandler :IRequestHandler<DeleteRoleCommand ,ApiResponseDTO<int>>
+    public class DeleteRoleCommandHandler :IRequestHandler<DeleteRoleCommand ,int>
   
     {
     
@@ -32,7 +32,7 @@ namespace Core.Application.UserRole.Commands.DeleteRole
          _userRoleQueryRepository = userRoleQueryRepository;
       }
 
-       public async Task<ApiResponseDTO<int>>Handle(DeleteRoleCommand request, CancellationToken cancellationToken)
+       public async Task<int>Handle(DeleteRoleCommand request, CancellationToken cancellationToken)
       {       
          _logger.LogInformation($"DeleteUserroleCommandHandler started for User Role ID: {request.Id}");
             var updateduserrolemap = _mapper.Map<Core.Domain.Entities.UserRole>(request);
@@ -45,12 +45,8 @@ namespace Core.Application.UserRole.Commands.DeleteRole
             if (userrole <= 0)
             {
                 _logger.LogWarning($"Failed to delete UserRole   with ID {request.Id}.");
-                return new ApiResponseDTO<int>
-                {
-                    IsSuccess = false,
-                    Message = "Failed to delete UserRole"
-                   
-                };
+                throw new Exception("Failed to delete UserRole");
+              
             }
                 _logger.LogInformation($"UserRole with ID {request.Id} deleted successfully.");
 
@@ -66,12 +62,7 @@ namespace Core.Application.UserRole.Commands.DeleteRole
             await _mediator.Publish(domainEvent, cancellationToken);
             _logger.LogInformation($"AuditLogsDomainEvent published for UserRole ID {request.Id}." );
 
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,
-                Message = "User Role deleted successfully"
-            
-            };  
+            return userrole;  
            
       }
 

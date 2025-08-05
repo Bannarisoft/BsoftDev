@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Core.Application.Companies.Commands.CreateCompany
 {
-    public class CreateCompanyCommand : IRequest<ApiResponseDTO<int>>
+    public class CreateCompanyCommand : IRequest<int>
     {
         public CompanyDTO Company { get; set; }
         

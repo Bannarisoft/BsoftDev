@@ -12,7 +12,7 @@ using static Core.Domain.Enums.FinancialYearEnum;
 
 namespace Core.Application.FinancialYear.Command.CreateFinancialYear
 {
-    public class CreateFinancialYearCommand : IRequest<ApiResponseDTO<FinancialYearDto>>
+    public class CreateFinancialYearCommand : IRequest<FinancialYearDto>
     {
 
         public int Id { get; set; }
