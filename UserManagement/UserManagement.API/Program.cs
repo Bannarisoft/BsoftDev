@@ -7,7 +7,8 @@ using UserManagement.API.GrpcServices;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using System.Security.Claims;
 using MediatR;
-using BackgroundService.Application.Notification.Common.Behaviors;
+using Core.Application.Common.Behaviors;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
