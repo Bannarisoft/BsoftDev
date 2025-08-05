@@ -6,6 +6,8 @@ using Core.Domain.Entities.Item;
 using InventoryManagement.Infrastructure.Data.Configurations.Item;
 using Core.Domain.Entities;
 using InventoryManagement.Infrastructure.Data.Configurations;
+using InventoryManagement.Infrastructure.Data.Configurations.Budget;
+using Core.Domain.Entities.Budget;
 using Microsoft.Identity.Client;
 
 namespace InventoryManagement.Infrastructure.Data
@@ -25,23 +27,30 @@ namespace InventoryManagement.Infrastructure.Data
 
          public DbSet<ItemGroup> ItemGroup { get; set; } 
          public DbSet<ItemCategory> ItemCategory { get; set; } 
+
 		 public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
          public DbSet<MiscMaster> MiscMaster { get; set; }        
          public DbSet<HSNMaster> HSNMaster { get; set; }
          public DbSet<UOM> UOMs { get; set; }
          public DbSet<UOMConversion> UOMConversions { get; set; }
-
-
+        public DbSet<BudgetMaster> BudgetMaster { get; set; }
+        public DbSet<BudgetDetail> BudgetDetail { get; set; }
+        public DbSet<BudgetLog> BudgetLog { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new ItemGroupConfiguration());
             modelBuilder.ApplyConfiguration(new ItemCategoryConfiguration());
+
             modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
             modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new BudgetMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new BudgetDetailConfiguration());
+            modelBuilder.ApplyConfiguration(new BudgetLogConfiguration());
             modelBuilder.ApplyConfiguration(new HSNMasterConfiguration());
             modelBuilder.ApplyConfiguration(new UOMConfiguration());
             modelBuilder.ApplyConfiguration(new UOMConversionConfiguration());
+
 
             base.OnModelCreating(modelBuilder);
         }

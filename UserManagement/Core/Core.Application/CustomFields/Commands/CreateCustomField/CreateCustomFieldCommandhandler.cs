@@ -7,11 +7,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.ICustomField;
 using Core.Domain.Entities;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.CustomFields.Commands.CreateCustomField
 {
-    public class CreateCustomFieldCommandhandler : IRequestHandler<CreateCustomFieldCommand, ApiResponseDTO<int>>
+    public class CreateCustomFieldCommandhandler : IRequestHandler<CreateCustomFieldCommand, int>
     {
         private readonly ICustomFieldCommand _customFieldCommand;
         private readonly IMapper _imapper;
@@ -22,7 +23,7 @@ namespace Core.Application.CustomFields.Commands.CreateCustomField
             _imapper = imapper;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<int>> Handle(CreateCustomFieldCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateCustomFieldCommand request, CancellationToken cancellationToken)
         {
              var customField  = _imapper.Map<CustomField>(request);
 
@@ -40,19 +41,10 @@ namespace Core.Application.CustomFields.Commands.CreateCustomField
                 //  );
                 //  await _mediator.Publish(domainEvent, cancellationToken);
                  
-                    return new ApiResponseDTO<int>
-                    {
-                        IsSuccess = true, 
-                        Message = "Custom field created successfully",
-                         Data = customFieldresult
-                    };
+                    return customFieldresult;
                 }
-               
-                    return new ApiResponseDTO<int>
-                    {
-                        IsSuccess = false, 
-                        Message = "Custom field not created"
-                    };
+               throw new ValidationException("Custom field not created");
+                 
         }
     }
 }

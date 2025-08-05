@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Core.Application.UserLogin.Commands.UnlockUser
 {
-    public class UnlockUserCommand : IRequest<ApiResponseDTO<bool>>
+    public class UnlockUserCommand : IRequest<bool>
     {
         public string? userName { get; set; }        
     }

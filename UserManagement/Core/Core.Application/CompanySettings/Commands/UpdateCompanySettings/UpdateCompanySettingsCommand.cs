@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.CompanySettings.Commands.UpdateCompanySettings
 {
-    public class UpdateCompanySettingsCommand : IRequest<ApiResponseDTO<bool>>
+    public class UpdateCompanySettingsCommand : IRequest<bool>
     {
         public int Id { get; set; }
         public int CompanyId { get; set; }

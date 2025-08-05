@@ -13,11 +13,12 @@ using Core.Application.Common.Interfaces.IUserRole;
 using Core.Application.Common.HttpResponse;
 using Core.Domain.Events;
 using Microsoft.Extensions.Logging;
+using FluentValidation;
 
 
 namespace Core.Application.UserRole.Queries.GetRoleById
 {
-    public class GetRoleByIdQueryHandler :IRequestHandler<GetRoleByIdQuery,ApiResponseDTO<GetUserRoleDto>>
+    public class GetRoleByIdQueryHandler :IRequestHandler<GetRoleByIdQuery,GetUserRoleDto>
     {
     private readonly IUserRoleQueryRepository _userRoleRepository;
      private readonly IMapper _mapper;
@@ -33,7 +34,7 @@ namespace Core.Application.UserRole.Queries.GetRoleById
         
           }
 
-          public async Task<ApiResponseDTO<GetUserRoleDto>> Handle(GetRoleByIdQuery request, CancellationToken cancellationToken)
+          public async Task<GetUserRoleDto> Handle(GetRoleByIdQuery request, CancellationToken cancellationToken)
           {
               _logger.LogInformation($"Processing GetRoleByIdQuery for ID: { request.Id}.");
 
@@ -43,12 +44,8 @@ namespace Core.Application.UserRole.Queries.GetRoleById
                 if (userRole is null)
                 {
                     _logger.LogWarning($"No user role found with ID: { request.Id}.");
-                    return new ApiResponseDTO<GetUserRoleDto>
-                    {
-                        IsSuccess = false,
-                        Message = $"No user role found with ID: {request.Id}.",
-                        Data = null
-                    };
+                    throw new ValidationException($"No user role found with ID: {request.Id}.");
+            
                 }
 
                 _logger.LogInformation($"User role found with ID: { request.Id}. Mapping to DTO.");
@@ -67,12 +64,7 @@ namespace Core.Application.UserRole.Queries.GetRoleById
                 await _mediator.Publish(domainEvent, cancellationToken);
 
                 _logger.LogInformation($"Returning success response for UserRole ID: {roleDto.Id}." );
-                return new ApiResponseDTO<GetUserRoleDto>
-                {
-                    IsSuccess = true,
-                    Message = "Success",
-                    Data = roleDto
-                };
+                return roleDto;
          
 
 

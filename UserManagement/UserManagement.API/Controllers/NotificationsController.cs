@@ -17,14 +17,12 @@ namespace UserManagement.API.Controllers
     {
          private readonly NotificationsQueryHandler _NotificationsQueryHandler;
          private readonly IMediator _mediator;
-         private readonly ApplicationDbContext _dbContext;
          private readonly ILogger<NotificationsController> _logger;
 
-        public NotificationsController(NotificationsQueryHandler NotificationsQueryHandler, IMediator mediator, ApplicationDbContext dbContext, ILogger<NotificationsController> logger) 
+        public NotificationsController(NotificationsQueryHandler NotificationsQueryHandler, IMediator mediator, ILogger<NotificationsController> logger) 
         : base(mediator)
         {
-            _NotificationsQueryHandler = NotificationsQueryHandler;   
-            _dbContext = dbContext; 
+            _NotificationsQueryHandler = NotificationsQueryHandler; 
             _mediator = mediator; 
             _logger = logger;
         }
@@ -32,26 +30,16 @@ namespace UserManagement.API.Controllers
         public async Task<IActionResult> PasswordResetNotifications([FromBody] NotificationRequest request)
         {
             var response = await _NotificationsQueryHandler.Handle(request, CancellationToken.None);
-            if (response.IsSuccess==false)
-            {
+           
                 _logger.LogInformation("User {Username} Password Reset Notifications information.", request.Username);
 
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status200OK,
-                    Message = response.Message
+                    Message = "Password Reset Notifications information.",
                   
                 });
-            }
-
-            _logger.LogWarning("Password is still valid for Username: {Username}. Reason: {Message}", 
-                request.Username, response.Message);
            
-            return NotFound(new
-            {
-                StatusCode = StatusCodes.Status404NotFound,
-                Message = response.Message
-            });
         }      
     }
 }

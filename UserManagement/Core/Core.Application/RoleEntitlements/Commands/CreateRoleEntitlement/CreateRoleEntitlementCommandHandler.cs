@@ -15,7 +15,7 @@ using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement
 {
-    public class CreateRoleEntitlementCommandHandler : IRequestHandler<CreateRoleEntitlementCommand, ApiResponseDTO<int>>
+    public class CreateRoleEntitlementCommandHandler : IRequestHandler<CreateRoleEntitlementCommand, bool>
     {
         private readonly IRoleEntitlementCommandRepository _roleEntitlementCommandrepository;
         private readonly IRoleEntitlementQueryRepository _roleEntitlementQueryrepository;
@@ -36,7 +36,7 @@ namespace Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement
 
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(CreateRoleEntitlementCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(CreateRoleEntitlementCommand request, CancellationToken cancellationToken)
         {
 
                 _logger.LogInformation("Starting role entitlement creation process for RoleName: {RoleName}");
@@ -79,11 +79,7 @@ namespace Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement
                     await _mediator.Publish(domainEvent, cancellationToken);
                     _logger.LogInformation("Role entitlements successfully created for RoleName: {RoleName}");
 
-                    return new ApiResponseDTO<int>
-                    {
-                        IsSuccess = true,
-                        Message = "Role entitlements created successfully."
-                    };
+                    return true;
         }
 
     }

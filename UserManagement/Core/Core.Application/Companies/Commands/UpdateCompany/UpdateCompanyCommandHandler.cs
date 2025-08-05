@@ -8,11 +8,12 @@ using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.ICompany;
 using Core.Domain.Entities;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.Companies.Commands.UpdateCompany
 {
-    public class UpdateCompanyCommandHandler : IRequestHandler<UpdateCompanyCommand, ApiResponseDTO<bool>>
+    public class UpdateCompanyCommandHandler : IRequestHandler<UpdateCompanyCommand, bool>
     {
         private readonly ICompanyCommandRepository _icompanyRepository;
         private readonly IFileUploadService _ifileUploadService;
@@ -29,7 +30,7 @@ namespace Core.Application.Companies.Commands.UpdateCompany
             _mediator = mediator;
         }
 
-          public async Task<ApiResponseDTO<bool>> Handle(UpdateCompanyCommand request, CancellationToken cancellationToken)
+          public async Task<bool> Handle(UpdateCompanyCommand request, CancellationToken cancellationToken)
         {
             
             
@@ -37,7 +38,8 @@ namespace Core.Application.Companies.Commands.UpdateCompany
 
               if (existingCompany != null)
               {
-                  return new ApiResponseDTO<bool>{IsSuccess = false, Message = "Company already exists"};
+                throw new ValidationException("Company already exists");
+                  
               }
             var company  = _imapper.Map<Company>(request.Company);
             
@@ -54,9 +56,10 @@ namespace Core.Application.Companies.Commands.UpdateCompany
                      module:"Company"
                  );
                  await _mediator.Publish(domainEvent, cancellationToken);
-               return new ApiResponseDTO<bool>{IsSuccess = true, Message = "Company updated successfully"};
+               return CompanyId;
            }
-            return new ApiResponseDTO<bool>{IsSuccess = false, Message = "Company not updated"};
+           throw new Exception("Company not updated");
+            
         }
     }
 }

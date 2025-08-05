@@ -9,11 +9,12 @@ using Core.Domain.Events;
 using Microsoft.Extensions.Logging;
 using Core.Application.Common.HttpResponse;
 using Core.Domain.Enums.Common;
+using FluentValidation;
 
 
 namespace Core.Application.PasswordComplexityRule.Commands.UpdatePasswordComplexityRule
 {
-    public class UpdatePasswordComplexityRuleCommandHandler :IRequestHandler<UpdatePasswordComplexityRuleCommand, ApiResponseDTO<PwdRuleDto>>
+    public class UpdatePasswordComplexityRuleCommandHandler :IRequestHandler<UpdatePasswordComplexityRuleCommand, bool>
     {
          public readonly IPasswordComplexityRuleCommandRepository  _IPasswordComplexityRepository;
          private readonly IMapper _Imapper;  
@@ -32,7 +33,7 @@ namespace Core.Application.PasswordComplexityRule.Commands.UpdatePasswordComplex
 
           }
 
-        public async Task<ApiResponseDTO<PwdRuleDto>> Handle(UpdatePasswordComplexityRuleCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(UpdatePasswordComplexityRuleCommand request, CancellationToken cancellationToken)
             {
               _logger.LogInformation($"Handling UpdatePasswordComplexityRuleCommand for Password Complexity Rule with ID: { request.Id}");
 
@@ -46,11 +47,8 @@ namespace Core.Application.PasswordComplexityRule.Commands.UpdatePasswordComplex
                                 if (result <=0)
                         {
                             _logger.LogWarning($"Failed to update Password Complexity Rule with ID {request.Id}.");
-                            return new ApiResponseDTO<PwdRuleDto>
-                            {
-                                IsSuccess = false,
-                                Message = "Failed to update Password Complexity Rule"
-                            };
+                            throw new ValidationException("Failed to update Password Complexity Rule");
+                       
                         }
                   
 
@@ -69,12 +67,7 @@ namespace Core.Application.PasswordComplexityRule.Commands.UpdatePasswordComplex
                       await _mediator.Publish(domainEvent, cancellationToken);
             _logger.LogInformation($"AuditLogsDomainEvent published for Password Complexity Rule ID {request.Id}.");
 
-            return new ApiResponseDTO<PwdRuleDto>
-            {
-                IsSuccess = true,
-                Message = "Password Complexity Rule updated successfully"
-               
-            };                                     
+            return result > 0;                                     
 
             }
 

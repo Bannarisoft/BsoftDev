@@ -9,10 +9,11 @@ using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
 using Microsoft.Extensions.Logging;
 using Core.Application.Common.Interfaces;
+using FluentValidation;
 
 namespace Core.Application.Units.Queries.GetUnitAutoComplete
 {
-    public class GetUnitAutoCompleteQueryHandler : IRequestHandler<GetUnitAutoCompleteQuery, ApiResponseDTO<List<UnitAutoCompleteDTO>>>
+    public class GetUnitAutoCompleteQueryHandler : IRequestHandler<GetUnitAutoCompleteQuery, List<UnitAutoCompleteDTO>>
     {
          private readonly IUnitQueryRepository _unitRepository;        
         private readonly IMapper _mapper;
@@ -31,7 +32,7 @@ namespace Core.Application.Units.Queries.GetUnitAutoComplete
             _ipAddressService = ipAddressService;
         }
 
-        public async Task<ApiResponseDTO<List<UnitAutoCompleteDTO>>> Handle(GetUnitAutoCompleteQuery request, CancellationToken cancellationToken)
+        public async Task<List<UnitAutoCompleteDTO>> Handle(GetUnitAutoCompleteQuery request, CancellationToken cancellationToken)
         {     
             var groupcode = _ipAddressService.GetGroupcode();
 
@@ -40,12 +41,7 @@ namespace Core.Application.Units.Queries.GetUnitAutoComplete
                     var Adminresult = await _unitRepository.GetUnit_SuperAdmin(request.SearchPattern);
                     var AdminunitDto = _mapper.Map<List<UnitAutoCompleteDTO>>(Adminresult);
 
-                    return new ApiResponseDTO<List<UnitAutoCompleteDTO>>
-                   {
-                       IsSuccess = true,
-                       Message = "Success",
-                       Data = AdminunitDto
-                   }; 
+                    return AdminunitDto; 
                 }
            _logger.LogInformation($"Search pattern started: {request.SearchPattern}");
 
@@ -54,11 +50,8 @@ namespace Core.Application.Units.Queries.GetUnitAutoComplete
               if (result is null || !result.Any() || result.Count == 0) 
                 {
                       _logger.LogWarning($"No Unit Record {request.SearchPattern} not found in DB.");
-                     return new ApiResponseDTO<List<UnitAutoCompleteDTO>>
-                     {
-                         IsSuccess = false,
-                         Message = "Unit not found."
-                     };
+                      throw new ValidationException("Unit not found.");
+                    
                 }
 
             var unitDto = _mapper.Map<List<UnitAutoCompleteDTO>>(result);
@@ -74,12 +67,7 @@ namespace Core.Application.Units.Queries.GetUnitAutoComplete
             await _mediator.Publish(domainEvent, cancellationToken);
 
             _logger.LogInformation($"Unit {result.Count} Listed successfully.");
-            return new ApiResponseDTO<List<UnitAutoCompleteDTO>>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = unitDto
-            };                                    
+            return unitDto;                                    
         }
     }
 }

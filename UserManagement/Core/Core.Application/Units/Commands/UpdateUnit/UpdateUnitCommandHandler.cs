@@ -5,10 +5,11 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Core.Application.Common.Interfaces.IUnit;
 using Core.Application.Common.HttpResponse;
+using FluentValidation;
 
 namespace Core.Application.Units.Commands.UpdateUnit
 {
-    public class UpdateUnitCommandHandler : IRequestHandler<UpdateUnitCommand, ApiResponseDTO<int>>
+    public class UpdateUnitCommandHandler : IRequestHandler<UpdateUnitCommand, int>
     {
         private readonly IUnitCommandRepository _iUnitRepository;
 
@@ -24,7 +25,7 @@ namespace Core.Application.Units.Commands.UpdateUnit
             _iunitQueryRepository = IunitQueryRepository;
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(UpdateUnitCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(UpdateUnitCommand request, CancellationToken cancellationToken)
         {
        
             _logger.LogInformation($"Starting update process for UnitId: {request.UpdateUnitDto.Id}");
@@ -33,11 +34,8 @@ namespace Core.Application.Units.Commands.UpdateUnit
             if (existingUnit is null )
             {
                 _logger.LogWarning($"Unit ID {request.UpdateUnitDto.Id} not found.");
-                return new ApiResponseDTO<int>
-                {
-                    IsSuccess = false,
-                    Message = "Unit Id not found / Unit is deleted."
-                };
+                throw new ValidationException("Unit Id not found / Unit is deleted.");
+                
             }
 
             // Check if unit name already exists for another ID
@@ -45,11 +43,8 @@ namespace Core.Application.Units.Commands.UpdateUnit
             if (existingUnitName)
             {
                 _logger.LogWarning($"Unit name {request.UpdateUnitDto.UnitName} already exists.");
-                return new ApiResponseDTO<int>
-                {
-                    IsSuccess = false,
-                    Message = "Unit name already exists."
-                };
+                throw new ValidationException("Unit name already exists.");
+              
             }
 
             var unit = _mapper.Map<Core.Domain.Entities.Unit>(request.UpdateUnitDto);
@@ -58,12 +53,8 @@ namespace Core.Application.Units.Commands.UpdateUnit
             {
                  _logger.LogWarning($"UnitId not found: {request.UpdateUnitDto.Id}");
 
-                    // The unit was not found, 
-                    return new ApiResponseDTO<int>
-                  {
-                      IsSuccess = false,
-                      Message = "UnitId not found",
-                  };
+                    throw new ValidationException("UnitId not found");
+                   
            
             }
             _logger.LogInformation($"Completed update process for UnitId: {request.UpdateUnitDto.Id}");
@@ -72,12 +63,7 @@ namespace Core.Application.Units.Commands.UpdateUnit
               _logger.LogInformation($"Unit {unitId} Fetched successfully For Other Tables UnitAddress and UnitContacts");
 
               _logger.LogInformation($"Unit {unitId} Updated successfully");
-              return new ApiResponseDTO<int>
-                {
-                    IsSuccess = true,
-                    Message = "Unit updated successfully",
-                    Data = unitId
-                };
+              return unitId;
 
         
         }

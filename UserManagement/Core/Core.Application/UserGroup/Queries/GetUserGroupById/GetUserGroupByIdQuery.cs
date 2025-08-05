@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.UserGroup.Queries.GetUserGroupById
 {
-    public class GetUserGroupByIdQuery : IRequest<ApiResponseDTO<UserGroupDto>>
+    public class GetUserGroupByIdQuery : IRequest<UserGroupDto>
     {
         public int Id { get; set; }
     }

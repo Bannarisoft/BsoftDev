@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.UserGroup.Commands.DeleteUserGroup
 {
-    public class DeleteUserGroupCommand :  IRequest<ApiResponseDTO<UserGroupDto>>  
+    public class DeleteUserGroupCommand :  IRequest<UserGroupDto>
        {
                 public int Id { get; set; }                
        }

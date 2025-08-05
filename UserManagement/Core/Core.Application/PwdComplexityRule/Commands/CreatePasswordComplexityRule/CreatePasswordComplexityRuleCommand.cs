@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Core.Application.PwdComplexityRule.Commands.CreatePasswordComplexityRule
 {
-    public class CreatePasswordComplexityRuleCommand : IRequest<ApiResponseDTO<PwdRuleDto>>
+    public class CreatePasswordComplexityRuleCommand : IRequest<PwdRuleDto>
     {
 
     

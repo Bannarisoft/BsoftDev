@@ -7,11 +7,12 @@ using Core.Domain.Events;
 using Microsoft.Extensions.Logging;
 using Contracts.Interfaces.External.IMaintenance;
 using Contracts.Interfaces.External.IFixedAssetManagement;
+using FluentValidation;
 
 namespace Core.Application.Departments.Commands.DeleteDepartment
 {
 
-    public class DeleteDepartmentCommandHandler : IRequestHandler<DeleteDepartmentCommand, ApiResponseDTO<int>>
+    public class DeleteDepartmentCommandHandler : IRequestHandler<DeleteDepartmentCommand, int>
     {
 
         private readonly IDepartmentCommandRepository _IdepartmentCommandRepository;
@@ -35,7 +36,7 @@ namespace Core.Application.Departments.Commands.DeleteDepartment
         }
 
 
-        public async Task<ApiResponseDTO<int>> Handle(DeleteDepartmentCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(DeleteDepartmentCommand request, CancellationToken cancellationToken)
         {
 
             _logger.LogInformation("DeleteDepartmentCommandHandler started for Department ID: {DepartmentId}", request.Id);
@@ -49,12 +50,8 @@ namespace Core.Application.Departments.Commands.DeleteDepartment
             if (isUsedInMaintenance || isUsedInFixedAsset)
             {
                 _logger.LogWarning("Cannot delete Department ID {DepartmentId} - it is in use by CostCenters.", request.Id);
-                return new ApiResponseDTO<int>
-                {
-                    IsSuccess = false,
-                    Message = "Cannot delete department. It is still in use in Maintenance or FixedAsset systems.",
-                    Data = 0
-                };
+                throw new ValidationException("Cannot delete department. It is still in use in Maintenance or FixedAsset systems.");
+               
             }
             
             // Map request to entity and delete
@@ -64,12 +61,7 @@ namespace Core.Application.Departments.Commands.DeleteDepartment
             if (result <= 0)
             {
                 _logger.LogWarning("Failed to delete Department with ID {DepartmentId}.", request.Id);
-                return new ApiResponseDTO<int>
-                {
-                    IsSuccess = false,
-                    Message = "Failed to delete department",
-                    Data = result
-                };
+                return result;
             }
 
             _logger.LogInformation("Department with ID {DepartmentId} deleted successfully.", request.Id);
@@ -86,12 +78,7 @@ namespace Core.Application.Departments.Commands.DeleteDepartment
             await _mediator.Publish(domainEvent, cancellationToken);
             _logger.LogInformation("AuditLogsDomainEvent published for Department ID {DepartmentId}.", request.Id);
 
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,
-                Message = "Department deleted successfully",
-                Data = result
-            };
+            return result;
 
         }
 

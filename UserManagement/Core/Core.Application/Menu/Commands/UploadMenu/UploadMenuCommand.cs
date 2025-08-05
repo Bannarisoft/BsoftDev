@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Core.Application.Menu.Commands.UploadMenu
 {
-    public class UploadMenuCommand : IRequest<ApiResponseDTO<string>>
+    public class UploadMenuCommand : IRequest<string>
     {
         public IFormFile File { get; set; }
     }

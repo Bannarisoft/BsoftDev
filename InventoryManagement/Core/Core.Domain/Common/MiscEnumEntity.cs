@@ -1,18 +1,16 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Core.Domain.Common
 {
-    public class MiscEnumEntity
+    public static class MiscEnumEntity
     {
-         public static class MiscTypes
+        public static class Budget_ActionType
         {
-
-            public const string WarehouseType = "WarehouseType";
-            public const string StorageType= "StorageType";            
-             
-        } 
+            public const string Insert = "INSERT";
+            public const string Update = "UPDATE";
+            public const string Delete = "DELETE";
+        }
+			public const string WarehouseType = "WarehouseType";
+            public const string StorageType= "StorageType"; 
     }
 }

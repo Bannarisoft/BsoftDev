@@ -8,6 +8,7 @@ using Core.Application.Common.Interfaces.IUser;
 using Core.Application.Common.Interfaces.IUserSession;
 using Core.Domain.Entities;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -15,7 +16,7 @@ using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.SwitchProfile.Commands.SwitchProfileByUnit
 {
-    public class SwitchProfileByUnitCommandHandler : IRequestHandler<SwitchProfileByUnitCommand, ApiResponseDTO<SwitchProfileByUnitDTO>>
+    public class SwitchProfileByUnitCommandHandler : IRequestHandler<SwitchProfileByUnitCommand, SwitchProfileByUnitDTO>
     {
         private readonly IJwtTokenHelper  _jwtTokenHelper;
         private readonly IUserSessionRepository _userSessionRepository;
@@ -36,7 +37,7 @@ namespace Core.Application.SwitchProfile.Commands.SwitchProfileByUnit
             _ipAddressService = ipAddressService;
             _jwtSettings = jwtSettings.Value;
         }
-        public async Task<ApiResponseDTO<SwitchProfileByUnitDTO>> Handle(SwitchProfileByUnitCommand request, CancellationToken cancellationToken)
+        public async Task<SwitchProfileByUnitDTO> Handle(SwitchProfileByUnitCommand request, CancellationToken cancellationToken)
         {
             var userId = _ipAddressService.GetUserId();
             var groupCode = _ipAddressService.GetGroupcode();
@@ -44,11 +45,8 @@ namespace Core.Application.SwitchProfile.Commands.SwitchProfileByUnit
             var user = await _userQueryRepository.GetByUserByUnit(userId,request.UnitId);
             if (user == null)
             {
-                return new ApiResponseDTO<SwitchProfileByUnitDTO>
-                {
-                    IsSuccess = false,
-                    Message = "User does not exist."
-                };
+                throw new ValidationException("User does not exist.");
+               
             }
             var token = _jwtTokenHelper.GenerateToken(user.UserName,userId,user.Mobile,user.EmailId,user.IsFirstTimeUser.ToString(),user.EntityId ?? 0,groupCode,request.CompanyId,request.DivisionId,request.UnitId ,request.OldUnitId,user.FirstName,user.LastName, out var jti);   
            
@@ -79,15 +77,10 @@ namespace Core.Application.SwitchProfile.Commands.SwitchProfileByUnit
                 module:"User"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<SwitchProfileByUnitDTO>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = new SwitchProfileByUnitDTO
+            return  new SwitchProfileByUnitDTO
                 {
                     Token = token
-                }
-            };
+                };
         }
     }
 }

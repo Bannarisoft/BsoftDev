@@ -10,12 +10,13 @@ using Core.Application.Common;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
 using Serilog;
+using FluentValidation;
 
 
 
 namespace Core.Application.Entity.Commands.CreateEntity
 {
-    public class CreateEntityCommandHandler :  IRequestHandler<CreateEntityCommand, ApiResponseDTO<int>>
+    public class CreateEntityCommandHandler :  IRequestHandler<CreateEntityCommand, int>
     {
         private readonly IEntityCommandRepository _IentityRepository;
 
@@ -35,18 +36,15 @@ namespace Core.Application.Entity.Commands.CreateEntity
            
         }
 
-  public async Task<ApiResponseDTO<int>> Handle(CreateEntityCommand request, CancellationToken cancellationToken)
+  public async Task<int> Handle(CreateEntityCommand request, CancellationToken cancellationToken)
 {
          // Check if Entity Name already exists
         var exists = await _IentityRepository.ExistsByCodeAsync(request.EntityName);
             if (exists)
             {
                  _logger.LogWarning($"Entity Name {request.EntityName} already exists.");
-                 return new ApiResponseDTO<int>
-            {
-            IsSuccess = false,
-            Message = "Entity Name already exists."
-            };
+                 throw new ValidationException("Entity Name already exists.");
+               
             }
         _logger.LogInformation($"Starting creation process for EntityCode: {request}");
         var entityCode = await _Imediator.Send(new GetEntityLastCodeQuery(), cancellationToken);
@@ -55,12 +53,8 @@ namespace Core.Application.Entity.Commands.CreateEntity
         if (entityCode.Data is null || string.IsNullOrEmpty(entityCode.Data))
         { 
             _logger.LogError($"Failed to create user for EntityCode: {entityCode.Data}");
-            return new ApiResponseDTO<int> 
-            { 
-                IsSuccess = false, 
-                Message = "Failed to generate entity code." 
-                
-            };
+            throw new Exception("Failed to generate entity code.");
+            
         }
         // Map the request to the Core domain entity
         var entity = _Imapper.Map<Core.Domain.Entities.Entity>(request);
@@ -86,22 +80,11 @@ namespace Core.Application.Entity.Commands.CreateEntity
              if (result > 0)
                   {
                      _logger.LogInformation("Entity {Entity} created successfully", result);
-                        return new ApiResponseDTO<int>
-                       {
-                           IsSuccess = true,
-                           Message = "Entity created successfully",
-                           Data = result
-                      };
+                        return result;
                  }
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,
-                Message = "Entity Creation Failed",
-                Data = result
-            };
-           
-
+                 throw new Exception("Entity Creation Failed");
       
+           
 
 }
 

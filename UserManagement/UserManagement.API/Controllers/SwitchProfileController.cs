@@ -24,22 +24,14 @@ namespace UserManagement.API.Controllers
         {
             var units = await Mediator.Send(new GetUnitProfileQuery {});
              
-            if(units.IsSuccess)
-            {
-                
+           
                 return Ok(new
                 {
-                    message = units.Message,
+                    message = "Unit List",
                     statusCode = StatusCodes.Status200OK,
-                    data = units.Data
+                    data = units
                 });
-            }
-            
-            return NotFound(new
-            {
-                message = units.Message,
-                statusCode = StatusCodes.Status404NotFound
-            });
+          
           
         }
            [HttpPost("SwitchProfile")]   
@@ -47,13 +39,9 @@ namespace UserManagement.API.Controllers
         { 
                           
             var result = await Mediator.Send(command);
-            if(result.IsSuccess)
-            {                
-                return Ok(new { StatusCode=StatusCodes.Status201Created, message = result.Message, errors = "", data = result.Data });
-            }
-            
-
-            return BadRequest( new { StatusCode=StatusCodes.Status400BadRequest, message = result.Message, errors = "" }); 
+                          
+                return Ok(new { StatusCode=StatusCodes.Status201Created, message = "Switched Profile", errors = "", data = result });
+           
             
         }
     }

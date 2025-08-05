@@ -4,11 +4,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IUserGroup;
 using Core.Application.UserGroup.Queries.GetUserGroup;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.UserGroup.Commands.CreateUserGroup
 {
-    public class CreateUserGroupCommandHandler  : IRequestHandler<CreateUserGroupCommand, ApiResponseDTO<UserGroupDto>>
+    public class CreateUserGroupCommandHandler  : IRequestHandler<CreateUserGroupCommand, UserGroupDto>
 {
     private readonly IMapper _mapper;
     private readonly IUserGroupCommandRepository _userGroupRepository;    
@@ -22,16 +23,13 @@ namespace Core.Application.UserGroup.Commands.CreateUserGroup
         _mediator = mediator;               
     }
 
-    public async Task<ApiResponseDTO<UserGroupDto>> Handle(CreateUserGroupCommand request, CancellationToken cancellationToken)
+    public async Task<UserGroupDto> Handle(CreateUserGroupCommand request, CancellationToken cancellationToken)
     {
         var userGroupExists = await _userGroupRepository.GetUserGroupByCodeAsync(request.GroupName ?? string.Empty,request.GroupCode ?? string.Empty);        
         if (userGroupExists.Id !=0)
         {
-            return new ApiResponseDTO<UserGroupDto>
-            {
-                IsSuccess = false,
-                Message = "GroupCode already exists"
-            };
+            throw new ValidationException("GroupCode already exists");
+          
         }
         var userGroupEntity = _mapper.Map<Core.Domain.Entities.UserGroup>(request);    
          
@@ -51,19 +49,11 @@ namespace Core.Application.UserGroup.Commands.CreateUserGroup
             var userGroupDto = _mapper.Map<UserGroupDto>(result);
             if (userGroupDto.Id > 0)
             {
-                return new ApiResponseDTO<UserGroupDto>
-                {
-                    IsSuccess = true,
-                    Message = "UserGroup created successfully",
-                    Data = userGroupDto
-                };
+                return userGroupDto;
             }
         }
-        return new ApiResponseDTO<UserGroupDto>
-        {
-            IsSuccess = false,
-            Message = "UserGroup not created"
-        };
+        throw new Exception("UserGroup not created");
+       
     }
     }
 }

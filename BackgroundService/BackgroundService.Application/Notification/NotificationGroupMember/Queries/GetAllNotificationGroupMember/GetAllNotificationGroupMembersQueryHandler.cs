@@ -9,7 +9,7 @@ using MediatR;
 
 namespace BackgroundService.Application.Notification.NotificationGroupMember.Queries.GetAllNotificationGroupMember
 {
-    public class GetAllNotificationGroupMembersQueryHandler : IRequestHandler<GetAllNotificationGroupMembersQuery, ApiResponseDTO<List<NotificationGroupMemberDto>>>
+    public class GetAllNotificationGroupMembersQueryHandler : IRequestHandler<GetAllNotificationGroupMembersQuery, ApiResponseDTO<List<NotificationGroupDto>>>
     {
         private readonly INotificationGroupMemberQuery _notificationGroupMemberQuery;
         private readonly IMediator _mediator;
@@ -20,13 +20,13 @@ namespace BackgroundService.Application.Notification.NotificationGroupMember.Que
             _mediator = mediator;
             _mapper = mapper;
         }
-        public async Task<ApiResponseDTO<List<NotificationGroupMemberDto>>> Handle(GetAllNotificationGroupMembersQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<List<NotificationGroupDto>>> Handle(GetAllNotificationGroupMembersQuery request, CancellationToken cancellationToken)
         {
             var (NotificationGroup, TotalCount) = await _notificationGroupMemberQuery.GetAllNotificationGroupAsync(request.PageNumber, request.PageSize, request.SearchTerm);
-            var NotificationGroupDto = _mapper.Map<List<NotificationGroupMemberDto>>(NotificationGroup);
+            var NotificationGroupDto = _mapper.Map<List<NotificationGroupDto>>(NotificationGroup);
 
 
-            return new ApiResponseDTO<List<NotificationGroupMemberDto>>
+            return new ApiResponseDTO<List<NotificationGroupDto>>
             {
                 IsSuccess = true,
                 Message = "Success",

@@ -13,7 +13,7 @@ using static Core.Domain.Enums.Common.Enums;
 namespace Core.Application.Departments.Commands.UpdateDepartment
 {
 
-    public class UpdateDepartmentCommand : IRequest<ApiResponseDTO<DepartmentDto>>
+    public class UpdateDepartmentCommand : IRequest<bool>
     {
         public int Id { get; set; }       
         public string? ShortName { get; set; }

@@ -12,7 +12,7 @@ using MediatR;
 
 namespace Core.Application.EntityLevelAdmin.Commands.SendOTP
 {
-    public class SendOTPCommandHandler : IRequestHandler<SendOTPCommand, ApiResponseDTO<SendOTPDTO>>
+    public class SendOTPCommandHandler : IRequestHandler<SendOTPCommand, SendOTPDTO>
     {
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
@@ -28,7 +28,7 @@ namespace Core.Application.EntityLevelAdmin.Commands.SendOTP
             _timeZoneService = timeZoneService;
         }
 
-        public async Task<ApiResponseDTO<SendOTPDTO>> Handle(SendOTPCommand request, CancellationToken cancellationToken)
+        public async Task<SendOTPDTO> Handle(SendOTPCommand request, CancellationToken cancellationToken)
         {
             string verificationCode = await _changePasswordService.GenerateVerificationCode(6);
             int expiryMinutes = await _notificationsQueryRepository.GetResetCodeExpiryMinutes();
@@ -56,17 +56,12 @@ namespace Core.Application.EntityLevelAdmin.Commands.SendOTP
 
             await _mediator.Publish(domainEvent, cancellationToken);
 
-            return new ApiResponseDTO<SendOTPDTO>()
-            {
-                IsSuccess = true,
-                Message = "OTP sent successfully.",
-                Data = new SendOTPDTO 
+            return  new SendOTPDTO 
                 { 
                     Email = request.Email,
                     PasswordResetCodeExpiryMinutes = expiryMinutes,
                     VerificationCode = verificationCode
-                }
-            };
+                };
         }
     }
 }

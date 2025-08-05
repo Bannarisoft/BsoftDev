@@ -7,11 +7,12 @@ using Core.Domain.Events;
 using Core.Application.Common;
 using Core.Application.Common.HttpResponse;
 using Microsoft.Extensions.Logging;
+using FluentValidation;
 
 namespace Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch
 {
 
-    public class GetDepartmentAutoCompleteSearchQueryHandler : IRequestHandler<GetDepartmentAutoCompleteSearchQuery, ApiResponseDTO<List<DepartmentAutocompleteDto>>>
+    public class GetDepartmentAutoCompleteSearchQueryHandler : IRequestHandler<GetDepartmentAutoCompleteSearchQuery, List<DepartmentAutocompleteDto>>
     {
         private readonly IDepartmentQueryRepository _departmentRepository;
         private readonly IMapper _mapper;
@@ -31,7 +32,7 @@ namespace Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch
         }
 
 
-        public async Task<ApiResponseDTO<List<DepartmentAutocompleteDto>>> Handle(GetDepartmentAutoCompleteSearchQuery request, CancellationToken cancellationToken)
+        public async Task<List<DepartmentAutocompleteDto>> Handle(GetDepartmentAutoCompleteSearchQuery request, CancellationToken cancellationToken)
         { 
 
             var groupcode = _ipAddressService.GetGroupcode();
@@ -41,12 +42,7 @@ namespace Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch
                     var Adminresult = await _departmentRepository.GetDepartment_SuperAdmin(request.SearchPattern);
                     var AdmindeptDto = _mapper.Map<List<DepartmentAutocompleteDto>>(Adminresult);
 
-                    return new ApiResponseDTO<List<DepartmentAutocompleteDto>>
-                   {
-                       IsSuccess = true,
-                       Message = "Success",
-                       Data = AdmindeptDto
-                   }; 
+                    return  AdmindeptDto; 
                 }
 
             _logger.LogInformation($"Handling GetDepartmentAutoCompleteSearchQuery with search pattern: {request.SearchPattern}" );
@@ -57,8 +53,8 @@ namespace Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch
                 if (result is null || !result.Any())
                     {
                     _logger.LogWarning("No department records found in the database. Total count: {Count}", result?.Count ?? 0);
-
-                        return new ApiResponseDTO<List<DepartmentAutocompleteDto>> { IsSuccess = false, Message = "No Record Found" };
+                    throw new ValidationException("No Record Found");
+                        
                     }
                 _logger.LogInformation($"Departments found for search pattern: {request.SearchPattern}. Mapping results to DTO.");
 
@@ -77,12 +73,7 @@ namespace Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch
 
                 _logger.LogInformation($"Domain event published for search pattern: {request.SearchPattern}");
 
-                return new ApiResponseDTO<List<DepartmentAutocompleteDto>>
-                {
-                    IsSuccess = true,
-                    Message = "Success",
-                    Data = deptDto
-                };
+                return deptDto;
                
 
         }

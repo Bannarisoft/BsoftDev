@@ -18,16 +18,13 @@ namespace UserManagement.API.Controllers
     
     public class UnitController : ApiControllerBase
     {
-        private readonly IValidator<CreateUnitCommand> _createUnitCommandValidator;
-        private readonly IValidator<UpdateUnitCommand> _updateUnitCommandValidator;
-        private readonly ApplicationDbContext _dbContext;
+       
         private readonly ILogger<UnitController> _logger;
-        public UnitController(ISender mediator,IValidator<CreateUnitCommand> createUnitCommandValidator,IValidator<UpdateUnitCommand> updateUnitCommandValidator,ApplicationDbContext dbContext, ILogger<UnitController> logger) 
+        public UnitController(ISender mediator,
+        ILogger<UnitController> logger) 
         : base(mediator)
         {
-            _createUnitCommandValidator = createUnitCommandValidator;   
-            _updateUnitCommandValidator = updateUnitCommandValidator; 
-            _dbContext = dbContext;  
+            
             _logger = logger;
         }
         [HttpGet]
@@ -81,58 +78,30 @@ namespace UserManagement.API.Controllers
                 });
         }
             var unit = await Mediator.Send(new GetUnitByIdQuery() { Id = id});
-           if (unit.IsSuccess)
-            {
-               _logger.LogInformation($"UnitId {unit.Data} Listed successfully.");
+        
                 return Ok(new
                 {
-                    message = unit.Message,
+                    message = "Unit Fetched Successfully",
                     statusCode = StatusCodes.Status200OK,
-                    data = unit.Data
+                    data = unit
                 });
-            }
-            _logger.LogWarning($"UnitId {unit.Data} Not found.");
-           return NotFound(new
-            {
-                message = unit.Message,
-                statusCode = StatusCodes.Status404NotFound
-            });
+         
         
         }
 
     [HttpPost]
     public async Task<IActionResult> CreateUnitAsync(CreateUnitCommand createUnitCommand)
     {
-        var validationResult = await _createUnitCommandValidator.ValidateAsync(createUnitCommand);
-        _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
-        if (!validationResult.IsValid)
-        {
-          return BadRequest(
-            new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                message = "Validation failed",
-                errors = validationResult.Errors.Select(e => e.ErrorMessage)
-            }
-          );
-        }
+     
         var createdUnit = await Mediator.Send(createUnitCommand);
-         if(createdUnit.IsSuccess)
-         {
-            _logger.LogInformation($"UnitId {createdUnit.Data} created successfully.");
+        
              return Ok(new
              {
-                 message = createdUnit.Message,
+                 message = "Unit Created Successfully",
                  statusCode = StatusCodes.Status201Created,
-                 data = createdUnit.Data
+                 data = createdUnit
              });
-         }
-         _logger.LogWarning($"UnitId {createdUnit.Data} Creation failed.");
-        return BadRequest(new
-        {
-            message = createdUnit.Message,
-            statusCode = StatusCodes.Status400BadRequest
-        });
+     
        
     }
 
@@ -140,35 +109,17 @@ namespace UserManagement.API.Controllers
     [HttpPut("update")]
     public async Task<IActionResult> UpdateUnitAsync( UpdateUnitCommand updateUnitCommand)
     {
-        var validationResult = await _updateUnitCommandValidator.ValidateAsync(updateUnitCommand);
-        if (!validationResult.IsValid)
-        { 
-            _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
-             return BadRequest(new
-             {
-                 StatusCode = StatusCodes.Status400BadRequest,
-                 message = "Validation failed",
-                 errors = validationResult.Errors.Select(e => e.ErrorMessage)
-             });
-        }
+       
        
         var result = await Mediator.Send(updateUnitCommand);
-        if(result.IsSuccess)
-        {
-            _logger.LogInformation($"UnitId {result.Data} updated successfully.");
+    
             return Ok(new
             {
-                message = result.Message,
+                message = "Unit Updated Successfully",
                 statusCode = StatusCodes.Status200OK
              
             });
-        }
-         _logger.LogWarning($"UnitId {result.Data} updated Failed.");
-        return BadRequest(new
-        {
-            message = result.Message,
-            statusCode = StatusCodes.Status400BadRequest
-        });
+    
     }
 
 
@@ -178,22 +129,15 @@ namespace UserManagement.API.Controllers
         
        var result = await Mediator.Send(new DeleteUnitCommand { UnitId = id });
 
-        if (result.IsSuccess)
-        {
+      
             _logger.LogInformation($"UnitId {id} deleted successfully.");
             return Ok(new
             {
-                message = result.Message,
+                message = "Unit Deleted Successfully",
                 statusCode = StatusCodes.Status200OK,
                 
             });
-        }
-        _logger.LogWarning($"UnitId {id} deleted Failed.");
-        return BadRequest(new
-        {
-            message = result.Message,
-            statusCode = StatusCodes.Status400BadRequest
-        });
+        
     }
 
        [HttpGet("by-name")]
@@ -201,22 +145,15 @@ namespace UserManagement.API.Controllers
         {
             var units = await Mediator.Send(new GetUnitAutoCompleteQuery {SearchPattern = unitname??string.Empty, CompanyId = CompanyId??0});
              _logger.LogInformation("Search pattern: {SearchPattern}", unitname);
-            if(units.IsSuccess)
-            {
-                _logger.LogInformation($"Unit {units.Data.Count} Listed successfully.");
+           
+             
                 return Ok(new
                 {
-                    message = units.Message,
+                    message = "Unit List",
                     statusCode = StatusCodes.Status200OK,
-                    data = units.Data
+                    data = units
                 });
-            }
-            _logger.LogWarning($"No Unit Record in the {unitname} not found in DB.");
-            return NotFound(new
-            {
-                message = units.Message,
-                statusCode = StatusCodes.Status404NotFound
-            });
+          
           
         }
       [HttpGet("by-userid")]
@@ -224,22 +161,14 @@ namespace UserManagement.API.Controllers
         {
             var units = await Mediator.Send(new GetUnitByUserIdQuery { CompanyId = CompanyId??0 ,UserId=UserId});
              
-            if(units.IsSuccess)
-            {
-                _logger.LogInformation($"Unit {units.Data.Count} Listed successfully.");
+           
                 return Ok(new
                 {
-                    message = units.Message,
+                    message = "Unit List",
                     statusCode = StatusCodes.Status200OK,
-                    data = units.Data
+                    data = units
                 });
-            }
-            _logger.LogWarning($"No Unit Record not found in DB.");
-            return NotFound(new
-            {
-                message = units.Message,
-                statusCode = StatusCodes.Status404NotFound
-            });
+         
           
         }
     }

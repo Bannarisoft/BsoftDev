@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.City.Commands.UpdateCity
 {
-       public class UpdateCityCommand : IRequest<ApiResponseDTO<CityDto>> 
+       public class UpdateCityCommand : IRequest<CityDto>
        {
                 public int Id { get; set; }
                 public string? CityCode { get; set; }

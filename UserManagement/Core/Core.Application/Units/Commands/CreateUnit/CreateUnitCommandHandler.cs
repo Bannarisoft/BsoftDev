@@ -7,11 +7,12 @@ using Core.Application.Common.Interfaces.IUnit;
 using Core.Application.Common;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
+using FluentValidation;
 
 namespace Core.Application.Units.Commands.CreateUnit
 {
 
-    public class CreateUnitCommandHandler : IRequestHandler<CreateUnitCommand, ApiResponseDTO<int>>
+    public class CreateUnitCommandHandler : IRequestHandler<CreateUnitCommand, int>
     {
         
         private readonly IUnitCommandRepository _iUnitRepository;
@@ -28,7 +29,7 @@ namespace Core.Application.Units.Commands.CreateUnit
             _Imediator = Imediator;
 
         }
-        public async Task<ApiResponseDTO<int>> Handle(CreateUnitCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateUnitCommand request, CancellationToken cancellationToken)
         {
        
             
@@ -38,12 +39,8 @@ namespace Core.Application.Units.Commands.CreateUnit
             if (exists)
             {
                  _logger.LogWarning($"Unit Name {request.UnitName} already exists.");
-                 return new ApiResponseDTO<int>
-            {
-            IsSuccess = false,
-            Message = "Unit Name already exists."
-        
-            };
+                 throw new ValidationException("Unit Name already exists.");
+                
             }
               var unit = _mapper.Map<Core.Domain.Entities.Unit>(request);
               var result =  await _iUnitRepository.CreateUnitAsync(unit);
@@ -65,19 +62,11 @@ namespace Core.Application.Units.Commands.CreateUnit
                   if (result > 0)
                   {
                      _logger.LogInformation($"Unit {unitId} created successfully");
-                        return new ApiResponseDTO<int>
-                       {
-                           IsSuccess = true,
-                           Message = "Unit created successfully",
-                           Data = unitId
-                      };
+                        return unitId;
                  }
                  _logger.LogWarning($"Unit {unitId} Creation Failed" );
-                  return new ApiResponseDTO<int>
-                  {
-                      IsSuccess = false,
-                      Message = "Unit not created"
-                  };
+                 throw new Exception("Unit not created");
+                 
         }
             
 

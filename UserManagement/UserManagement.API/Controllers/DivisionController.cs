@@ -23,15 +23,11 @@ namespace UserManagement.API.Controllers
     
     public class DivisionController : ApiControllerBase
     {
-        private readonly IValidator<CreateDivisionCommand> _createDivisionCommandValidator;
-        private readonly IValidator<UpdateDivisionCommand> _updateDivisionCommandValidator;
-        private readonly IValidator<DeleteDivisionCommand> _deleteDivisionCommandValidator;
-        public DivisionController(ISender mediator,IValidator<CreateDivisionCommand> createDivisionCommandValidator,IValidator<UpdateDivisionCommand> updateDivisionCommandValidator,IValidator<DeleteDivisionCommand> deleteDivisionCommandValidator) 
+        
+        public DivisionController(ISender mediator
+        ) 
         : base(mediator)
         {
-            _createDivisionCommandValidator = createDivisionCommandValidator;
-            _updateDivisionCommandValidator = updateDivisionCommandValidator;
-            _deleteDivisionCommandValidator = deleteDivisionCommandValidator;
         }
          [HttpGet]
         public async Task<IActionResult> GetAllDivisionsAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
@@ -58,25 +54,11 @@ namespace UserManagement.API.Controllers
         public async Task<IActionResult> CreateAsync(CreateDivisionCommand command)
         {
             
-            var validationResult = await _createDivisionCommandValidator.ValidateAsync(command);
-            
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new 
-                {
-                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-                });
-            }
+          
             var response = await Mediator.Send(command);
-            if(response.IsSuccess)
-            {
-                // return CreatedAtAction(nameof(GetByIdAsync), new {  id = response.Data }, response);
-                return Ok(new { StatusCode=StatusCodes.Status201Created, message = response.Message, errors = "", data = response.Data });
-            }
-             
-
-            return BadRequest( new { StatusCode=StatusCodes.Status400BadRequest, message = response.Message, errors = "" }); 
+      
+                return Ok(new { StatusCode=StatusCodes.Status201Created, message = "Division created successfully", errors = "", data = response });
+           
             
         }
          [HttpGet("{id}")]
@@ -86,21 +68,13 @@ namespace UserManagement.API.Controllers
            
             var division = await Mediator.Send(new GetDivisionByIdQuery() { Id = id});
           
-             if(division == null)
-            {
-                return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = $"Division ID {id} not found.", errors = "" });
-            }
-            return Ok(new { StatusCode=StatusCodes.Status200OK, data = division.Data});
+            return Ok(new { StatusCode=StatusCodes.Status200OK, data = division});
         }
 
         [HttpPut]
         public async Task<IActionResult> Update( UpdateDivisionCommand command )
         {
-            var validationResult = await _updateDivisionCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(validationResult.Errors);
-            }
+          
           
 
              var divisionExists = await Mediator.Send(new GetDivisionByIdQuery { Id = command.Id });
@@ -111,14 +85,9 @@ namespace UserManagement.API.Controllers
              }
 
              var response = await Mediator.Send(command);
-             if(response.IsSuccess)
-             {
-                 return Ok(new { StatusCode=StatusCodes.Status200OK, message = response.Message, errors = "" });
-             }
             
-           
-
-            return BadRequest( new { StatusCode=StatusCodes.Status400BadRequest, message = response.Message, errors = "" }); 
+                 return Ok(new { StatusCode=StatusCodes.Status200OK, message = "Division updated successfully", errors = "" });
+      
         }
 
 
@@ -127,24 +96,13 @@ namespace UserManagement.API.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var command = new DeleteDivisionCommand { Id = id };
-             var validationResult = await  _deleteDivisionCommandValidator.ValidateAsync(command);
-               if (!validationResult.IsValid)
-                {
-                    return BadRequest(new
-                    {
-                        message = validationResult.Errors.Select(e => e.ErrorMessage).FirstOrDefault(),
-                        statusCode = StatusCodes.Status400BadRequest
-                    });
-                }
+           
            var updatedDivision = await Mediator.Send(command);
 
-           if(updatedDivision.IsSuccess)
-           {
-            return Ok(new { StatusCode=StatusCodes.Status200OK, message = updatedDivision.Message, errors = "" });
+         
+            return Ok(new { StatusCode=StatusCodes.Status200OK, message = "Division deleted successfully", errors = "" });
               
-           }
-
-            return BadRequest(new { StatusCode=StatusCodes.Status400BadRequest, message = updatedDivision.Message, errors = "" });
+       
             
         }
 
@@ -155,7 +113,7 @@ namespace UserManagement.API.Controllers
            var companiesClaim = User.FindFirst("companyId")?.Value; 
            
             var divisions = await Mediator.Send(new GetDivisionAutoCompleteQuery {SearchPattern = name,Companies = companiesClaim});
-            return Ok( new { StatusCode=StatusCodes.Status200OK, data = divisions.Data });
+            return Ok( new { StatusCode=StatusCodes.Status200OK, data = divisions });
         }
       
       

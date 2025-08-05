@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Core.Application.Units.Commands.CreateUnit
 {
-    public class CreateUnitCommand : IRequest<ApiResponseDTO<int>> 
+    public class CreateUnitCommand : IRequest<int>
     {
     public string? UnitName { get; set; }
     public string? ShortName { get; set; }

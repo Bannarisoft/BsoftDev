@@ -6,11 +6,12 @@ using Core.Application.Common.Interfaces.ICity;
 using Core.Domain.Entities;
 using Core.Domain.Enums.Common;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.City.Commands.DeleteCity
 {
-    public class DeleteCityCommandHandler : IRequestHandler<DeleteCityCommand, ApiResponseDTO<CityDto>>
+    public class DeleteCityCommandHandler : IRequestHandler<DeleteCityCommand, bool>
     {
         private readonly ICityCommandRepository _cityRepository;
         private readonly IMapper _mapper;
@@ -26,29 +27,21 @@ namespace Core.Application.City.Commands.DeleteCity
             _fixedAssetCityValidationGrpcClient = fixedAssetCityValidationGrpcClient;
         }
 
-        public async Task<ApiResponseDTO<CityDto>> Handle(DeleteCityCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DeleteCityCommand request, CancellationToken cancellationToken)
         {
             bool iscountryUsedInFixedAsset = await _fixedAssetCityValidationGrpcClient.CheckIfCityIsUsedForFixedAssetAsync(request.Id);  
 
             if (iscountryUsedInFixedAsset)
             {
-                return new ApiResponseDTO<CityDto>
-                {
-                    IsSuccess = false,
-                    Message = "Cannot delete Country. It is still in use in FixedAsset system."
-                   
-                };
+                return iscountryUsedInFixedAsset;
             }
 
             // Fetch the city to be deleted
             var city = await _cityQueryRepository.GetByIdAsync(request.Id);
             if (city is null || city.IsDeleted is Enums.IsDelete.Deleted )
             {
-                return new ApiResponseDTO<CityDto>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid CityID. The specified City does not exist or is inactive."
-                };
+                throw new ValidationException("Invalid CityID. The specified City does not exist or is inactive.");
+             
             }
             var cityDelete = _mapper.Map<Cities>(request);           
            
@@ -65,19 +58,10 @@ namespace Core.Application.City.Commands.DeleteCity
                     module:"City"
                 );               
                 await _mediator.Publish(domainEvent, cancellationToken);                 
-                return new ApiResponseDTO<CityDto>
-                {
-                    IsSuccess = true,
-                    Message = "City deleted successfully.",
-                    Data = cityDto
-                };
+                return true;
             }
-
-            return new ApiResponseDTO<CityDto>
-            {
-                IsSuccess = false,
-                Message = "City deletion failed."                             
-            };
+            throw new Exception("City deletion failed.");
+         
            
         }
     }

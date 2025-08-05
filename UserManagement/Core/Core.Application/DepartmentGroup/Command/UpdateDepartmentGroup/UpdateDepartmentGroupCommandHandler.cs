@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IDepartmentGroup;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.DepartmentGroup.Command.UpdateDepartmentGroup
 {
-    public class UpdateDepartmentGroupCommandHandler : IRequestHandler<UpdateDepartmentGroupCommand, ApiResponseDTO<int>>
+    public class UpdateDepartmentGroupCommandHandler : IRequestHandler<UpdateDepartmentGroupCommand, int>
     {
         private readonly IDepartmentGroupCommandRepository _departmentGroupCommandRepository;
         private readonly IMapper _mapper;
@@ -24,17 +25,13 @@ namespace Core.Application.DepartmentGroup.Command.UpdateDepartmentGroup
             _departmentGroupQueryRepository = departmentGroupQueryRepository;
         }
         
-         public async Task<ApiResponseDTO<int>> Handle(UpdateDepartmentGroupCommand request, CancellationToken cancellationToken)
+         public async Task<int> Handle(UpdateDepartmentGroupCommand request, CancellationToken cancellationToken)
         {
             var existing = await _departmentGroupQueryRepository.GetDepartmentGroupByIdAsync(request.Id);
             if (existing == null)
             {
-                return new ApiResponseDTO<int>
-                {
-                    IsSuccess = false,
-                    Message = "DepartmentGroup not found.",
-                    Data = 0
-                };
+                throw new ValidationException("DepartmentGroup not found.");
+               
             }
 
             // Update fields
@@ -45,12 +42,7 @@ namespace Core.Application.DepartmentGroup.Command.UpdateDepartmentGroup
             var rows = await _departmentGroupCommandRepository.UpdateAsync(request.Id, existing);
 
 
-            return new ApiResponseDTO<int>
-            {
-                 IsSuccess = rows,
-                 Message = rows ? "DepartmentGroup updated successfully." : "Update failed.",
-                 Data = rows ? 1 : 0
-            };
+            return rows ? 1 : 0;
         }
     }
 }

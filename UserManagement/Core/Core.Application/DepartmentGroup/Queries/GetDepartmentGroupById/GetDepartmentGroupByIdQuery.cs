@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.DepartmentGroup.Queries.GetDepartmentGroupById
 {
-    public class GetDepartmentGroupByIdQuery : IRequest<ApiResponseDTO<DepartmentGroupByIdDto>>
+    public class GetDepartmentGroupByIdQuery : IRequest<DepartmentGroupByIdDto>
     {
         public int Id { get; set; }
     }

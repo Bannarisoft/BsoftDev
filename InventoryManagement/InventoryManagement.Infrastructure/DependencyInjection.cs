@@ -1,6 +1,7 @@
 using System.Data;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.AuditLog;
+using Core.Application.Common.Interfaces.Budget;
 using Core.Application.Common.Interfaces.IHSNMaster;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IMiscTypeMaster;
@@ -11,6 +12,7 @@ using Core.Application.Common.Interfaces.IUOMConversion;
 using Core.Application.Common.Mappings;
 using Core.Domain.Entities.Item;
 using Infrastructure.Data;
+using Infrastructure.Persistence.Repositories;
 using InventoryManagement.Infrastructure.Data;
 using InventoryManagement.Infrastructure.Repositories;
 using InventoryManagement.Infrastructure.Repositories.HSNMaster;
@@ -110,6 +112,7 @@ namespace InventoryManagement.Infrastructure
 			services.AddScoped<IMiscTypeMasterQueryRepository, MiscTypeMasterQueryRepository>();            
             services.AddScoped<IMiscTypeMasterCommandRepository, MiscTypeMasterCommandRepository>();
             services.AddScoped<IMiscMasterQueryRepository, MiscMasterQueryRepository>();
+
             services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>(); 
             services.AddScoped<IHSNMasterQueryRepository , HSNMasterQueryRepository>();     
             services.AddScoped<IHSNMasterCommandRepository, HSNMasterCommandRepository>();
@@ -117,6 +120,9 @@ namespace InventoryManagement.Infrastructure
             services.AddScoped<IUOMCommandRepository, UOMCommandRepository>();
             services.AddScoped<IUOMConversionQueryRepository , UOMConversionQueryRepository>();
             services.AddScoped<IUOMConversionCommandRepository, UOMConversionCommandRepository>();
+            services.AddScoped<IBudgetCommandRepository, BudgetCommandRepository>(); 
+            services.AddScoped<IBudgetQueryRepository, BudgetQueryRepository>(); 
+            services.AddScoped<IBudgetLogQueryRepository, BudgetLogQueryRepository>(); 
 
 
             // Miscellaneous services
@@ -128,6 +134,7 @@ namespace InventoryManagement.Infrastructure
             // AutoMapper profiles
           services.AddAutoMapper(
                  typeof(MiscTypeMasterProfile),
+
                 typeof(MiscMasterProfile),               
                 typeof(HSNMasterProfile),
                 typeof(UOMProfile),

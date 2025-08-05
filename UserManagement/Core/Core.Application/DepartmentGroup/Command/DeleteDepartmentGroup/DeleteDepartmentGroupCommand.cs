@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.DepartmentGroup.Command.DeleteDepartmentGroup
 {
-    public class DeleteDepartmentGroupCommand  :IRequest<ApiResponseDTO<bool>> 
+    public class DeleteDepartmentGroupCommand  :IRequest<bool> 
     {
          public int Id { get; set; }
     }

@@ -20,7 +20,8 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
         public async Task<int> CreateAsync(Domain.Entities.Notification.NotificationConfig notificationConfig)        
         {   
             notificationConfig.UnitId = _ipAddressService.GetUnitId();
-            _applicationDbContext.Entry(notificationConfig);
+             notificationConfig.NotificationEventType = null;
+            //_applicationDbContext.Entry(notificationConfig);
             await _applicationDbContext.NotificationConfig.AddAsync(notificationConfig);
             await _applicationDbContext.SaveChangesAsync();                
             return notificationConfig.Id;

@@ -8,12 +8,13 @@ using Core.Application.Common;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAdminSecuritySettings;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySettingsById
 {
-    public class GetAdminSecuritySettingsByIdQueryHandler :IRequestHandler<GetAdminSecuritySettingsByIdQuery, ApiResponseDTO<GetAdminSecuritySettingsDto>>
+    public class GetAdminSecuritySettingsByIdQueryHandler :IRequestHandler<GetAdminSecuritySettingsByIdQuery, GetAdminSecuritySettingsDto>
     {    
           private readonly IAdminSecuritySettingsQueryRepository _IAdminSecuritySettingsQueryRepository;        
         private readonly IMapper _mapper;
@@ -28,7 +29,7 @@ namespace Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySetting
             _logger = logger;
         } 
 
-           public async Task<ApiResponseDTO<GetAdminSecuritySettingsDto>> Handle(GetAdminSecuritySettingsByIdQuery request, CancellationToken cancellationToken)
+           public async Task<GetAdminSecuritySettingsDto> Handle(GetAdminSecuritySettingsByIdQuery request, CancellationToken cancellationToken)
         {
              _logger.LogInformation($"Handling GetAdminSecuritySettingsByIdQuery for ID: { request.Id}");
             // Fetch admin security setting by ID
@@ -36,13 +37,8 @@ namespace Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySetting
                  if (adminSettings is null)
                     {
                         _logger.LogWarning($"AdminSecuritySettings with ID {request.Id} not found." );
-
-                        return new ApiResponseDTO<GetAdminSecuritySettingsDto>
-                        {
-                            IsSuccess = false,
-                            Message = "AdminSecuritySettings not found.",
-                            Data = null
-                        };
+                        throw new ValidationException("AdminSecuritySettings not found.");
+                    
                     }
         
                 _logger.LogInformation($"Admin Security Settings with ID {request.Id} retrieved successfully. Mapping to DTO.");
@@ -62,7 +58,7 @@ namespace Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySetting
 
              
                    await _mediator.Publish(domainEvent, cancellationToken);
-                  return new ApiResponseDTO<GetAdminSecuritySettingsDto> { IsSuccess = true, Message = "Success", Data = adminSettingsDto };
+                  return adminSettingsDto;
         
 
           

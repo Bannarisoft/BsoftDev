@@ -4,10 +4,11 @@ using AutoMapper;
 using Core.Application.Common.Interfaces.IState;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
+using FluentValidation;
 
 namespace Core.Application.State.Queries.GetStateAutoComplete
 {
-    public class GetStateAutoCompleteQueryHandler : IRequestHandler<GetStateAutoCompleteQuery, ApiResponseDTO<List<StateAutoCompleteDTO>>>    
+    public class GetStateAutoCompleteQueryHandler : IRequestHandler<GetStateAutoCompleteQuery, List<StateAutoCompleteDTO>>
     {
         private readonly IStateQueryRepository _stateRepository;
         private readonly IMapper _mapper;
@@ -18,16 +19,13 @@ namespace Core.Application.State.Queries.GetStateAutoComplete
             _mapper =mapper;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<List<StateAutoCompleteDTO>>> Handle(GetStateAutoCompleteQuery request, CancellationToken cancellationToken)
+        public async Task<List<StateAutoCompleteDTO>> Handle(GetStateAutoCompleteQuery request, CancellationToken cancellationToken)
         {          
             var result = await _stateRepository.GetByStateNameAsync(request.SearchPattern ?? string.Empty);
             if (result is null || result.Count is 0)
             {
-                 return new ApiResponseDTO<List<StateAutoCompleteDTO>>
-                {
-                    IsSuccess = false,
-                    Message = "No States found matching the search pattern."
-                };
+                throw new ValidationException("No States found matching the search pattern.");
+               
             }
             var stateDto = _mapper.Map<List<StateAutoCompleteDTO>>(result);
             //Domain Event
@@ -39,12 +37,7 @@ namespace Core.Application.State.Queries.GetStateAutoComplete
                 module:"State"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<StateAutoCompleteDTO>>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = stateDto
-            };
+            return stateDto;
         }
     }
 }

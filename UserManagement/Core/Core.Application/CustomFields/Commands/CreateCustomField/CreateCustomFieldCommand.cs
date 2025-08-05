@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.CustomFields.Commands.CreateCustomField
 {
-    public class CreateCustomFieldCommand : IRequest<ApiResponseDTO<int>>
+    public class CreateCustomFieldCommand : IRequest<int>
     {
         public string? LabelName { get; set; }
         public int Length { get; set; }

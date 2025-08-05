@@ -25,22 +25,14 @@ namespace UserManagement.API.Controllers
     // public ModulesController(ISender mediator) : base(mediator)
     // {
     // }
-    private readonly IValidator<CreateModuleCommand> _createModuleCommandValidator;
-         private readonly IValidator<UpdateModuleCommand> _updateModuleCommandValidator;
-         private readonly IValidator<DeleteModuleCommand> _deleteModuleCommandValidator;
+  
          private readonly ILogger<ModulesController> _logger;
 
          
        public ModulesController(ISender mediator, 
-                             IValidator<CreateModuleCommand> createModuleCommandValidator, 
-                             IValidator<UpdateModuleCommand> updateModuleCommandValidator, 
-                             ILogger<ModulesController> logger,
-                             IValidator<DeleteModuleCommand> deleteModuleCommandValidator) 
+                             ILogger<ModulesController> logger) 
          : base(mediator)
         {        
-            _createModuleCommandValidator = createModuleCommandValidator;
-            _updateModuleCommandValidator = updateModuleCommandValidator;    
-            _deleteModuleCommandValidator = deleteModuleCommandValidator;
             _logger = logger;
 
              
@@ -49,29 +41,14 @@ namespace UserManagement.API.Controllers
     [HttpPost]
     public async Task<IActionResult> CreateModule([FromBody] CreateModuleCommand createModuleCommand)
     {
-        var validationResult = await _createModuleCommandValidator.ValidateAsync(createModuleCommand);
-        _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
-
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                message = "Validation failed",
-                errors = validationResult.Errors.Select(e => e.ErrorMessage)
-            });
-        }
+   
 
         var response = await Mediator.Send(createModuleCommand);
-        if (response.IsSuccess)
-            {
+        
                 _logger.LogInformation($"Module {createModuleCommand.ModuleName} created successfully.");
 
-                return Ok(new { StatusCode = StatusCodes.Status201Created, message = response.Message, data = response.Data });
-            }
-                _logger.LogWarning($"Failed to create module {createModuleCommand.ModuleName}.");
-
-                return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = response.Message }); 
+                return Ok(new { StatusCode = StatusCodes.Status201Created, message = "Module created successfully", data = response });
+       
     }
 
     [HttpGet]
@@ -108,49 +85,26 @@ namespace UserManagement.API.Controllers
         }
            _logger.LogWarning("Module Listed successfully: {Modulename}", module);
 
-        return Ok(new { StatusCode = StatusCodes.Status200OK, data = module.Data });
+        return Ok(new { StatusCode = StatusCodes.Status200OK, data = module });
     }
     [HttpPut]
     public async Task<IActionResult> UpdateModule([FromBody] UpdateModuleCommand updateModuleCommand)
     {
-        var validationResult = await _updateModuleCommandValidator.ValidateAsync(updateModuleCommand);
-        _logger.LogWarning($"Validation failed: {string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage))}");
+     
 
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                message = "Validation failed",
-                errors = validationResult.Errors.Select(e => e.ErrorMessage)
-            });
-        }
-
-        var response = await Mediator.Send(updateModuleCommand);
-        if (response.IsSuccess)
-            {
+         await Mediator.Send(updateModuleCommand);
+     
                 _logger.LogInformation($"Module {updateModuleCommand.ModuleName} updated successfully.");
 
-                return Ok(new { StatusCode = StatusCodes.Status200OK, message = response.Message });
-            }
-                _logger.LogWarning($"Failed to update module {updateModuleCommand.ModuleName}.");
-
-                return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = response.Message });
+                return Ok(new { StatusCode = StatusCodes.Status200OK, message = "Module updated successfully" });
+       
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteModule(int id)
     {
          var command = new DeleteModuleCommand { ModuleId = id };
-             var validationResult = await  _deleteModuleCommandValidator.ValidateAsync(command);
-               if (!validationResult.IsValid)
-                {
-                    return BadRequest(new
-                    {
-                        message = validationResult.Errors.Select(e => e.ErrorMessage).FirstOrDefault(),
-                        statusCode = StatusCodes.Status400BadRequest
-                    });
-                } 
+            
           
         if (id <= 0)
         {
@@ -160,17 +114,8 @@ namespace UserManagement.API.Controllers
                 message = "Invalid Module ID"
             });
         }
-        var result = await Mediator.Send(command);                 
-            if (!result.IsSuccess)
-            {          
-                 _logger.LogWarning($"Deletion failed for module {id}: {result?.Message ?? "Unknown error"}.");
-    
-                return NotFound(new 
-                { 
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message
-                });
-            }
+         await Mediator.Send(command);                 
+         
             _logger.LogInformation($"Module {id} deleted successfully.");
 
             return Ok(new
@@ -184,7 +129,7 @@ namespace UserManagement.API.Controllers
         {
            
             var modules = await Mediator.Send(new GetModuleAutoCompleteQuery {SearchPattern = name});
-            return Ok( new { StatusCode=StatusCodes.Status200OK, data = modules.Data });
+            return Ok( new { StatusCode=StatusCodes.Status200OK, data = modules });
         }
 
 

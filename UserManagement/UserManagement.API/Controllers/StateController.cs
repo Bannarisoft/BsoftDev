@@ -17,19 +17,12 @@ namespace UserManagement.API.Controllers
     
     public class StateController : ApiControllerBase
     {
-         private readonly IValidator<CreateStateCommand> _createStateCommandValidator;
-         private readonly IValidator<UpdateStateCommand> _updateStateCommandValidator;    
-         private readonly IValidator<DeleteStateCommand> _deleteStateCommandValidator;     
+        
          
-        public StateController(ISender mediator, 
-                                IValidator<CreateStateCommand> createStateCommandValidator, 
-                                IValidator<UpdateStateCommand> updateStateCommandValidator, 
-                                IValidator<DeleteStateCommand> deleteStateCommandValidator) 
+        public StateController(ISender mediator) 
             : base(mediator)
         {        
-            _createStateCommandValidator = createStateCommandValidator;    
-            _updateStateCommandValidator = updateStateCommandValidator;  
-            _deleteStateCommandValidator = deleteStateCommandValidator;   
+           
             
         }
         [HttpGet]
@@ -82,40 +75,17 @@ namespace UserManagement.API.Controllers
         [HttpPost]   
         public async Task<IActionResult> CreateAsync(CreateStateCommand  command)
         { 
-            var validationResult = await _createStateCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new 
-                {
-                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-                });
-            }                
+                       
             var result = await Mediator.Send(command);
-            if(result.IsSuccess)
-            {                
-                return Ok(new { StatusCode=StatusCodes.Status201Created, message = result.Message, errors = "", data = result.Data });
-            }
-            
-
-            return BadRequest( new { StatusCode=StatusCodes.Status400BadRequest, message = result.Message, errors = "" }); 
+                         
+                return Ok(new { StatusCode=StatusCodes.Status201Created, message = "State created successfully", errors = "", data = result });
+       
             
         }
         [HttpPut]
         public async Task<IActionResult> UpdateAsync(UpdateStateCommand command)
         {           
-            var validationResult = await _updateStateCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {                
-                return BadRequest(
-                    new
-                    {
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        message = "Validation failed",
-                        errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                    }
-                );
-            }
+         
             if (command.CountryId<=0)
             {
                 return BadRequest(
@@ -128,30 +98,20 @@ namespace UserManagement.API.Controllers
             }
 
             var result = await Mediator.Send(command);
-            if(result.IsSuccess)
-            {                 
+                           
                 return Ok(new 
                 {   StatusCode=StatusCodes.Status200OK,
-                    message = result.Message, 
-                    City = result.Data
+                    message = "State updated successfully", 
+                    City = result
                 });
-            }
-            return BadRequest( new { StatusCode=StatusCodes.Status400BadRequest, message = result.Message, errors = "" }); 
+           
         }        
         [HttpDelete("{id}")]   
         public async Task<IActionResult> DeleteAsync(int id)
         {  
             
               var command = new DeleteStateCommand { Id = id };
-             var validationResult = await  _deleteStateCommandValidator.ValidateAsync(command);
-               if (!validationResult.IsValid)
-                {
-                    return BadRequest(new
-                    {
-                        message = validationResult.Errors.Select(e => e.ErrorMessage).FirstOrDefault(),
-                        statusCode = StatusCodes.Status400BadRequest
-                    });
-                }        
+                 
             if (id <= 0)
             {
                 return BadRequest(new
@@ -161,19 +121,12 @@ namespace UserManagement.API.Controllers
                 });
             }            
               var result = await Mediator.Send(command);                 
-            if (!result.IsSuccess)
-            {                
-                return NotFound(new 
-                { 
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message
-                });
-            }
+        
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
                 data =$"State ID {id} Deleted" ,
-                message = result.Message
+                message = "State Deleted Successfully"
             });
         }
 
@@ -181,21 +134,14 @@ namespace UserManagement.API.Controllers
         public async Task<IActionResult> GetState([FromQuery] string? name)
         {           
             var result = await Mediator.Send(new GetStateAutoCompleteQuery {SearchPattern = name}); // Pass `searchPattern` to the constructor
-            if (result.IsSuccess)
-            {
+         
                 return Ok(new 
                 {
                     StatusCode=StatusCodes.Status200OK,
-                    message = result.Message,
-                    data = result.Data
+                    message = "State List",
+                    data = result
                 });
-            }
-            return Ok(new
-            {
-                StatusCode = StatusCodes.Status200OK,
-                message = result.Message,
-                data = result.Data
-            });
+         
         }  
         [HttpGet("by-country/{countryid}")]
         public async Task<IActionResult> GetStateByCountryId(int countryid)

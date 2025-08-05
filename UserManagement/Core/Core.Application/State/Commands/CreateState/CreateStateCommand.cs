@@ -4,7 +4,7 @@ using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.State.Commands.CreateState
 {     
-     public class CreateStateCommand : IRequest<ApiResponseDTO<StateDto>>  
+     public class CreateStateCommand : IRequest<StateDto>
      {
           public string? StateCode { get; set; }
           public string? StateName { get; set; }

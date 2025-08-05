@@ -37,7 +37,7 @@ namespace UserManagement.API.Controllers
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                data = menus.Data.ToList()
+                data = menus.ToList()
             });
         }
         [HttpPost("by-parent")]
@@ -55,7 +55,7 @@ namespace UserManagement.API.Controllers
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                data = menus.Data.ToList()
+                data = menus.ToList()
             });
         }
         [HttpGet]
@@ -83,25 +83,12 @@ namespace UserManagement.API.Controllers
         public async Task<IActionResult> CreateAsync(CreateMenuCommand command)
         {
 
-            // var validationResult = await _createDivisionCommandValidator.ValidateAsync(command);
-
-            // if (!validationResult.IsValid)
-            // {
-            //     return BadRequest(new 
-            //     {
-            //         StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
-            //         errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-            //     });
-            // }
+            
             var response = await Mediator.Send(command);
-            if (response.IsSuccess)
-            {
+          
 
-                return Ok(new { StatusCode = StatusCodes.Status201Created, message = response.Message, errors = "", data = response.Data });
-            }
-
-
-            return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = response.Message, errors = "" });
+                return Ok(new { StatusCode = StatusCodes.Status201Created, message = "Menu created successfully", errors = "", data = response });
+       
 
         }
         //  [HttpGet("{id}")]
@@ -121,29 +108,12 @@ namespace UserManagement.API.Controllers
         [HttpPut]
         public async Task<IActionResult> Update(UpdateMenuCommand command)
         {
-            // var validationResult = await _updateDivisionCommandValidator.ValidateAsync(command);
-            // if (!validationResult.IsValid)
-            // {
-            //     return BadRequest(validationResult.Errors);
-            // }
+           
 
+             await Mediator.Send(command);
+          
+                return Ok(new { StatusCode = StatusCodes.Status200OK, message = "Menu updated successfully", errors = "" });
 
-            //  var divisionExists = await Mediator.Send(new GetDivisionByIdQuery { Id = command.Id });
-
-            //  if (divisionExists == null)
-            //  {
-            //      return NotFound(new { StatusCode=StatusCodes.Status404NotFound, message = $"Division ID {command.Id} not found.", errors = "" }); 
-            //  }
-
-            var response = await Mediator.Send(command);
-            if (response.IsSuccess)
-            {
-                return Ok(new { StatusCode = StatusCodes.Status200OK, message = response.Message, errors = "" });
-            }
-
-
-
-            return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = response.Message, errors = "" });
         }
 
 
@@ -153,15 +123,11 @@ namespace UserManagement.API.Controllers
         {
             var command = new DeleteMenuCommand { Id = id };
 
-            var updatedDivision = await Mediator.Send(command);
+             await Mediator.Send(command);
 
-            if (updatedDivision.IsSuccess)
-            {
-                return Ok(new { StatusCode = StatusCodes.Status200OK, message = updatedDivision.Message, errors = "" });
+                return Ok(new { StatusCode = StatusCodes.Status200OK, message = "Menu deleted successfully", errors = "" });
 
-            }
-
-            return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = updatedDivision.Message, errors = "" });
+           
 
         }
 
@@ -177,7 +143,7 @@ namespace UserManagement.API.Controllers
         {
            
             var MenuList = await Mediator.Send(new GetParentMenuQuery {SearchPattern = name});
-            return Ok( new { StatusCode=StatusCodes.Status200OK, data = MenuList.Data });
+            return Ok( new { StatusCode=StatusCodes.Status200OK, data = MenuList });
         }
     }
 }
