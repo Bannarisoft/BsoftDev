@@ -1,6 +1,8 @@
 
+using Contracts.Interfaces.External.IInvetoryManagement;
 using Contracts.Interfaces.External.IUser;
 using GrpcServices.UserManagement;
+using Inventory.Grpc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Infrastructure.HttpClientPolly;
@@ -17,7 +19,7 @@ namespace WarehouseManagement.Infrastructure
         public static IServiceCollection AddHttpClients(this IServiceCollection services, IConfiguration configuration)
         {
             var userManagementUrl = configuration["GrpcSettings:UserManagementUrl"];
-
+            var inventoryManagementUrl = configuration["GrpcSettings:InventoryManagementUrl"];  
             
             // ✅ Register Session gRPC Client
             services.AddGrpcClient<SessionService.SessionServiceClient>(options =>
@@ -30,7 +32,15 @@ namespace WarehouseManagement.Infrastructure
 
             services.AddScoped<IUserSessionGrpcClient, GrpcUserSessionClient>();
 
+            services.AddGrpcClient<MiscMasterService.MiscMasterServiceClient>(options =>
+            {
+                options.Address = new Uri(inventoryManagementUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => GrpcHttpHandler)
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
 
+            services.AddScoped<IMiscMasterGrpcClient, InventoryMiscMasterGrpcClient>();
             return services;
         }
     }

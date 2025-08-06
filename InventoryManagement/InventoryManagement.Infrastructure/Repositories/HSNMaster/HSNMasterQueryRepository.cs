@@ -1,0 +1,204 @@
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
+using Core.Application.Common.Interfaces.IHSNMaster;
+using Core.Application.HSNMaster.Queries.GetAllHSNMaster;
+using Core.Application.HSNMaster.Queries.GetHSNMasterAutoComplete;
+using Dapper;
+using MassTransit.Futures.Contracts;
+
+namespace InventoryManagement.Infrastructure.Repositories.HSNMaster
+{
+    public class HSNMasterQueryRepository : IHSNMasterQueryRepository
+    {
+        private readonly IDbConnection _dbConnection;
+
+        public HSNMasterQueryRepository(IDbConnection dbConnection)
+        {
+            _dbConnection = dbConnection;
+
+        }
+        public async Task<(List<HSNMasterDto>, int)> GetAllAsync(int pageNumber, int pageSize, string searchTerm)
+        {
+            var query = $$"""
+                DECLARE @TotalCount INT;
+
+                SELECT @TotalCount = COUNT(*)
+                FROM Inventory.HSNMaster h
+                LEFT JOIN Inventory.MiscMaster m ON h.GSTCategoryId = m.Id
+                INNER JOIN Inventory.MiscMaster ht ON h.TypeId = ht.Id
+                WHERE h.IsDeleted = 0
+                {{(string.IsNullOrWhiteSpace(searchTerm) ? "" : "AND (h.HSNCode LIKE @Search OR h.Description LIKE @Search OR m.Description LIKE @Search)")}};
+                
+                SELECT 
+                    h.Id, h.TypeId,ht.Code AS Type, h.HSNCode, h.Description, h.GSTCategoryId,
+                    m.Description AS GstCategoryName,
+                    h.GstPercentage AS GSTPercentage,
+                    h.CgstPercentage AS CGSTPercentage,
+                    h.SgstPercentage AS SGSTPercentage,
+                    h.IgstPercentage AS IGSTPercentage,
+                    h.ValidFrom,
+                    h.IsActive,
+                    h.IsDeleted,
+                    h.CreatedBy,
+                    h.CreatedDate,
+                    h.CreatedByName,
+                    h.CreatedIP,
+                    h.ModifiedBy,
+                    h.ModifiedDate,
+                    h.ModifiedByName,
+                    h.ModifiedIP
+                FROM Inventory.HSNMaster h
+                LEFT JOIN Inventory.MiscMaster m ON h.GSTCategoryId = m.Id
+                INNER JOIN Inventory.MiscMaster ht ON h.TypeId = ht.Id
+                WHERE h.IsDeleted = 0
+                {{(string.IsNullOrWhiteSpace(searchTerm) ? "" : "AND (h.HSNCode LIKE @Search OR h.Description LIKE @Search OR m.Description LIKE @Search)")}}
+                ORDER BY h.Id DESC
+                OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+
+                SELECT @TotalCount AS TotalCount;
+            """;
+
+            var parameters = new
+            {
+                Search = $"%{searchTerm}%",
+                Offset = (pageNumber - 1) * pageSize,
+                PageSize = pageSize
+            };
+
+            var result = await _dbConnection.QueryMultipleAsync(query, parameters);
+            var hsnList = (await result.ReadAsync<HSNMasterDto>()).ToList();
+            var totalCount = await result.ReadFirstAsync<int>();
+
+            return (hsnList, totalCount);
+        }
+
+        public async Task<HSNMasterDto?> GetByIdAsync(int id)
+        {
+            var query = @"
+                SELECT h.Id, h.TypeId ,m2.Code AS Type, h.HSNCode, h.Description, h.GSTCategoryId,
+                    m1.Description AS GstCategoryName, m1.Description AS TypeName,
+                    h.GSTPercentage, h.CGSTPercentage, h.SGSTPercentage, h.IGSTPercentage,
+                    h.ValidFrom, h.IsActive, h.IsDeleted, h.CreatedBy, h.CreatedDate,
+                    h.CreatedByName, h.CreatedIP, h.ModifiedBy, h.ModifiedDate,
+                    h.ModifiedByName, h.ModifiedIP
+                FROM Inventory.HSNMaster h
+                LEFT JOIN Inventory.MiscMaster m1 ON h.GSTCategoryId = m1.Id
+                LEFT JOIN Inventory.MiscMaster m2 ON h.TypeId = m2.Id
+                WHERE h.Id = @Id AND h.IsDeleted = 0";
+
+            return await _dbConnection.QueryFirstOrDefaultAsync<HSNMasterDto>(query, new { Id = id });
+        }
+
+        public async Task<List<GetHSNMasterAutoCompleteDto>> GetHSNMasterAutoCompleteAsync(string searchPattern)
+        {
+            const string query = @"
+                SELECT TOP 15 
+                    Id, 
+                    HSNCode, 
+                    Description AS HSNDescription
+                FROM Inventory.HSNMaster
+                WHERE IsDeleted = 0 
+                AND (HSNCode LIKE @SearchPattern OR Description LIKE @SearchPattern)
+                ORDER BY HSNCode";
+
+            var parameters = new
+            {
+                SearchPattern = $"%{searchPattern}%"
+            };
+
+            var result = await _dbConnection.QueryAsync<GetHSNMasterAutoCompleteDto>(query, parameters);
+            return result.ToList();
+        }
+
+       public async Task<bool> AlreadyExistsAsync(string hsnCode, int? id = null)
+        {
+            const string baseSql = @"
+                SELECT COUNT(1) 
+                FROM Inventory.HSNMaster
+                WHERE HSNCode = @HSNCode 
+                AND IsDeleted = 0";
+
+            var sql = baseSql;
+
+            if (id.HasValue && id.Value > 0)
+            {
+                sql += " AND Id != @Id";
+            }
+
+            var parameters = new
+            {
+                HSNCode = hsnCode.Trim(),  // ✅ Prevent whitespace causing duplicates
+                Id = id
+            };
+
+            var count = await _dbConnection.ExecuteScalarAsync<int>(sql, parameters);
+            return count > 0;
+        }
+        public async Task<bool> NotFoundAsync(int id)
+        {
+            const string query = @"SELECT COUNT(1) 
+                                    FROM Inventory.HSNMaster 
+                                    WHERE Id = @Id AND IsDeleted = 0";
+
+            var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
+
+            return count == 0;
+        }        
+            
+         public async Task<bool> SoftDeleteValidation(int id)
+        {
+            const string query = @"
+                SELECT 1
+                FROM Inventory.HSNMaster H
+                WHERE H.Id = @Id
+                AND H.IsDeleted = 0;
+            ";
+
+            using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = id });
+            var recordExists = await multi.ReadFirstOrDefaultAsync<int?>();
+
+            return recordExists.HasValue;
+        }
+        
+        public async Task<bool> FKColumnValidation(int hsnMasterId)
+        {
+            // Find all referencing tables and columns dynamically
+            var fkQuery = @"
+                SELECT 
+                    OBJECT_NAME(fk.parent_object_id) AS TableName,
+                    c1.name AS ColumnName
+                FROM sys.foreign_keys fk
+                INNER JOIN sys.foreign_key_columns fkc 
+                    ON fk.object_id = fkc.constraint_object_id
+                INNER JOIN sys.columns c1 
+                    ON fkc.parent_object_id = c1.object_id 
+                    AND fkc.parent_column_id = c1.column_id
+                WHERE OBJECT_NAME(fk.referenced_object_id) = 'HSNMaster';";
+
+            var fkList = await _dbConnection.QueryAsync<(string TableName, string ColumnName)>(fkQuery);
+
+            foreach (var fk in fkList)
+            {
+                var sql = $@"
+                    SELECT COUNT(1)
+                    FROM Inventory.{fk.TableName}
+                    WHERE {fk.ColumnName} = @Id
+                    AND IsDeleted = 0";
+
+                var count = await _dbConnection.ExecuteScalarAsync<int>(sql, new { Id = hsnMasterId });
+
+                if (count > 0)
+                {
+                    return true; 
+                }
+            }
+            return false; 
+        }
+
+
+
+    }
+}

@@ -63,6 +63,7 @@
   <Protobuf Include="..\..\Shared\Contracts\Protos\allapprovalrequeststatus.proto" GrpcServices="Client" />
   <Protobuf Include="..\..\Shared\Contracts\Protos\approvalrequestbyapprover.proto" GrpcServices="Client" />
   <Protobuf Include="..\..\Shared\Contracts\Protos\approvedapprovalrequest.proto" GrpcServices="Client" />
+  <Protobuf Include="..\..\Shared\Contracts\Protos\miscmaster.proto" GrpcServices="Client" />
 </ItemGroup>
 
   <PropertyGroup>

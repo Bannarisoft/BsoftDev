@@ -48,10 +48,11 @@ namespace PurchaseManagement.API.Validation.MiscTypeMaster
                             .WithMessage($"{nameof(UpdateMiscTypeMasterCommand.Description)} {rule.Error}");
                         break;
                         case "AlreadyExists":
-                        RuleFor(x => x.MiscTypeCode)
-                            .MustAsync(async (miscTypeCode, cancellation) =>
-                                !await _miscTypeMasterQueryRepository.AlreadyExistsAsync(miscTypeCode))
-                            .WithMessage("MiscTypeCode already exists.");
+                         RuleFor(x => x)
+                            .MustAsync(async (command, cancellation) =>
+                                !await _miscTypeMasterQueryRepository.AlreadyExistsAsync(command.MiscTypeCode, command.Id))
+                            .WithName(nameof(UpdateMiscTypeMasterCommand.MiscTypeCode))
+                            .WithMessage("MiscTypeCode already exists.");  
                         break;
                         case "NotFound":
                            RuleFor(x => x.Id )
