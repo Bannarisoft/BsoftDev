@@ -44,12 +44,9 @@ namespace BackgroundService.API.Validation.NotificationConfig
                            .NotEmpty()
                            .WithMessage($"{nameof(CreateNotificationConfigCommand.ModuleName)} {rule.Error}")
                            .MustAsync(async (command, moduleName, cancellation) =>
-                            !await _notificationConfigCommandRepository.IsNameDuplicateAsync(moduleName, command.NotificationEventTypeId))
+                            !await _notificationConfigCommandRepository.ExistsByCodeAsync(moduleName, command.NotificationEventTypeId))
                              .WithMessage("A ModuleName already exists in this Event Type.");
                         break;
-
-
-
                 }
             }
         }

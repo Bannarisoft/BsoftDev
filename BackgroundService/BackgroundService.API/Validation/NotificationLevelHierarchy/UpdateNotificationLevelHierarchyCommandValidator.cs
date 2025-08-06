@@ -14,7 +14,7 @@ namespace BackgroundService.API.Validation.NotificationLevelHierarchy
         {
             _NotificationLevelHierarchyQueryRepository = NotificationLevelHierarchyQueryRepository;            
             _NotificationLevelHierarchyCommandRepository = NotificationLevelHierarchyCommandRepository;
-            var maxLength = maxLengthProvider.GetMaxLength<Domain.Entities.Notification.NotificationLevelHierarchy>("ModuleName") ?? 250;
+            var maxLength = maxLengthProvider.GetMaxLength<Domain.Entities.Notification.NotificationLevelHierarchy>("Description") ?? 250;
 
             _validationRules = ValidationRuleLoader.LoadValidationRules();
 
@@ -55,7 +55,7 @@ namespace BackgroundService.API.Validation.NotificationLevelHierarchy
                         .WithMessage($"{nameof(UpdateNotificationLevelHierarchyCommand.NotificationConfigId)} {rule.Error}")
                         .MustAsync(async (command, notificationConfigId, cancellation) =>
                             !await _NotificationLevelHierarchyCommandRepository
-                                .IsNameDuplicateAsync(notificationConfigId, command.TargetTypeId, command.TargetId))
+                                .IsNameDuplicateAsync(notificationConfigId, command.TargetTypeId, command.TargetId,command.Id))
                         .WithMessage("The combination already exists.");
                         break;
                     case "RecordNotFound":
