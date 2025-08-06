@@ -7,7 +7,7 @@ using MediatR;
 
 namespace BackgroundService.Application.Notification.NotificationGroupMember.Queries.GetAllNotificationGroupMember
 {
-    public class GetAllNotificationGroupMembersQuery : IRequest<ApiResponseDTO<List<NotificationGroupDto>>>
+    public class GetAllNotificationGroupMembersQuery : IRequest<ApiResponseDTO<List<GetNotificationGroupMemberDto>>>
     {
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 15;
