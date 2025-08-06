@@ -6,7 +6,7 @@ using static Core.Domain.Common.BaseEntity;
 
 namespace Core.Application.MiscTypeMaster.Queries.GetMiscTypeMaster
 {
-    public class GetMiscTypeMasterAutocompleteDto
+    public class GetMiscTypeMasterDto
     {
         public int Id { get; set; }
         public string? MiscTypeCode { get; set; }
