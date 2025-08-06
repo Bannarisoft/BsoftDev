@@ -40,6 +40,7 @@ namespace BackgroundService.Application.Workflow.Common.Mappings
 
             CreateMap<ApprovalStepUnitMappingDto, ApprovalStepUnitMapping>();
             CreateMap<RuleSkipApproverMappingDto, RuleSkipApproverMapping>();
+            CreateMap<ApprovalStepDepartmentMappingDto, ApprovalStepDepartmentMapping>();
 
             CreateMap<UpdateApprovalStepDetailCommand, ApprovalStepDetail>()
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == 1 ? Status.Active : Status.Inactive))
