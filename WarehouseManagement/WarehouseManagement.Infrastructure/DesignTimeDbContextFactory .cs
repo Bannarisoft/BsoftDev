@@ -18,7 +18,7 @@ namespace WarehouseManagement.Infrastructure
 
             // Build configuration
             IConfigurationRoot configuration = new ConfigurationBuilder()
-                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../PartyManagement.Api"))
+                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../WarehouseManagement.Api"))
                 .AddJsonFile($"appsettings.{environment}.json", optional: false, reloadOnChange: true)
                 .Build();
 

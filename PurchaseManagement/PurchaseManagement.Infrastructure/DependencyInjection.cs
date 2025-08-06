@@ -3,6 +3,7 @@ using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.AuditLog;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IMiscTypeMaster;
+using Core.Application.Common.Interfaces.IPurchaseIndent;
 using Core.Application.Common.Interfaces.IPartyMaster;
 using Core.Application.Common.Mappings;
 using Infrastructure.Data;
@@ -15,6 +16,7 @@ using PurchaseManagement.Infrastructure.Data;
 using PurchaseManagement.Infrastructure.Repositories;
 using PurchaseManagement.Infrastructure.Repositories.MiscMaster;
 using PurchaseManagement.Infrastructure.Repositories.MiscTypeMaster;
+using PurchaseManagement.Infrastructure.Repositories.PurchaseIndents;
 using PurchaseManagement.Infrastructure.Repositories.PartyMaster;
 using PurchaseManagement.Infrastructure.Services;
 using Serilog;
@@ -98,6 +100,7 @@ namespace PurchaseManagement.Infrastructure
             services.AddScoped<IMiscTypeMasterCommandRepository, MiscTypeMasterCommandRepository>();
             services.AddScoped<IMiscMasterQueryRepository, MiscMasterQueryRepository>();
             services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();
+            services.AddScoped<IPurchaseIndentCommand, PurchaseIndentCommandRepository>();
             services.AddScoped<IPartyMasterQueryRepository, PartyMasterQueryRepository>();
             
 

@@ -43,6 +43,7 @@
   </ItemGroup>
    <ItemGroup>
   <Protobuf Include="..\..\Shared\Contracts\Protos\session.proto" GrpcServices="Client" />
+ 
 </ItemGroup>
 
   <PropertyGroup>
