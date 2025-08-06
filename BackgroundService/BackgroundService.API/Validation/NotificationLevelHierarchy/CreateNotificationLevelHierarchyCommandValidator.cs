@@ -12,7 +12,7 @@ namespace BackgroundService.API.Validation.NotificationLevelHierarchy
 
         public CreateNotificationLevelHierarchyCommandValidator(MaxLengthProvider maxLengthProvider,INotificationLevelHierarchyCommandRepository NotificationLevelHierarchyCommandRepository)
         {
-            var maxLength = maxLengthProvider.GetMaxLength<Domain.Entities.Notification.NotificationLevelHierarchy>("ModuleName") ?? 250;
+            var maxLength = maxLengthProvider.GetMaxLength<Domain.Entities.Notification.NotificationLevelHierarchy>("Description") ?? 250;
             
             _NotificationLevelHierarchyCommandRepository = NotificationLevelHierarchyCommandRepository;
             _validationRules = ValidationRuleLoader.LoadValidationRules();
@@ -25,7 +25,7 @@ namespace BackgroundService.API.Validation.NotificationLevelHierarchy
             foreach (var rule in _validationRules)
             {
                 switch (rule.Rule)
-                {
+                {   
                     case "NotEmpty":
                         RuleFor(x => x.Description)
                             .NotEmpty()
@@ -54,7 +54,7 @@ namespace BackgroundService.API.Validation.NotificationLevelHierarchy
                         .WithMessage($"{nameof(CreateNotificationLevelHierarchyCommand.NotificationConfigId)} {rule.Error}")
                         .MustAsync(async (command, notificationConfigId, cancellation) =>
                             !await _NotificationLevelHierarchyCommandRepository
-                                .IsNameDuplicateAsync(notificationConfigId, command.TargetTypeId, command.TargetId))
+                                .ExistsByCodeAsync(notificationConfigId, command.TargetTypeId, command.TargetId))
                         .WithMessage("The combination already exists.");
                         break;
 
