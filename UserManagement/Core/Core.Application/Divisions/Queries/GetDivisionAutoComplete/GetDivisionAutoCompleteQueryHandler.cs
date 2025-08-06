@@ -19,7 +19,7 @@ using Core.Application.Users.Queries.GetUsers;
 
 namespace Core.Application.Divisions.Queries.GetDivisionAutoComplete
 {
-    public class GetDivisionAutoCompleteQueryHandler : IRequestHandler<GetDivisionAutoCompleteQuery,ApiResponseDTO<List<DivisionAutoCompleteDTO>>>
+    public class GetDivisionAutoCompleteQueryHandler : IRequestHandler<GetDivisionAutoCompleteQuery,List<DivisionAutoCompleteDTO>>
     {
         private readonly IDivisionQueryRepository _divisionRepository;
         private readonly IMapper _mapper;
@@ -32,7 +32,7 @@ namespace Core.Application.Divisions.Queries.GetDivisionAutoComplete
             _mediator = mediator;
             _ipAddressService = ipAddressService;
          }  
-          public async Task<ApiResponseDTO<List<DivisionAutoCompleteDTO>>> Handle(GetDivisionAutoCompleteQuery request, CancellationToken cancellationToken)
+          public async Task<List<DivisionAutoCompleteDTO>> Handle(GetDivisionAutoCompleteQuery request, CancellationToken cancellationToken)
           {
              var groupcode = _ipAddressService.GetGroupcode();
 
@@ -41,12 +41,7 @@ namespace Core.Application.Divisions.Queries.GetDivisionAutoComplete
                     var Adminresult = await _divisionRepository.GetDivision_SuperAdmin(request.SearchPattern);
                     var Admindivision = _mapper.Map<List<DivisionAutoCompleteDTO>>(Adminresult);
 
-                    return new ApiResponseDTO<List<DivisionAutoCompleteDTO>>
-                   {
-                       IsSuccess = true,
-                       Message = "Success",
-                       Data = Admindivision
-                   }; 
+                    return Admindivision; 
                 }
 
             //     var companies = JsonSerializer.Deserialize<List<UserCompanyDTO>>(request.Companies) ?? new List<UserCompanyDTO>();
@@ -63,7 +58,7 @@ namespace Core.Application.Divisions.Queries.GetDivisionAutoComplete
                     module:"Division"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<DivisionAutoCompleteDTO>> { IsSuccess = true, Message = "Success", Data = division };            
+            return division;            
          } 
     }
 }

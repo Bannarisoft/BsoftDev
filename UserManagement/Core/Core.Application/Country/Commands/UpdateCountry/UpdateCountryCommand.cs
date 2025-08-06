@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.Country.Commands.UpdateCountry
 {
-       public class UpdateCountryCommand : IRequest<ApiResponseDTO<CountryDto>>
+       public class UpdateCountryCommand : IRequest<CountryDto>
        {
               public int Id { get; set; }
               public string? CountryCode { get; set; }

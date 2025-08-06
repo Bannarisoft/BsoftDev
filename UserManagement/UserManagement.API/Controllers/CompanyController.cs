@@ -19,18 +19,10 @@ namespace UserManagement.API.Controllers
     public class CompanyController : ApiControllerBase
     {
         
-        private readonly IValidator<CreateCompanyCommand>  _CreateCompanyCommandvalidator;
-        private readonly IValidator<UpdateCompanyCommand> _UpdateCompanyCommandvalidator;
-        private readonly IValidator<UploadFileCompanyCommand> _UploadFileCompanyCommandvalidator;
-        private readonly IValidator<DeleteCompanyCommand> _DeleteCompanyCommandvalidator;
 
-        public CompanyController(ISender mediator, IValidator<CreateCompanyCommand> createCompanyCommandValidator, IValidator<UpdateCompanyCommand> updateCompanyCommandValidator, IValidator<UploadFileCompanyCommand> uploadFileCompanyCommandvalidator, IValidator<DeleteCompanyCommand> deleteCompanyCommandvalidator) 
+        public CompanyController(ISender mediator) 
         : base(mediator)
         {
-            _CreateCompanyCommandvalidator = createCompanyCommandValidator;
-            _UpdateCompanyCommandvalidator = updateCompanyCommandValidator;
-            _UploadFileCompanyCommandvalidator = uploadFileCompanyCommandvalidator;
-            _DeleteCompanyCommandvalidator = deleteCompanyCommandvalidator;
         }
         
         [HttpGet]
@@ -58,34 +50,18 @@ namespace UserManagement.API.Controllers
          [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateCompanyCommand command)
         {
-            var validationResult = await _CreateCompanyCommandvalidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new 
-                { 
-                    StatusCode=StatusCodes.Status400BadRequest, 
-                    message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-                });
-            }
+            
            
             var createdCompany = await Mediator.Send(command);
-            if (createdCompany.IsSuccess)
-            {
+          
                 return Ok(new 
                 { 
                     StatusCode=StatusCodes.Status201Created,
-                    message = createdCompany.Message,  
+                    message = "Company created successfully",  
                     errors = "", 
-                    data = createdCompany.Data  
+                    data = createdCompany  
                 });
-            }
-            return BadRequest(new 
-            { 
-                StatusCode=StatusCodes.Status400BadRequest, 
-                message = createdCompany.Message, 
-                errors = "" 
-            });
+          
             
         }
          [HttpGet("{id}")]
@@ -102,34 +78,18 @@ namespace UserManagement.API.Controllers
             }
 
             var company = await Mediator.Send(new GetCompanyByIdQuery() { CompanyId = id });
-            if (company == null)
-            {
-                return NotFound(new 
-                { 
-                    StatusCode=StatusCodes.Status404NotFound,
-                    Message = "Company not found" 
-                });
-            }
+        
             return Ok(new 
             {
                 StatusCode=StatusCodes.Status200OK,
-                data = company.Data
+                data = company
             });
         }
 
         [HttpPut]
         public async Task<IActionResult> Update(UpdateCompanyCommand command)
         {
-            var validationResult = await _UpdateCompanyCommandvalidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new 
-                { 
-                    StatusCode=StatusCodes.Status400BadRequest,
-                    Message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-                });
-            }
+            
            
             var companyExists = await Mediator.Send(new GetCompanyByIdQuery { CompanyId = command.Company.Id });
 
@@ -142,57 +102,31 @@ namespace UserManagement.API.Controllers
                     errors = "" 
                 }); 
              }
-           var updatedCompany = await Mediator.Send(command);
+            await Mediator.Send(command);
 
-            if (updatedCompany.IsSuccess)
-            {
                 return Ok(new 
                 {
                     StatusCode=StatusCodes.Status200OK,
-                    message = updatedCompany.Message,
+                    message = "Company updated successfully",
                     errors = ""
                 });
-            }
-            
-            return BadRequest(new 
-            { 
-                StatusCode=StatusCodes.Status400BadRequest, 
-                message = updatedCompany.Message, 
-                errors = "" 
-            });
+          
         }
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
            
-             var command = new DeleteCompanyCommand { Id = id };
-             var validationResult = await  _DeleteCompanyCommandvalidator.ValidateAsync(command);
-               if (!validationResult.IsValid)
-                {
-                    return BadRequest(new
-                    {
-                        message = validationResult.Errors.Select(e => e.ErrorMessage).FirstOrDefault(),
-                        statusCode = StatusCodes.Status400BadRequest
-                    });
-                }
-           var updatedCompany = await Mediator.Send(command);
+            var command = new DeleteCompanyCommand { Id = id };
+            await Mediator.Send(command);
 
-            if(updatedCompany.IsSuccess)
-            {
+          
                 return Ok(new 
                 {
                     StatusCode=StatusCodes.Status200OK,
-                    message = updatedCompany.Message,
+                    message = "Company deleted successfully",
                     errors = ""
                 });
-            }
-            
-            return BadRequest(new 
-            { 
-                StatusCode=StatusCodes.Status400BadRequest, 
-                message = updatedCompany.Message, 
-                errors = "" 
-            });
+           
         }
          [HttpGet("by-name")]
         public async Task<IActionResult> GetCompany([FromQuery] string? name)
@@ -201,39 +135,20 @@ namespace UserManagement.API.Controllers
             var companies = await Mediator.Send(new GetCompanyAutoCompleteQuery {SearchPattern = name});
             return Ok(new 
             { StatusCode=StatusCodes.Status200OK, 
-            data = companies.Data 
+            data = companies 
             });
         }
         [HttpPost("upload-logo")]
         public async Task<IActionResult> UploadLogo(UploadFileCompanyCommand uploadFileCompanyCommand)
         {
-            var validationResult = await _UploadFileCompanyCommandvalidator.ValidateAsync(uploadFileCompanyCommand);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new 
-                { 
-                    StatusCode=StatusCodes.Status400BadRequest, 
-                    message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-                });
-            }
+            
             var file = await Mediator.Send(uploadFileCompanyCommand);
-            if (!file.IsSuccess)
-            {
-                return BadRequest(new 
-                { 
-                    StatusCode=StatusCodes.Status400BadRequest, 
-                    message = file.Message, 
-                    errors = "" 
-                });
-            }
-           
                
            return Ok(new 
             { 
                 StatusCode=StatusCodes.Status200OK, 
-                message = file.Message, 
-                data = file.Data,
+                message = "File uploaded successfully", 
+                data = file,
                 errors = "" 
             });
               
@@ -242,20 +157,12 @@ namespace UserManagement.API.Controllers
         [HttpDelete("delete-logo")]
         public async Task<IActionResult> DeleteLogo(DeleteFileCompanyCommand deleteFileCompanyCommand)
         {
-            var file = await Mediator.Send(deleteFileCompanyCommand);
-            if (!file.IsSuccess)
-            {
-                return BadRequest(new 
-                { 
-                    StatusCode=StatusCodes.Status400BadRequest, 
-                    message = file.Message, 
-                    errors = "" 
-                });
-            }
+             await Mediator.Send(deleteFileCompanyCommand);
+         
             return Ok(new 
             { 
                 StatusCode=StatusCodes.Status200OK, 
-                message = file.Message, 
+                message = "File deleted successfully", 
                 errors = "" 
             });
         }

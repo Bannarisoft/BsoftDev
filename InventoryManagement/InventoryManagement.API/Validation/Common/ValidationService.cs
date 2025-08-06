@@ -1,5 +1,8 @@
 using Core.Application.Budget.Commands.CreateBudget;
 using Core.Application.Budget.Commands.UpdateBudget;
+using Core.Application.HSNMaster.Command.CreateHSNMaster;
+using Core.Application.HSNMaster.Command.DeleteHSNMaster;
+using Core.Application.HSNMaster.Command.UpdateHSNMaster;
 using Core.Application.Item.ItemCategory.Commands.CreateItemCategory;
 using Core.Application.Item.ItemCategory.Commands.DeleteItemCategory;
 using Core.Application.Item.ItemCategory.Commands.UpdateItemCategory;
@@ -13,12 +16,19 @@ using Core.Application.MiscMaster.Command.UpdateMiscMaster;
 using Core.Application.MiscTypeMaster.Command.CreateMiscTypeMaster;
 using Core.Application.MiscTypeMaster.Command.DeleteMiscTypeMaster;
 using Core.Application.MiscTypeMaster.Command.UpdateMiscTypeMaster;
+using Core.Application.UOM.Command.CreateUOM;
+using Core.Application.UOM.Command.UpdateUOM;
+using Core.Application.UOMConversion.Command.CreateUOMConversion;
+using Core.Application.UOMConversion.Command.UpdateUOMConversion;
 using FluentValidation;
 using InventoryManagement.API.Validation.Budget;
+using InventoryManagement.API.Validation.HSNMaster;
 using InventoryManagement.API.Validation.Item.ItemCategory;
 using InventoryManagement.API.Validation.Item.ItemGroup;
 using InventoryManagement.API.Validation.MiscMaster;
 using InventoryManagement.API.Validation.MiscTypeMaster;
+using InventoryManagement.API.Validation.UOM;
+using InventoryManagement.API.Validation.UOMConversion;
 
 namespace InventoryManagement.API.Validation.Common
 {
@@ -33,6 +43,7 @@ namespace InventoryManagement.API.Validation.Common
             services.AddScoped<IValidator<CreateItemGroupCommand>, CreateItemGroupCommandValidator>();
             services.AddScoped<IValidator<UpdateItemGroupCommand>, UpdateItemGroupCommandValidator>();
             services.AddScoped<IValidator<DeleteItemGroupCommand>, DeleteItemGroupCommandValidator>();
+
             services.AddScoped<IValidator<CreateMiscTypeMasterCommand>, CreateMiscTypeMasterCommandValidator>();
             services.AddScoped<IValidator<DeleteMiscTypeMasterCommand>, DeleteMiscTypeMasterCommandValidator>();
             services.AddScoped<IValidator<UpdateMiscTypeMasterCommand>, UpdateMiscTypeMasterCommandValidator>();
@@ -42,6 +53,13 @@ namespace InventoryManagement.API.Validation.Common
             services.AddScoped<IValidator<CreateBudgetCommand>, CreateBudgetCommandValidator>();
             services.AddScoped<IValidator<UpdateBudgetCommand>, UpdateBudgetCommandValidator>();
             
+            services.AddScoped<IValidator<CreateHSNMasterCommand>, CreateHSNMasterCommandValidator>();
+            services.AddScoped<IValidator<UpdateHSNMasterCommand>, UpdateHSNMasterCommandValidator>();
+            services.AddScoped<IValidator<DeleteHSNMasterCommand>, DeleteHSNMasterCommandValidator>();
+            services.AddScoped<IValidator<CreateUOMCommand>, CreateUOMCommandValidator>();
+            services.AddScoped<IValidator<UpdateUOMCommand>, UpdateUOMCommandValidator>();
+            services.AddScoped<IValidator<CreateUOMConversionCommand>, CreateUOMConversionCommandValidator>();
+            services.AddScoped<IValidator<UpdateUOMConversionCommand>, UpdateUOMConversionCommandValidator>();
         }
     }
 }

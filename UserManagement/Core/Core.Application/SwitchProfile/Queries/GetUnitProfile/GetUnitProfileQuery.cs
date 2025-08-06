@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.SwitchProfile.Queries.GetUnitProfile
 {
-    public class GetUnitProfileQuery : IRequest<ApiResponseDTO<List<GetUnitProfileDTO>>>
+    public class GetUnitProfileQuery : IRequest<List<GetUnitProfileDTO>>
     {
         
     }

@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.EntityLevelAdmin.Commands.ResetPassword
 {
-    public class ResetPasswordCommand : IRequest<ApiResponseDTO<bool>>
+    public class ResetPasswordCommand : IRequest<bool>
     {
         public int UserId { get; set; }
         public string? VerificationCode { get; set; }

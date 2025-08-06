@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
 using Microsoft.Data.SqlClient;
+using System.Text.Json;
+using FluentValidation;
+
 
 namespace PurchaseManagement.Infrastructure.Logging.Middleware
 {
@@ -48,41 +51,37 @@ namespace PurchaseManagement.Infrastructure.Logging.Middleware
             }
             await _next(context);                    
         }
+           catch (ValidationException ex)
+            {
+                // Handle 400 - Validation Error
+                context.Response.ContentType = "application/json";
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+    
+                var response = new
+                {
+                    statusCode = context.Response.StatusCode,
+                    message = "Validation failed",
+                    errors = ex.Errors.Select(e => e.ErrorMessage).ToArray()
+                };
+    
+                await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+            }
         catch (Exception ex)
             {
-                // 🛑 Log and return standardized error
-                _logger.LogError(ex, "Unhandled exception occurred. TraceId: {TraceId}", traceId);
+                // Handle any exceptions that occur
+                _logger.LogError(ex, "Unhandled exception");
 
-                context.Response.ContentType = "application/json";
-                context.Response.StatusCode = ex switch
-                {
-                    EntityAlreadyExistsException => StatusCodes.Status409Conflict,
-                    EntityNotFoundException => StatusCodes.Status404NotFound,
-                    ExceptionRules => StatusCodes.Status400BadRequest,
-                    SqlException => StatusCodes.Status503ServiceUnavailable,
-                    DbUpdateException => StatusCodes.Status500InternalServerError,
-                    NullReferenceException => StatusCodes.Status500InternalServerError,
-                    _ => StatusCodes.Status500InternalServerError
-                };
+                 context.Response.ContentType = "application/json";
+                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
-                var response =  new ApiResponseDTO<object>
-                {
-                    IsSuccess = false,
-                    Message = ex.Message,                    
-                   /*  Data = ex switch
-                    {
-                        EntityAlreadyExistsException => "Already exists.",
-                        EntityNotFoundException => "Id not found.",
-                        ExceptionRules => "Validation error.",
-                        SqlException => "Database connection error.",
-                        DbUpdateException => "Database update failed.",
-                        NullReferenceException => "Null reference exception.",
-                        _ => "An unexpected error occurred."
-                    }, */
-                    Errors = new List<string> { ex.Message },
-                    StatusCode = context.Response.StatusCode
-                };
-                await context.Response.WriteAsJsonAsync(response);
+                 var response = new
+                 {
+                     statusCode = context.Response.StatusCode,
+                     message = "Internal Server Error",
+                     errors = new[] { ex.Message } // optional: ex.StackTrace for development
+                 };
+
+                 await context.Response.WriteAsync(JsonSerializer.Serialize(response));
             }
         }
     }

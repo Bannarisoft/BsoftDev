@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.UserGroup.Queries.GetUserGroupAutoComplete
 {
-    public class GetUserGroupAutoCompleteQuery : IRequest<ApiResponseDTO<List<UserGroupAutoCompleteDto>>>
+    public class GetUserGroupAutoCompleteQuery : IRequest<List<UserGroupAutoCompleteDto>>
     {
          public string? SearchPattern { get; set; }
     }

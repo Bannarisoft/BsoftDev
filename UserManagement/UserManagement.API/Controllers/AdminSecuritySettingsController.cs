@@ -26,20 +26,16 @@ namespace UserManagement.API.Controllers
     [Route("api/[controller]")]
     public class AdminSecuritySettingsController : ApiControllerBase
     {
-        private readonly ApplicationDbContext _dbContext;
-        private readonly IValidator<CreateAdminSecuritySettingsCommand> _createAdminSecuritySettingsCommandValidator;   
-        private readonly IValidator <UpdateAdminSecuritySettingsCommand> _updateAdminSecuritysettingsCommandValidator;
+     
         
         private readonly ILogger<AdminSecuritySettingsController> _logger;
 
 
 
-        public AdminSecuritySettingsController (ISender mediator  , ApplicationDbContext dbContext,
-        IValidator<CreateAdminSecuritySettingsCommand> createAdminSecuritySettingsCommandValidator, IValidator<UpdateAdminSecuritySettingsCommand> UpdateAdminSecuritySettingsCommandValidator,ILogger<AdminSecuritySettingsController> logger )  : base(mediator)
+        public AdminSecuritySettingsController (ISender mediator, 
+         ILogger<AdminSecuritySettingsController> logger)  : base(mediator)
         {
-             _dbContext = dbContext; 
-             _createAdminSecuritySettingsCommandValidator = createAdminSecuritySettingsCommandValidator;
-             _updateAdminSecuritysettingsCommandValidator = UpdateAdminSecuritySettingsCommandValidator;
+          
              _logger = logger;
 
              
@@ -88,15 +84,7 @@ namespace UserManagement.API.Controllers
                     // Fetch the admin security setting by ID
                     var adminSecuritySetting = await Mediator.Send(new GetAdminSecuritySettingsByIdQuery { Id = id });
 
-                    if (adminSecuritySetting == null || adminSecuritySetting.Data == null)
-                    {
-                        _logger.LogWarning($"Admin Security Setting with ID {id} not found.");
-                        return NotFound(new
-                        {
-                            StatusCode = StatusCodes.Status404NotFound,
-                            Message = $"Admin Security Setting with ID {id} not found."
-                        });
-                    }
+                  
 
                     _logger.LogInformation($"Admin Security Setting with ID {id} retrieved successfully.");
 
@@ -117,41 +105,20 @@ namespace UserManagement.API.Controllers
 
                _logger.LogInformation($"Create AdminSecuritySettings request started with data: {createAdminSecuritySettingscmd}");
 
-            // Validate the command
-            var validationResult = await _createAdminSecuritySettingsCommandValidator.ValidateAsync(createAdminSecuritySettingscmd);
-            if (!validationResult.IsValid)
-            {
-                _logger.LogWarning("Validation failed for Create AdminSecuritySettings request. Errors: {@Errors}", validationResult.Errors);
-
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Validation failed",
-                    Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
+      
 
             // Process the command
-            var createAdminSecuritySettings = await Mediator.Send(createAdminSecuritySettingscmd);
-            if (createAdminSecuritySettings.IsSuccess)
-                {
-                    _logger.LogInformation($"Create Department request succeeded. Department created with ID: {createAdminSecuritySettings.Data}");
+             await Mediator.Send(createAdminSecuritySettingscmd);
+         
+                    
 
                     return Ok(new
                     {
                         StatusCode = StatusCodes.Status201Created,
-                        Message = createAdminSecuritySettings.Message
+                        Message = "Admin Security Settings created successfully",
                         
                     });
-                }
-            _logger.LogWarning($"Create Department request failed. Reason: {createAdminSecuritySettings.Message}");
-
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                Message = createAdminSecuritySettings.Message
-            });
-            
+                
         
         }
          
@@ -160,19 +127,7 @@ namespace UserManagement.API.Controllers
             {
                  _logger.LogInformation($"Starting UpdateAsync for Admin Security Settings with ID: {id}.");
             // Validate the command
-        _logger.LogDebug($"Validating UpdateAdminSecuritySettingsCommand: {updateadminsecuritycommand}.");
-            var validationResult = await _updateAdminSecuritysettingsCommandValidator.ValidateAsync(updateadminsecuritycommand);
-
-            if (!validationResult.IsValid)
-            {
-                _logger.LogWarning($"Validation failed for UpdateAdminSecuritySettingsCommand with ID: {id}. Errors: { validationResult.Errors}");
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Validation failed",
-                    Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
+    
 
             // Check for ID mismatch
             if (id != updateadminsecuritycommand.Id)
@@ -187,10 +142,8 @@ namespace UserManagement.API.Controllers
 
             // Process the update command
             _logger.LogInformation("Sending UpdateAdminSecuritySettingsCommand for processing.");
-            var updateResult = await Mediator.Send(updateadminsecuritycommand);
+             await Mediator.Send(updateadminsecuritycommand);
 
-            if (updateResult.IsSuccess)
-            {
                 _logger.LogInformation($"Admin Security Settings with ID: {id} updated successfully.");
                 return Ok(new
                 {
@@ -198,14 +151,7 @@ namespace UserManagement.API.Controllers
                     Message = "Updated Successfully"
                     
                 });
-            }
-
-            _logger.LogWarning($"Failed to update Admin Security Settings with ID: {id}. Reason: {updateResult.Message}");
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                Message = updateResult.Message
-            });
+           
                 
             }
             
@@ -228,27 +174,20 @@ namespace UserManagement.API.Controllers
                 _logger.LogInformation($"Admin Security Settings  with ID {id} found. Proceeding with deletion.");
 
                 // Attempt to delete the department
-                var result = await Mediator.Send(new DeleteAdminSecuritySettingsCommand { Id = id });
+                 await Mediator.Send(new DeleteAdminSecuritySettingsCommand { Id = id });
 
-                if (result.IsSuccess)
-                {
+            
                     _logger.LogInformation($"Admin Security Settings  with ID {id} deleted successfully.");
 
                     return Ok(new
                     {
-                        Message = result.Message,
+                        Message = "Admin Security Settings  deleted successfully",
                         StatusCode = StatusCodes.Status200OK
                       
                     });
-                }
+                
 
-                _logger.LogWarning($"Failed to delete Admin Security Settings  with ID {id}. Reason: {result.Message}"  );
-
-                return BadRequest(new
-                {
-                    Message = result.Message,
-                    StatusCode = StatusCodes.Status400BadRequest
-                });
+               
           
         }
 

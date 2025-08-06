@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.Notification.Queries
 {
-    public class NotificationRequest : IRequest<ApiResponseDTO<NotificationResponse>>
+    public class NotificationRequest : IRequest<NotificationResponse>
     {
         public string? Username { get; set; }
     }

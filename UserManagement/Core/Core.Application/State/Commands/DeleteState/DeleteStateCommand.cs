@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.State.Commands.DeleteState
 {
-       public class DeleteStateCommand :  IRequest<ApiResponseDTO<StateDto>>  
+       public class DeleteStateCommand :  IRequest<StateDto>
        {
                 public int Id { get; set; }                
        }

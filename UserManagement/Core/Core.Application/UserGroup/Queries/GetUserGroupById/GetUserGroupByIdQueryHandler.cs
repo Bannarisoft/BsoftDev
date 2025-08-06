@@ -7,11 +7,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IUserGroup;
 using Core.Application.UserGroup.Queries.GetUserGroup;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.UserGroup.Queries.GetUserGroupById
 {
-    public class GetUserGroupByIdQueryHandler  : IRequestHandler<GetUserGroupByIdQuery, ApiResponseDTO<UserGroupDto>>
+    public class GetUserGroupByIdQueryHandler  : IRequestHandler<GetUserGroupByIdQuery, UserGroupDto>
     {
         private readonly IUserGroupQueryRepository _userGroupRepository;
         private readonly IMapper _mapper;
@@ -24,16 +25,13 @@ namespace Core.Application.UserGroup.Queries.GetUserGroupById
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<UserGroupDto>> Handle(GetUserGroupByIdQuery request, CancellationToken cancellationToken)
+        public async Task<UserGroupDto> Handle(GetUserGroupByIdQuery request, CancellationToken cancellationToken)
         {           
             var userGroup = await _userGroupRepository.GetByIdAsync(request.Id);
             if (userGroup is null)
             {
-                return new ApiResponseDTO<UserGroupDto>
-                {
-                    IsSuccess = false,
-                    Message = "UserGroup not found"
-                };
+                throw new ValidationException("UserGroup not found");
+               
             }            
             var userGroupDto = _mapper.Map<UserGroupDto>(userGroup);
                 
@@ -46,12 +44,7 @@ namespace Core.Application.UserGroup.Queries.GetUserGroupById
                 module:"UserGroup"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<UserGroupDto>
-            {
-                IsSuccess = true,
-                Message = "UserGroup fetched successfully",
-                Data = userGroupDto
-            };           
+            return userGroupDto;           
         }
     }
 }

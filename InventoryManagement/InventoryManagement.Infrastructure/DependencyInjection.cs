@@ -2,20 +2,26 @@ using System.Data;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.AuditLog;
 using Core.Application.Common.Interfaces.Budget;
+using Core.Application.Common.Interfaces.IHSNMaster;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IMiscTypeMaster;
 using Core.Application.Common.Interfaces.Item.ItemCategory;
 using Core.Application.Common.Interfaces.Item.ItemGroup;
+using Core.Application.Common.Interfaces.IUOM;
+using Core.Application.Common.Interfaces.IUOMConversion;
 using Core.Application.Common.Mappings;
 using Core.Domain.Entities.Item;
 using Infrastructure.Data;
 using Infrastructure.Persistence.Repositories;
 using InventoryManagement.Infrastructure.Data;
 using InventoryManagement.Infrastructure.Repositories;
+using InventoryManagement.Infrastructure.Repositories.HSNMaster;
 using InventoryManagement.Infrastructure.Repositories.Item.ItemCategory;
 using InventoryManagement.Infrastructure.Repositories.Item.ItemGroup;
 using InventoryManagement.Infrastructure.Repositories.MiscMaster;
 using InventoryManagement.Infrastructure.Repositories.MiscTypeMaster;
+using InventoryManagement.Infrastructure.Repositories.UOMConversion;
+using InventoryManagement.Infrastructure.Repositories.UOMs;
 using InventoryManagement.Infrastructure.Services;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -106,7 +112,14 @@ namespace InventoryManagement.Infrastructure
 			services.AddScoped<IMiscTypeMasterQueryRepository, MiscTypeMasterQueryRepository>();            
             services.AddScoped<IMiscTypeMasterCommandRepository, MiscTypeMasterCommandRepository>();
             services.AddScoped<IMiscMasterQueryRepository, MiscMasterQueryRepository>();
-            services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();      
+
+            services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>(); 
+            services.AddScoped<IHSNMasterQueryRepository , HSNMasterQueryRepository>();     
+            services.AddScoped<IHSNMasterCommandRepository, HSNMasterCommandRepository>();
+            services.AddScoped<IUOMQueryRepository , UOMQueryRepository>();     
+            services.AddScoped<IUOMCommandRepository, UOMCommandRepository>();
+            services.AddScoped<IUOMConversionQueryRepository , UOMConversionQueryRepository>();
+            services.AddScoped<IUOMConversionCommandRepository, UOMConversionCommandRepository>();
             services.AddScoped<IBudgetCommandRepository, BudgetCommandRepository>(); 
             services.AddScoped<IBudgetQueryRepository, BudgetQueryRepository>(); 
             services.AddScoped<IBudgetLogQueryRepository, BudgetLogQueryRepository>(); 
@@ -121,7 +134,11 @@ namespace InventoryManagement.Infrastructure
             // AutoMapper profiles
           services.AddAutoMapper(
                  typeof(MiscTypeMasterProfile),
-                typeof(MiscMasterProfile)
+
+                typeof(MiscMasterProfile),               
+                typeof(HSNMasterProfile),
+                typeof(UOMProfile),
+                typeof(UOMConversionProfile)
                 
             );
             return services;

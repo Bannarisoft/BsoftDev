@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.CustomFields.Commands.UpdateCustomField
 {
-    public class UpdateCustomFieldCommandHandler : IRequestHandler<UpdateCustomFieldCommand, ApiResponseDTO<bool>>
+    public class UpdateCustomFieldCommandHandler : IRequestHandler<UpdateCustomFieldCommand, bool>
     {
         private readonly ICustomFieldCommand _customFieldCommand;
          private readonly IMapper _imapper;
@@ -22,7 +22,7 @@ namespace Core.Application.CustomFields.Commands.UpdateCustomField
             _imapper = imapper;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<bool>> Handle(UpdateCustomFieldCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(UpdateCustomFieldCommand request, CancellationToken cancellationToken)
         {
               var customField  = _imapper.Map<CustomField>(request);
          
@@ -40,18 +40,10 @@ namespace Core.Application.CustomFields.Commands.UpdateCustomField
               
                 if(customFieldresult)
                 {
-                    return new ApiResponseDTO<bool>
-                    {
-                        IsSuccess = true, 
-                        Message = "Custom field updated successfully."
-                    };
+                    return customFieldresult;
                 }
-
-                return new ApiResponseDTO<bool>
-                {
-                    IsSuccess = false, 
-                    Message = "Custom field not updated."
-                };
+            throw new Exception("Custom field not updated.");
+              
         }
     }
 }

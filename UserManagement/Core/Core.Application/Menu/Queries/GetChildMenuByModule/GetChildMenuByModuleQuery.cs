@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.Menu.Queries.GetChildMenuByModule
 {
-    public class GetChildMenuByModuleQuery : IRequest<ApiResponseDTO<List<ChildMenuDTO>>>
+    public class GetChildMenuByModuleQuery : IRequest<List<ChildMenuDTO>>
     {
         public List<int>? ParentId { get; set; }
     }

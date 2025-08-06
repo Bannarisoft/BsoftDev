@@ -13,7 +13,7 @@ using Core.Domain.Events;
 namespace Core.Application.Companies.Commands.DeleteCompany
 {
 
-    public class DeleteCompanyCommandHandler : IRequestHandler<DeleteCompanyCommand, ApiResponseDTO<bool>>
+    public class DeleteCompanyCommandHandler : IRequestHandler<DeleteCompanyCommand, bool>
     {
         private readonly ICompanyCommandRepository _icompanyRepository;
         private readonly IMapper _imapper;
@@ -26,7 +26,7 @@ namespace Core.Application.Companies.Commands.DeleteCompany
         }
 
 
-        public async Task<ApiResponseDTO<bool>> Handle(DeleteCompanyCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DeleteCompanyCommand request, CancellationToken cancellationToken)
         {
             var company  = _imapper.Map<Company>(request);
 
@@ -44,9 +44,10 @@ namespace Core.Application.Companies.Commands.DeleteCompany
                      module:"Company"
                  );
                  await _mediator.Publish(domainEvent, cancellationToken);
-                return new ApiResponseDTO<bool>{IsSuccess = true, Message = "Company deleted successfully"};
+                return result;
             }
-            return new ApiResponseDTO<bool>{IsSuccess = false, Message = "Company not deleted"};
+            throw new Exception("Company not deleted");
+            
         }
     }
 }

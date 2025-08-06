@@ -23,6 +23,10 @@ namespace PurchaseManagement.Infrastructure.Data
         // public DbSet<AssetGroup> AssetGroup { get; set; } 
         public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
         public DbSet<MiscMaster> MiscMaster { get; set; }
+        public DbSet<IndentHeader> IndentHeader { get; set; }
+        public DbSet<IndentDetail> IndentDetail { get; set; }
+        public DbSet<IndentDepartmentMapping> IndentDepartmentMapping { get; set; }
+        public DbSet<IndentLog> IndentLog { get; set; }
 
 
 
@@ -33,6 +37,10 @@ namespace PurchaseManagement.Infrastructure.Data
 
             modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
             modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new IndentHeaderConfiguration());
+            modelBuilder.ApplyConfiguration(new IndentDetailConfiguration());
+            modelBuilder.ApplyConfiguration(new IndentDepartmentMappingConfiguration());
+            modelBuilder.ApplyConfiguration(new IndentLogConfiguration());
 
 
 

@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Core.Application.Modules.Queries.GetModuleById
 {
-    public class GetModuleByIdQuery: IRequest<ApiResponseDTO<ModuleByIdDto>>
+    public class GetModuleByIdQuery: IRequest<ModuleByIdDto>
     {
         public int Id { get; set; }
         

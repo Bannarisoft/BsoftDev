@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Core.Application.Common.Interfaces;
 using Core.Domain.Common;
 using Core.Domain.Entities;
+using WarehouseManagement.Infrastructure.Data.Configurations;
 
 namespace WarehouseManagement.Infrastructure.Data
 {
@@ -18,10 +19,14 @@ namespace WarehouseManagement.Infrastructure.Data
             _timeZoneService = timeZoneService;
 
         }
-
-
+        
+         public DbSet<WarehouseItemGroupMapping> GetWarehouseItemGroupMappings  { get; set; }
+         public DbSet<WarehouseMaster> WarehouseMasters  { get; set; }
+          
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.ApplyConfiguration(new WarehouseMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new WarehouseItemGroupMappingConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }

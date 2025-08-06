@@ -13,7 +13,7 @@ using Core.Domain.Events;
 
 namespace Core.Application.Divisions.Queries.GetDivisionById
 {
-    public class GetDivisionByIdQueryHandler : IRequestHandler<GetDivisionByIdQuery,ApiResponseDTO<DivisionDTO>>
+    public class GetDivisionByIdQueryHandler : IRequestHandler<GetDivisionByIdQuery,DivisionDTO>
     {
          private readonly IDivisionQueryRepository _divisionRepository;        
         private readonly IMapper _mapper;
@@ -25,7 +25,7 @@ namespace Core.Application.Divisions.Queries.GetDivisionById
             _mapper =mapper;
             _mediator = mediator;
         } 
-        public async Task<ApiResponseDTO<DivisionDTO>> Handle(GetDivisionByIdQuery request, CancellationToken cancellationToken)
+        public async Task<DivisionDTO> Handle(GetDivisionByIdQuery request, CancellationToken cancellationToken)
         {
             
         var result = await _divisionRepository.GetByIdAsync(request.Id);
@@ -40,7 +40,7 @@ namespace Core.Application.Divisions.Queries.GetDivisionById
                     module:"Division"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-          return new ApiResponseDTO<DivisionDTO> { IsSuccess = true, Message = "Success", Data = division };
+          return division;
 
         }
     }

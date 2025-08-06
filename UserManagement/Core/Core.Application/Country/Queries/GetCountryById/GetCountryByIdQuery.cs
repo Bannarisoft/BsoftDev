@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Core.Application.Country.Queries.GetCountryById
 {
-    public class GetCountryByIdQuery : IRequest<ApiResponseDTO<CountryDto>>
+    public class GetCountryByIdQuery : IRequest<CountryDto>
     {
         public int Id { get; set; }
     }

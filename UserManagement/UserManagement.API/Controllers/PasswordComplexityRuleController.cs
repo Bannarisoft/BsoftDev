@@ -18,18 +18,11 @@ namespace UserManagement.API.Controllers
     [Route("api/[controller]")]
     public class PasswordComplexityRuleController :ApiControllerBase
     {
-         private readonly IValidator<CreatePasswordComplexityRuleCommand> _createPasswordComplexityRuleCommand;
-         private readonly IValidator<UpdatePasswordComplexityRuleCommand> _updatepasswordComplexityRuleCommandValidator; 
-         private readonly ApplicationDbContext _dbContext;
+       
          private readonly ILogger<PasswordComplexityRuleController> _logger;
-         public PasswordComplexityRuleController(ISender mediator , 
-         IValidator<CreatePasswordComplexityRuleCommand> createPasswordComplexityRuleCommandValidator, 
-         IValidator<UpdatePasswordComplexityRuleCommand> updatePasswordComplexityRuleCommandValidator,
-         ApplicationDbContext dbContext ,ILogger<PasswordComplexityRuleController> logger ) : base(mediator)
+         public PasswordComplexityRuleController(ISender mediator  ,ILogger<PasswordComplexityRuleController> logger ) : base(mediator)
         {                      
-             _createPasswordComplexityRuleCommand=createPasswordComplexityRuleCommandValidator;
-             _updatepasswordComplexityRuleCommandValidator= updatePasswordComplexityRuleCommandValidator;
-             _dbContext = dbContext; 
+             
              _logger = logger;
         }
 
@@ -78,17 +71,7 @@ namespace UserManagement.API.Controllers
             // Send the query to get the password complexity rule by ID
         var pwdComplexity = await Mediator.Send(new GetPwdComplexityRuleByIdQuery { Id = id });
 
-        if (!pwdComplexity.IsSuccess )
-        {
-            _logger.LogWarning("Password Complexity Rule with ID: {Id} not found.", id);
-
-            return NotFound(new
-            {
-                StatusCode = StatusCodes.Status404NotFound,
-                Message = pwdComplexity.Message
-               
-            });
-        }
+     
 
         _logger.LogInformation("Password Complexity Rule with ID: {Id} retrieved successfully.", id);
 
@@ -112,25 +95,15 @@ namespace UserManagement.API.Controllers
                     var query = new GetPwdComplexityRuleAutoComplete { SearchTerm  = name ?? string.Empty };
                         var result = await Mediator.Send(query);
 
-                        if (result.IsSuccess )
-                        {               
-
+                     
                             _logger.LogInformation("Password Complexity Rule found for search pattern: {SearchPattern}. Returning data.", name);
 
                         return Ok(new
                         {
                             StatusCode = StatusCodes.Status200OK,
-                            Data = result.Data
+                            Data = result
                         });
-                        }
-                        _logger.LogWarning("Password Complexity Rule found for search pattern: {SearchPattern}", name);
-
-                        return NotFound(new
-                        {
-                                StatusCode = StatusCodes.Status404NotFound,
-                                Message = "No matching Password Complexity Rule found.",
-
-                        });
+                     
         
          }
 
@@ -140,62 +113,30 @@ namespace UserManagement.API.Controllers
         {
              _logger.LogInformation("Starting CreateAsync for creating a Password Complexity Rule.");
 
-           // Validate the command
-        var validationResult = await _createPasswordComplexityRuleCommand.ValidateAsync(createPasswordComplexityRuleCommand);
-        if (!validationResult.IsValid)
-        {
-            _logger.LogWarning("Validation failed for CreatePasswordComplexityRuleCommand. Errors: {@Errors}", validationResult.Errors);
-
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                Message = "Validation failed",
-                Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-            });
-        }
+       
 
         _logger.LogInformation("Validation passed for CreatePasswordComplexityRuleCommand. Proceeding with creation.");
 
         // Send the command to the Mediator
         var createPasswordComplexityRule = await Mediator.Send(createPasswordComplexityRuleCommand);
-        if (createPasswordComplexityRule.IsSuccess)
-            {
+      
                 _logger.LogInformation("Password Complexity Rule created successfully.");
 
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status201Created,
                     Message = "Password Complexity Rule Created Successfully",
-                    Data=createPasswordComplexityRule.Data
+                    Data=createPasswordComplexityRule
                 
                 });
-          }
-           _logger.LogWarning("Create Department request failed. Reason: {Message}", createPasswordComplexityRule.Message);
-
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                Message = createPasswordComplexityRule.Message
-
-            });
+     
              
         }
 
         [HttpPut]
         public async Task<IActionResult> UpdateAsync( UpdatePasswordComplexityRuleCommand updatePasswordComplexityRuleCommand)
         {
-            // Validate the command
-            var validationResult = await _updatepasswordComplexityRuleCommandValidator.ValidateAsync(updatePasswordComplexityRuleCommand);
-            if (!validationResult.IsValid)
-            {          
-
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Validation failed",
-                    Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
+         
         var PasswordComplexityRule = await Mediator.Send(new GetPwdComplexityRuleByIdQuery { Id = updatePasswordComplexityRuleCommand.Id });
             // Check for ID mismatch
             if (PasswordComplexityRule==null)
@@ -256,26 +197,18 @@ namespace UserManagement.API.Controllers
                 _logger.LogInformation($" Password Complexity Rule with ID {id} found. Proceeding with deletion.");
 
                 // Attempt to delete the department
-                var result = await Mediator.Send(new DeletePasswordComplexityRuleCommand { Id = id });
+                 await Mediator.Send(new DeletePasswordComplexityRuleCommand { Id = id });
 
-                if (result.IsSuccess)
-                {
+              
                     _logger.LogInformation($" Password Complexity Rule with ID {id} deleted successfully.");
 
                     return Ok(new
                     {
-                        Message = result.Message,
+                        Message = " Password Complexity Rule deleted successfully",
                         StatusCode = StatusCodes.Status200OK
                       
                     });
-                }
-                _logger.LogWarning($"Failed to delete  Password Complexity Rule with ID {id}. Reason: {result.Message}" );
-
-                return BadRequest(new
-                {
-                    Message = result.Message,
-                    StatusCode = StatusCodes.Status400BadRequest
-                });     
+               
         }    
 
     }

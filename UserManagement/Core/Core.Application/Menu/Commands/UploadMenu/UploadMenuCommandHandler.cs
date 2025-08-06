@@ -11,7 +11,7 @@ using OfficeOpenXml;
 
 namespace Core.Application.Menu.Commands.UploadMenu
 {
-    public class UploadMenuCommandHandler : IRequestHandler<UploadMenuCommand, ApiResponseDTO<string>>
+    public class UploadMenuCommandHandler : IRequestHandler<UploadMenuCommand, string>
     {
         private readonly IModuleQueryRepository _moduleQueryRepository;
         private readonly IMapper _imapper;
@@ -24,7 +24,7 @@ namespace Core.Application.Menu.Commands.UploadMenu
             _menuCommand = menuCommand;
             _menuQuery = menuQuery;
         }
-        public async Task<ApiResponseDTO<string>> Handle(UploadMenuCommand request, CancellationToken cancellationToken)
+        public async Task<string> Handle(UploadMenuCommand request, CancellationToken cancellationToken)
         {
             using var stream = new MemoryStream();
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -81,11 +81,7 @@ namespace Core.Application.Menu.Commands.UploadMenu
             var ChildMenu = _imapper.Map<List<Core.Domain.Entities.Menu>>(ChildMenuDtos);
             var ChildMenuresult = await _menuCommand.BulkImportMenuAsync(ChildMenu);
 
-             return new ApiResponseDTO<string>
-            {
-                IsSuccess = true,
-                Message = "Upload successful."
-            };
+             return "Upload successful.";
         }
     }
 }

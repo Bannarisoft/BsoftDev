@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.City.Queries.GetCityByStateId
 {
-    public class GetCityByStateIdQuery : IRequest<ApiResponseDTO<List<CityDto>>>
+    public class GetCityByStateIdQuery : IRequest<List<CityDto>>
     {
         public int Id { get; set; }
     }

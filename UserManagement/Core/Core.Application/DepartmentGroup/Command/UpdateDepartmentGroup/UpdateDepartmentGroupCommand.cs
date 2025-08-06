@@ -9,7 +9,7 @@ using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.DepartmentGroup.Command.UpdateDepartmentGroup
 {
-    public class UpdateDepartmentGroupCommand  : IRequest<ApiResponseDTO<int>>
+    public class UpdateDepartmentGroupCommand  : IRequest<int>
     {
          public int Id { get; set; }
         public string? DepartmentGroupCode { get; set; }

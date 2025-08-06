@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Core.Application.Units.Queries.GetUnitAutoComplete
 {
-    public class GetUnitAutoCompleteQuery : IRequest<ApiResponseDTO<List<UnitAutoCompleteDTO>>>
+    public class GetUnitAutoCompleteQuery : IRequest<List<UnitAutoCompleteDTO>>
     {
         public string? SearchPattern { get; set; }
         public int CompanyId { get; set; }        

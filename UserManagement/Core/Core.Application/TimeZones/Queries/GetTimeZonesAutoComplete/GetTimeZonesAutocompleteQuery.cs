@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.TimeZones.Queries.GetTimeZonesAutoComplete
 {
-    public class GetTimeZonesAutocompleteQuery : IRequest<ApiResponseDTO<List<TimeZonesAutoCompleteDto>>>
+    public class GetTimeZonesAutocompleteQuery : IRequest<List<TimeZonesAutoCompleteDto>>
     {
          public string? SearchPattern { get; set; }
     }

@@ -7,12 +7,13 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.ITimeZones;
 using Core.Application.TimeZones.Queries.GetTimeZones;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Core.Application.TimeZones.Queries.GetTimeZonesAutoComplete
 {
-    public class GetTimeZonesAutocompleteQueryHandler : IRequestHandler<GetTimeZonesAutocompleteQuery, ApiResponseDTO<List<TimeZonesAutoCompleteDto>>>
+    public class GetTimeZonesAutocompleteQueryHandler : IRequestHandler<GetTimeZonesAutocompleteQuery, List<TimeZonesAutoCompleteDto>>
     {
         private readonly ITimeZonesQueryRepository _timeZonesQueryRepository;        
         private readonly IMapper _mapper;
@@ -27,18 +28,15 @@ namespace Core.Application.TimeZones.Queries.GetTimeZonesAutoComplete
             _logger = logger?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<ApiResponseDTO<List<TimeZonesAutoCompleteDto>>> Handle(GetTimeZonesAutocompleteQuery request, CancellationToken cancellationToken)
+        public async Task<List<TimeZonesAutoCompleteDto>> Handle(GetTimeZonesAutocompleteQuery request, CancellationToken cancellationToken)
         {
             _logger.LogInformation($"Fetching TimeZones Request started: {request}"); 
             var newTimeZones = await _timeZonesQueryRepository.GetByTimeZonesNameAsync(request.SearchPattern);
             if (newTimeZones is null || !newTimeZones.Any() || newTimeZones.Count == 0)
             {
                 _logger.LogWarning($"No TimeZones Record {newTimeZones.Count} not found in DB.", newTimeZones.Count);
-                return new ApiResponseDTO<List<TimeZonesAutoCompleteDto>>
-                {
-                    IsSuccess = false,
-                    Message = "No TimeZones found"
-                };
+                throw new ValidationException("No TimeZones found");
+                
             }
             else
             {
@@ -53,12 +51,7 @@ namespace Core.Application.TimeZones.Queries.GetTimeZonesAutoComplete
                     module:"TimeZones");
                 await _mediator.Publish(domainEvent);
                 _logger.LogInformation($"TimeZones {newTimeZonesDto.Count} Listed successfully.");
-                return new ApiResponseDTO<List<TimeZonesAutoCompleteDto>>
-                {
-                    IsSuccess = true,
-                    Message = "Success",
-                    Data = newTimeZonesDto
-                };
+                return newTimeZonesDto;
             }           
             
         }

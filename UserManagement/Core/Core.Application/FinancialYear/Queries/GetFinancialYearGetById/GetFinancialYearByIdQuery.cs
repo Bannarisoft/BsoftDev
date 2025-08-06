@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.FinancialYear.Queries.GetFinancialYearGetById
 {
-    public class GetFinancialYearByIdQuery   : IRequest<ApiResponseDTO<List<GetFinancialYearDto>>>
+    public class GetFinancialYearByIdQuery   : IRequest<List<GetFinancialYearDto>>
     { 
      
            public int Id { get; set; }

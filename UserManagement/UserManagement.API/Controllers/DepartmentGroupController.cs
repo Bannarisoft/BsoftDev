@@ -22,21 +22,14 @@ namespace UserManagement.API.Controllers
     [Route("api/[controller]")]
     public class DepartmentGroupController : ApiControllerBase
     {
-        private readonly IValidator<CreateDepartmentGroupCommand> _createDepartmentGroupCommandValidator;
-        private readonly IValidator<DeleteDepartmentGroupCommand> _deleteDepartmentGroupCommandValidator;
-        private readonly IValidator<UpdateDepartmentGroupCommand> _updateDepartmentGroupCommandValidator;
-        private readonly ApplicationDbContext _dbContext;
+        
         private readonly ILogger<DepartmentController> _logger;
 
 
-        public DepartmentGroupController(ISender mediator, IValidator<CreateDepartmentGroupCommand> createDepartmentGroupCommandValidator, ApplicationDbContext dbContext, ILogger<DepartmentController> logger,
-            IValidator<DeleteDepartmentGroupCommand> deleteDepartmentGroupCommandValidator, IValidator<UpdateDepartmentGroupCommand> updateDepartmentGroupCommandValidator) : base(mediator)
+        public DepartmentGroupController(ISender mediator, ILogger<DepartmentController> logger) : base(mediator)
         {
-            _createDepartmentGroupCommandValidator = createDepartmentGroupCommandValidator;
-            _dbContext = dbContext;
+            
             _logger = logger;
-            _updateDepartmentGroupCommandValidator = updateDepartmentGroupCommandValidator;
-            _deleteDepartmentGroupCommandValidator = deleteDepartmentGroupCommandValidator;
 
         }
 
@@ -45,42 +38,19 @@ namespace UserManagement.API.Controllers
         {
 
 
-            // Validate the command
-            var validationResult = await _createDepartmentGroupCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-
-
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Validation failed",
-                    Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
 
             // Process the command
             var createdepartmentgroup = await Mediator.Send(command);
-            if (createdepartmentgroup.IsSuccess)
-            {
+          
 
 
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status201Created,
-                    Message = createdepartmentgroup.Message,
-                    Data = createdepartmentgroup.Data
+                    Message = "Department Group Created Successfully",
+                    Data = createdepartmentgroup
                 });
-            }
-            else
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = createdepartmentgroup.Message,
-                    Data = createdepartmentgroup.Data
-                });
-            }
+           
         }
 
         [HttpGet("GetAllDepartmentGroup")]
@@ -122,19 +92,12 @@ namespace UserManagement.API.Controllers
         {
             var result = await Mediator.Send(new GetDepartmentGroupByIdQuery { Id = id });
 
-            if (result == null || result.Data == null)
-            {
-                return NotFound(new
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = result?.Message ?? "Department Group not found."
-                });
-            }
+          
 
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                Data = result.Data
+                Data = result
             });
         }
 
@@ -142,32 +105,13 @@ namespace UserManagement.API.Controllers
         public async Task<IActionResult> UpdateAsync([FromBody] UpdateDepartmentGroupCommand command)
         {
 
-
-            var validationResult = await _updateDepartmentGroupCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Validation failed",
-                    Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
             var result = await Mediator.Send(command);
 
-            if (!result.IsSuccess || result.Data == 0)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = result.Message
-                });
-            }
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                Message = result.Message,
-                Data = result.Data
+                Message = "Department Group Updated Successfully",
+                Data = result
             });
         }
 
@@ -177,52 +121,21 @@ namespace UserManagement.API.Controllers
         {
             var command = new DeleteDepartmentGroupCommand { Id = id };
 
-            // Validate the delete command
-            var validationResult = await _deleteDepartmentGroupCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Validation failed",
-                    Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
 
             // Check if the department group exists
-            var department = await Mediator.Send(new GetDepartmentGroupByIdQuery { Id = id });
-            if (department == null || department.Data == null)
-            {
-
-                return NotFound(new
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = $"Department Group ID {id} not found"
-                });
-            }
-
-
+             await Mediator.Send(new GetDepartmentGroupByIdQuery { Id = id });
 
             // Attempt deletion
-            var result = await Mediator.Send(command);
+             await Mediator.Send(command);
 
-            if (result.IsSuccess)
-            {
+          
 
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status200OK,
-                    Message = result.Message
+                    Message = "Department Group Deleted Successfully",
                 });
-            }
-
-            _logger.LogWarning("Failed to delete Department Group with ID {Id}. Reason: {Reason}", id, result.Message);
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                Message = result.Message
-            });
+           
         }
             
 
@@ -230,20 +143,12 @@ namespace UserManagement.API.Controllers
         public async Task<IActionResult> GetAllDepartmentGroupAutocompleteAsync([FromQuery] string? name)
         {           
             var result = await Mediator.Send(new GetDepartmentGroupAutoCompleteQuery {SearchPattern = name}); // Pass `searchPattern` to the constructor
-            if (result.IsSuccess)
-            {
-                return Ok(new 
-                {
-                    StatusCode=StatusCodes.Status200OK,
-                    message = result.Message,
-                    data = result.Data
-                });
-            }
+           
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                message = result.Message,
-                data = result.Data
+                message = "Department Group List",
+                data = result
             });
         }  
 

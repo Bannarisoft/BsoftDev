@@ -6,11 +6,12 @@ using Core.Application.Common.Interfaces.ICountry;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
 using Core.Domain.Enums.Common;
+using FluentValidation;
 
 
 namespace Core.Application.Country.Commands.UpdateCountry
 {    
-    public class UpdateCountryCommandHandler : IRequestHandler<UpdateCountryCommand,ApiResponseDTO<CountryDto>>    
+    public class UpdateCountryCommandHandler : IRequestHandler<UpdateCountryCommand,CountryDto>
     {
         private readonly ICountryCommandRepository _countryRepository;
         private readonly IMapper _mapper;
@@ -24,24 +25,18 @@ namespace Core.Application.Country.Commands.UpdateCountry
             _countryQueryRepository = countryQueryRepository;
             _mediator = mediator;
         }       
-        public async Task<ApiResponseDTO<CountryDto>> Handle(UpdateCountryCommand request, CancellationToken cancellationToken)
+        public async Task<CountryDto> Handle(UpdateCountryCommand request, CancellationToken cancellationToken)
         {
             var country = await _countryQueryRepository.GetByIdAsync(request.Id);
             if (country is null)
-                return new ApiResponseDTO<CountryDto>
-                {
-                    IsSuccess = false,
-                    Message = "Country not found"
-                };
+            throw new ValidationException("Country not found");
+              
             var oldCountryName = country.CountryName;
             country.CountryName = request.CountryName;
             if (country is null || country.IsDeleted is Enums.IsDelete.Deleted)
             {
-                return new ApiResponseDTO<CountryDto>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid CountryID. The specified Country does not exist or is inactive."
-                };
+                throw new ValidationException("Invalid CountryID. The specified Country does not exist or is inactive.");
+              
             }   
                       
             if ((byte)country.IsActive != request.IsActive)
@@ -50,29 +45,20 @@ namespace Core.Application.Country.Commands.UpdateCountry
                 await _countryRepository.UpdateAsync(country.Id, country);
                 if (request.IsActive is 0)
                 {
-                    return new ApiResponseDTO<CountryDto>
-                    {
-                        IsSuccess = true,
-                        Message = "CountryCode DeActivated."
-                    };
+                    throw new ValidationException("CountryCode DeActivated.");
+                  
                 }
                 else{
-                    return new ApiResponseDTO<CountryDto>
-                    {
-                        IsSuccess = true,
-                        Message = "CountryCode Activated."
-                    }; 
+                    throw new ValidationException("CountryCode Activated.");
+                  
                 }                                     
             }
             var countryExists = await _countryRepository.GetCountryByCodeAsync(request.CountryName ?? string.Empty,request.CountryCode ?? string.Empty);            
             if (countryExists.Id !=0)
             {                   
                 await _countryRepository.UpdateAsync(countryExists.Id, countryExists); 
-                    return new ApiResponseDTO<CountryDto>
-                {
-                    IsSuccess = false,
-                    Message = $"CountryCode already exists and is {(Enums.Status) request.IsActive}."
-                };                                        
+                throw new ValidationException($"CountryCode already exists and is {(Enums.Status)request.IsActive}.");
+                                                    
                 
             }            
             var updatedCountryEntity = _mapper.Map<Countries>(request);
@@ -94,26 +80,15 @@ namespace Core.Application.Country.Commands.UpdateCountry
                 await _mediator.Publish(domainEvent, cancellationToken);
                 if(updateResult>0)
                 {
-                    return new ApiResponseDTO<CountryDto>
-                    {
-                        IsSuccess = true,
-                        Message = "Country updated successfully",
-                        Data = countryDto
-                    };
+                    return  countryDto;
                 }
-                return new ApiResponseDTO<CountryDto>
-                {
-                    IsSuccess = false,
-                    Message = "Country not updated."
-                }; 
+                throw new Exception("Country not updated.");
+                
             }
             else
             {
-                return new ApiResponseDTO<CountryDto>
-                {
-                    IsSuccess = false,
-                    Message = "Country update failed"
-                };
+                throw new ValidationException("Country update failed");
+               
             }                   
         }
     }

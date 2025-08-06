@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Core.Application.UserRole.Commands.CreateRole
 {
-    public class CreateRoleCommand  : IRequest<ApiResponseDTO<UserRoleDto>>
+    public class CreateRoleCommand  : IRequest<UserRoleDto>
     {         
         public string? RoleName { get; set; }
         public string? Description { get; set; }

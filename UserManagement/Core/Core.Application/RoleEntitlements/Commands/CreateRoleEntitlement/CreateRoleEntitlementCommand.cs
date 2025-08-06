@@ -8,7 +8,7 @@ using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement
 {
-    public class CreateRoleEntitlementCommand : IRequest<ApiResponseDTO<int>>
+    public class CreateRoleEntitlementCommand : IRequest<bool>
     {
         
          public int RoleId { get; set; }

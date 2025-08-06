@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Core.Application.DepartmentGroup.Command.CreateDepartmentGroup
 {
-    public class CreateDepartmentGroupCommandHandler : IRequestHandler<CreateDepartmentGroupCommand, ApiResponseDTO<int>>
+    public class CreateDepartmentGroupCommandHandler : IRequestHandler<CreateDepartmentGroupCommand, int>
     {
         private readonly IDepartmentGroupCommandRepository _departmentGroupCommandRepository;
         private readonly IMapper _mapper;
@@ -25,7 +25,7 @@ namespace Core.Application.DepartmentGroup.Command.CreateDepartmentGroup
         }
 
         // ✅ This is the correct signature — NO explicit interface syntax
-        public async Task<ApiResponseDTO<int>> Handle(CreateDepartmentGroupCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateDepartmentGroupCommand request, CancellationToken cancellationToken)
         {
             var departmentGroupEntity = _mapper.Map<Core.Domain.Entities.DepartmentGroup>(request);
 
@@ -33,12 +33,8 @@ namespace Core.Application.DepartmentGroup.Command.CreateDepartmentGroup
 
            if (result <= 0) 
             {
-                return new ApiResponseDTO<int>
-                {
-                    IsSuccess = false,
-                    Message = "DepartmentGroup creation failed",
-                    Data = 0
-                };
+                throw new Exception("DepartmentGroup creation failed");
+               
             }
 
             // Publish domain event
@@ -51,12 +47,7 @@ namespace Core.Application.DepartmentGroup.Command.CreateDepartmentGroup
 
             await _mediator.Publish(domainEvent, cancellationToken);
 
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,
-                Message = "DepartmentGroup created successfully",
-                Data = result
-            };
+            return result;
         }
     }
 }

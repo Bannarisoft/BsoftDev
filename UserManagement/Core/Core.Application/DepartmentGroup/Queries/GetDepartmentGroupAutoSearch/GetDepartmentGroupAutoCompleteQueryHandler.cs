@@ -6,11 +6,12 @@ using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IDepartmentGroup;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.DepartmentGroup.Queries.GetDepartmentGroupAutoSearch
 {
-    public class GetDepartmentGroupAutoCompleteQueryHandler   : IRequestHandler<GetDepartmentGroupAutoCompleteQuery, ApiResponseDTO<List<DepartmentGroupAutoCompleteDto>>>   
+    public class GetDepartmentGroupAutoCompleteQueryHandler   : IRequestHandler<GetDepartmentGroupAutoCompleteQuery, List<DepartmentGroupAutoCompleteDto>>
     {
         private readonly IDepartmentGroupQueryRepository _departmentGroupRepository;
         private readonly IMapper _mapper;
@@ -23,16 +24,13 @@ namespace Core.Application.DepartmentGroup.Queries.GetDepartmentGroupAutoSearch
             _mediator = mediator;
         }
         
-         public async Task<ApiResponseDTO<List<DepartmentGroupAutoCompleteDto>>> Handle(GetDepartmentGroupAutoCompleteQuery request, CancellationToken cancellationToken)
+         public async Task<List<DepartmentGroupAutoCompleteDto>> Handle(GetDepartmentGroupAutoCompleteQuery request, CancellationToken cancellationToken)
         {          
             var result = await _departmentGroupRepository.GetAllDepartmentGroupAsync(request.SearchPattern ?? string.Empty);
             if (result is null || result.Count is 0)
             {
-                 return new ApiResponseDTO<List<DepartmentGroupAutoCompleteDto>>
-                {
-                    IsSuccess = false,
-                    Message = "No DepartmentGroup found matching the search pattern."
-                };
+                throw new ValidationException("No DepartmentGroup found matching the search pattern.");
+              
             }
             var stateDto = _mapper.Map<List<DepartmentGroupAutoCompleteDto>>(result);
             //Domain Event
@@ -44,12 +42,7 @@ namespace Core.Application.DepartmentGroup.Queries.GetDepartmentGroupAutoSearch
                 module:"DepartmentGroup"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<DepartmentGroupAutoCompleteDto>>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = stateDto
-            };
+            return stateDto;
         }
 
 

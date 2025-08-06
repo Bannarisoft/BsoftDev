@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Core.Application.UserRole.Commands.UpdateRole
 {  
    
-    public class UpdateRoleCommand : IRequest<ApiResponseDTO<UserRoleDto>>
+    public class UpdateRoleCommand : IRequest<bool>
     {
          public int Id { get; set; }
         public string? RoleName { get; set; }

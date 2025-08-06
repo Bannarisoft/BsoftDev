@@ -7,12 +7,13 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.ITimeZones;
 using Core.Application.TimeZones.Queries.GetTimeZones;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Core.Application.TimeZones.Queries.GetTimeZonesById
 {
-    public class GetTimeZoneByIdQueryHandler : IRequestHandler<GetTimeZoneByIdQuery, ApiResponseDTO<TimeZonesDto>>
+    public class GetTimeZoneByIdQueryHandler : IRequestHandler<GetTimeZoneByIdQuery, TimeZonesDto>
     {
         
         private readonly ITimeZonesQueryRepository _timeZonesQueryRepository;        
@@ -28,18 +29,15 @@ namespace Core.Application.TimeZones.Queries.GetTimeZonesById
             _logger = logger?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<ApiResponseDTO<TimeZonesDto>> Handle(GetTimeZoneByIdQuery request, CancellationToken cancellationToken)
+        public async Task<TimeZonesDto> Handle(GetTimeZoneByIdQuery request, CancellationToken cancellationToken)
         {
             _logger.LogInformation($"Fetching TimeZones Request started: {request.TimeZoneId}");
             var newTimeZones = await _timeZonesQueryRepository.GetByIdAsync(request.TimeZoneId);
             if (newTimeZones is null )
             {
                 _logger.LogWarning($"No TimeZones Record {request.TimeZoneId} not found in DB.");
-                return new ApiResponseDTO<TimeZonesDto>
-                {
-                    IsSuccess = false,
-                    Message = "No TimeZones found"
-                };
+                throw new ValidationException("No TimeZones found");
+                
             }
             var TimeZoneslist = _mapper.Map<TimeZonesDto>(newTimeZones);
             _logger.LogInformation($"Fetching TimeZones Request Completed: {request.TimeZoneId}");
@@ -52,12 +50,7 @@ namespace Core.Application.TimeZones.Queries.GetTimeZonesById
                 module:"TimeZones");
             await _mediator.Publish(domainEvent);
             _logger.LogInformation($"TimeZones {request.TimeZoneId} Listed successfully.");            
-            return new ApiResponseDTO<TimeZonesDto>
-            {               
-                IsSuccess = true,
-                Message = "Success",
-                Data = TimeZoneslist
-            };
+            return TimeZoneslist;
         }
     }
 }

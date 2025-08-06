@@ -14,11 +14,12 @@ using Core.Application.Common.Interfaces.IDepartment;
 using Core.Application.Common;
 using Core.Application.Common.HttpResponse;
 using Microsoft.Extensions.Logging;
+using FluentValidation;
 
 namespace Core.Application.Departments.Queries.GetDepartmentById
 {
 
-    public class GetDepartmentByIdQueryHandler :IRequestHandler<GetDepartmentByIdQuery,ApiResponseDTO<GetDepartmentDto>>
+    public class GetDepartmentByIdQueryHandler :IRequestHandler<GetDepartmentByIdQuery,GetDepartmentDto>
     {
           private readonly IDepartmentQueryRepository _departmentRepository;        
         private readonly IMapper _mapper;
@@ -35,7 +36,7 @@ namespace Core.Application.Departments.Queries.GetDepartmentById
             _logger = logger;
         } 
 
-      public async Task<ApiResponseDTO<GetDepartmentDto>> Handle(GetDepartmentByIdQuery request, CancellationToken cancellationToken)
+      public async Task<GetDepartmentDto> Handle(GetDepartmentByIdQuery request, CancellationToken cancellationToken)
         {
             
                 _logger.LogInformation("Fetching Department Request started: {Request}", request);
@@ -46,13 +47,8 @@ namespace Core.Application.Departments.Queries.GetDepartmentById
                     if (department == null)
                     {
                         _logger.LogWarning("Department with ID {DepartmentId} not found.", request.DepartmentId);
-
-                        return new ApiResponseDTO<GetDepartmentDto>
-                        {
-                            IsSuccess = false,
-                            Message = "Department not found.",
-                            Data = null
-                        };
+                    throw new ValidationException("Department not found.");
+                     
                     }
             
 
@@ -67,7 +63,7 @@ namespace Core.Application.Departments.Queries.GetDepartmentById
                 );
 
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<GetDepartmentDto> { IsSuccess = true, Message = "Success", Data = deptDto };
+            return deptDto;
 
                
 

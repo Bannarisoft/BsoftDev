@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.Divisions.Commands.UpdateDivision
 {
-    public class UpdateDivisionCommand : IRequest<ApiResponseDTO<bool>>
+    public class UpdateDivisionCommand : IRequest<bool>
     {
          public int Id { get; set; }
         public string ShortName { get; set; }

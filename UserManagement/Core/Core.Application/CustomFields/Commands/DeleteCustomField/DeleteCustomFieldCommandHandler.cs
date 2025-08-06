@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.CustomFields.Commands.DeleteCustomField
 {
-    public class DeleteCustomFieldCommandHandler : IRequestHandler<DeleteCustomFieldCommand, ApiResponseDTO<bool>>
+    public class DeleteCustomFieldCommandHandler : IRequestHandler<DeleteCustomFieldCommand, bool>
     {
         private readonly ICustomFieldCommand _customFieldCommand;
         private readonly IMapper _imapper;
@@ -22,7 +22,7 @@ namespace Core.Application.CustomFields.Commands.DeleteCustomField
             _imapper = imapper;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<bool>> Handle(DeleteCustomFieldCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DeleteCustomFieldCommand request, CancellationToken cancellationToken)
         {
             var customField  = _imapper.Map<CustomField>(request);
             var customFieldresult = await _customFieldCommand.DeleteAsync(request.Id, customField);
@@ -40,18 +40,10 @@ namespace Core.Application.CustomFields.Commands.DeleteCustomField
 
                  if(customFieldresult)
                 {
-                    return new ApiResponseDTO<bool>
-                    {
-                        IsSuccess = true, 
-                        Message = "Custom field deleted successfully."
-                    };
+                    return customFieldresult;
                 }
-
-                return new ApiResponseDTO<bool>
-                {
-                    IsSuccess = false, 
-                    Message = "Custom field not deleted."
-                };
+                throw new Exception("Custom field not deleted.");
+              
         }
     }
 }

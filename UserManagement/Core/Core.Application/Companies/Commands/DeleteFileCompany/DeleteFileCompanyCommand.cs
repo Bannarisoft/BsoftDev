@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.Companies.Commands.DeleteFileCompany
 {
-    public class DeleteFileCompanyCommand : IRequest<ApiResponseDTO<bool>>
+    public class DeleteFileCompanyCommand : IRequest<bool>
     {
         public string? Logo { get; set; }
     }

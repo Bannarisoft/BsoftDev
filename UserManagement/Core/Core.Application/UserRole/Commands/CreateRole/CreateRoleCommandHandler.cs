@@ -11,10 +11,11 @@ using Core.Application.Common.Interfaces.IUserRole;
 using Core.Application.Common.HttpResponse;
 using Core.Domain.Events;
 using Microsoft.Extensions.Logging;
+using FluentValidation;
 
 namespace Core.Application.UserRole.Commands.CreateRole
 {
-    public class CreateRoleCommandHandler :IRequestHandler<CreateRoleCommand,  ApiResponseDTO<UserRoleDto>>
+    public class CreateRoleCommandHandler :IRequestHandler<CreateRoleCommand,  UserRoleDto>
     {
         
         private readonly IUserRoleCommandRepository _roleRepository;
@@ -34,7 +35,7 @@ namespace Core.Application.UserRole.Commands.CreateRole
             _logger=logger;
         }
 
-        public async Task<ApiResponseDTO<UserRoleDto>>Handle(CreateRoleCommand request,CancellationToken cancellationToken)
+        public async Task<UserRoleDto> Handle(CreateRoleCommand request,CancellationToken cancellationToken)
          {          
             _logger.LogInformation($"Starting CreateUserRoleCommandHandler for request: {request}");
             
@@ -42,11 +43,8 @@ namespace Core.Application.UserRole.Commands.CreateRole
               if (exists)
                  {
                      _logger.LogWarning($"Entity Name {request.RoleName} already exists." );
-                        return new ApiResponseDTO<UserRoleDto>
-                    {
-                    IsSuccess = false,
-                    Message = "UserRole Name already exists."
-                    };
+                     throw new ValidationException("UserRole Name already exists.");
+                       
                 }
             // Map the request to the entity
             var userRoleEntity = _mapper.Map<Core.Domain.Entities.UserRole>(request);
@@ -58,11 +56,8 @@ namespace Core.Application.UserRole.Commands.CreateRole
             if (createdUserRole is null)
             {
                 _logger.LogWarning($"Failed to create UserRole. UserRole entity: {userRoleEntity}");
-                return new ApiResponseDTO<UserRoleDto>
-                {
-                    IsSuccess = false,
-                    Message = "UserRole not created"
-                };
+                throw new Exception("UserRole not created");
+               
             }
 
             _logger.LogInformation($"UserRole successfully created with ID: {createdUserRole.Id}" );
@@ -84,12 +79,7 @@ namespace Core.Application.UserRole.Commands.CreateRole
 
             _logger.LogInformation($"Returning success response for UserRole ID: {createdUserRole.Id}");
 
-            return new ApiResponseDTO<UserRoleDto>
-            {
-                IsSuccess = true,
-                Message = "UserRole created successfully",
-                Data = userrolrDto
-            };
+            return userrolrDto;
            
        
 

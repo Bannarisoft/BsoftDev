@@ -6,12 +6,13 @@ using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IFinancialYear;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Core.Application.FinancialYear.Queries.GetFinancialYearAutoComplete
 {
-    public class GetFinancialYearAutoCompleteQueryHandler  : IRequestHandler<GetFinancialYearAutoCompleteQuery, ApiResponseDTO<List<GetFinancialYearAutoCompleteDto>>>
+    public class GetFinancialYearAutoCompleteQueryHandler  : IRequestHandler<GetFinancialYearAutoCompleteQuery, List<GetFinancialYearAutoCompleteDto>>
     {
         
         private readonly IFinancialYearCommandRepository _financialYearCommandRepository ;
@@ -32,7 +33,7 @@ namespace Core.Application.FinancialYear.Queries.GetFinancialYearAutoComplete
 
       }
 
-        public async Task<ApiResponseDTO<List<GetFinancialYearAutoCompleteDto>>> Handle(GetFinancialYearAutoCompleteQuery request, CancellationToken cancellationToken)
+        public async Task<List<GetFinancialYearAutoCompleteDto>> Handle(GetFinancialYearAutoCompleteQuery request, CancellationToken cancellationToken)
         {
 
 
@@ -44,12 +45,8 @@ namespace Core.Application.FinancialYear.Queries.GetFinancialYearAutoComplete
             if (financialyear is null || !financialyear.Any())
             {
                 _logger.LogWarning($"No financial years found for search pattern: {request.SearchTerm}" );
-                return new ApiResponseDTO<List<GetFinancialYearAutoCompleteDto>>
-                {
-                    IsSuccess = false,
-                        Message = "No matching financial years found",
-                        Data = new List<GetFinancialYearAutoCompleteDto>()
-                };
+                throw new ValidationException("No matching financial years found");
+               
             }
 
             _logger.LogInformation($"Financial years found for search pattern: {request.SearchTerm}. Mapping results to DTO.");
@@ -69,12 +66,7 @@ namespace Core.Application.FinancialYear.Queries.GetFinancialYearAutoComplete
 
             _logger.LogInformation($"Domain event published for search pattern: {request.SearchTerm}" );
 
-            return new ApiResponseDTO<List<GetFinancialYearAutoCompleteDto>>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = financialYearDto
-            };
+            return financialYearDto;
 
 
 
