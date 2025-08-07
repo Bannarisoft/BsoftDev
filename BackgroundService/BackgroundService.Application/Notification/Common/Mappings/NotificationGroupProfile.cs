@@ -26,7 +26,7 @@ namespace BackgroundService.Application.Notification.Common.Mappings
 
             CreateMap<Domain.Entities.Notification.NotificationGroup, NotificationGroupDto>();
 
-            CreateMap<Domain.Entities.Notification.NotificationGroup, GetNotificationGroupAutoCompleteDto>();
+            CreateMap<Domain.Entities.Notification.NotificationGroup, GetNotificationGroupAutoCompleteDto>();            
         }
         
     }

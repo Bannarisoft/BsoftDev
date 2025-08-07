@@ -1,4 +1,6 @@
-public class NotificationGroupDto
+namespace BackgroundService.Application.Notification.NotificationGroupMember.Queries.GetAllNotificationGroupMember
+{
+public class GetNotificationGroupMemberDto
 {
     public int GroupId { get; set; }
     public string? GroupName { get; set; }
@@ -9,4 +11,6 @@ public class UserDto
 {
     public int UserId { get; set; }
     public string? UserName { get; set; }
+}
+
 }

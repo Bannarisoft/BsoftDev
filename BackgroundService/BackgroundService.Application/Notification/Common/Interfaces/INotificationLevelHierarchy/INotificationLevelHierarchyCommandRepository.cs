@@ -4,8 +4,10 @@ namespace BackgroundService.Application.Notification.Common.Interfaces.INotifica
     {
         Task<int> CreateAsync(Domain.Entities.Notification.NotificationLevelHierarchy NotificationLevelHierarchy);
         Task<int> UpdateAsync(int id, Domain.Entities.Notification.NotificationLevelHierarchy NotificationLevelHierarchy);
-        Task<int> DeleteAsync(int id, Domain.Entities.Notification.NotificationLevelHierarchy NotificationLevelHierarchy);        
-        Task<bool> IsNameDuplicateAsync(int notificationConfigId, int targetTypeId, int targetId);
+        Task<int> DeleteAsync(int id, Domain.Entities.Notification.NotificationLevelHierarchy NotificationLevelHierarchy);
+        Task<bool> IsNameDuplicateAsync(int notificationConfigId, int targetTypeId, int targetId, int excludeId);
+        Task<bool> ExistsByCodeAsync(int notificationConfigId, int targetTypeId, int targetId);     
+        
                 
     }
 }

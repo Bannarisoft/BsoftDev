@@ -8,13 +8,13 @@ namespace BackgroundService.Application.Notification.NotificationGroup.Queries.G
     public class NotificationGroupDto
     {
         public int Id { get; set; }
-        public string GroupName { get; set; }
+        public string? GroupName { get; set; }
         public byte IsActive { get; set; }
         public int CreatedBy { get; set; }
         public DateTimeOffset CreatedDate { get; set; }
-        public string CreatedByName { get; set; }
+        public string? CreatedByName { get; set; }
         public int ModifiedBy { get; set; }
         public DateTimeOffset ModifiedDate { get; set; }
-        public string ModifiedByName { get; set; }
+        public string? ModifiedByName { get; set; }
     }
 }
