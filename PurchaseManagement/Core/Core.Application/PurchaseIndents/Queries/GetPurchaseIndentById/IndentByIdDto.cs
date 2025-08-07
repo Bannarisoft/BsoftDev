@@ -2,19 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Core.Domain.Common;
 
-namespace Core.Domain.Entities
+namespace Core.Application.PurchaseIndents.Queries.GetPurchaseIndentById
 {
-    public class IndentHeader : BaseEntity
+    public class IndentByIdDto
     {
+        public int Id { get; set; }
         public string IndentNumber { get; set; }
         public DateOnly IndentDate { get; set; }
         public int IndentTypeId { get; set; }
         public int UnitId { get; set; }
         public string Purpose { get; set; }
-        public ICollection<IndentDetail> IndentDetails { get; set; }
-        public ICollection<IndentDepartmentMapping> IndentDepartmentMappings { get; set; }
-        public MiscMaster IndentType { get; set; }
+        public ICollection<IndentDepartmentByIdDto> IndentDepartments { get; set; }
     }
 }

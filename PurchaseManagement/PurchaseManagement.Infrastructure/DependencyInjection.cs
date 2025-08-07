@@ -1,6 +1,7 @@
 using System.Data;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.AuditLog;
+using Core.Application.Common.Interfaces.ILogService;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IMiscTypeMaster;
 using Core.Application.Common.Interfaces.IPurchaseIndent;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using PurchaseManagement.Infrastructure.Data;
 using PurchaseManagement.Infrastructure.Repositories;
+using PurchaseManagement.Infrastructure.Repositories.LogServices;
 using PurchaseManagement.Infrastructure.Repositories.MiscMaster;
 using PurchaseManagement.Infrastructure.Repositories.MiscTypeMaster;
 using PurchaseManagement.Infrastructure.Repositories.PurchaseIndents;
@@ -99,6 +101,8 @@ namespace PurchaseManagement.Infrastructure
             services.AddScoped<IMiscMasterQueryRepository, MiscMasterQueryRepository>();
             services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();
             services.AddScoped<IPurchaseIndentCommand, PurchaseIndentCommandRepository>();
+            services.AddScoped<ILogServiceCommand, LogServiceCommandRepository>();
+            services.AddScoped<IPurchaseIndentQuery, PurchaseIndentQueryRepository>();
             
 
 
