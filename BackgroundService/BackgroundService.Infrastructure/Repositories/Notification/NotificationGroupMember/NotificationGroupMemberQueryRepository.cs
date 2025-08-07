@@ -94,7 +94,7 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
                     NGM.GroupId,
                     NG.GroupName,
                     NGM.UserId,
-                    U.UserName
+                    U.UserName,NG.IsActive
                 FROM [AppNotification].[NotificationGroupMembers] NGM
                 INNER JOIN [AppNotification].[NotificationGroup] NG ON NG.Id = NGM.GroupId
                 LEFT JOIN Bannari.AppSecurity.Users U ON U.UserId = NGM.UserId
@@ -135,6 +135,7 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
                 {
                     GroupId = g.Key.GroupId,
                     GroupName = g.Key.GroupName,
+                    IsActive = g.First().IsActive,
                     Users = g.Select(u => new UserDto
                     {
                         UserId = u.UserId,

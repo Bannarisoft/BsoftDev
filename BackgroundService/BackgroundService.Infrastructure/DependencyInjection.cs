@@ -25,14 +25,14 @@ using BackgroundService.Infrastructure.Repositories.Notification.NotificationTem
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationGroupMembers;
 using BackgroundService.Infrastructure.Repositories.Notification.NotificationGroupMember;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationEventRule;
-using BackgroundService.Infrastructure.Repositories.Notification.NotificationEventRules;
-using BackgroundService.Domain.Entities.Notification;
+
 using BackgroundService.Application.Notification.Common.Mappings;
 using MassTransit;
 using BackgroundService.Application.Consumers;
 using BackgroundService.Application.Interfaces.Notification;
 using BackgroundService.Infrastructure.Services.Notification;
 using BackgroundService.Application.Notification;
+
 using BackgroundService.Application.Workflow.Common.Interfaces.IWorkflowType;
 using BackgroundService.Infrastructure.Repositories.Workflow.WorkflowTypes;
 using BackgroundService.Application.Workflow.Common.Interfaces.IApprovalStepDetail;
@@ -174,6 +174,7 @@ namespace BackgroundService.Infrastructure
 
                     cfg.ReceiveEndpoint("email-notification-queue", e =>
 
+
                     {
                         e.Bind("Contracts.Events.Notifications.WorkOrder.Email:SendEmailNotificationInternalCommand", s =>
                         {
@@ -190,8 +191,8 @@ namespace BackgroundService.Infrastructure
                         });
 
                         e.ConfigureConsumer<SendSmsNotificationConsumer>(context);
-
                     });
+                    
                     cfg.ReceiveEndpoint("inapp-notification-queue", e =>
                    {
                        e.Bind("Contracts.Events.Notifications.WorkOrder.InApp:SendInAppNotificationInternalCommand", s =>
@@ -250,7 +251,8 @@ namespace BackgroundService.Infrastructure
                policyBuilder.WaitAndRetryAsync(3, retryAttempt =>
                    TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
 
-            services.AddAutoMapper(typeof(NotificationEventRuleProfile));
+
+            services.AddAutoMapper(typeof(NotificationHierarchyAndEventRuleProfile));
 
             services.AddHttpClient();
             services.AddScoped<IEmailService, RealEmailService>();
@@ -266,14 +268,15 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<IIPAddressService, IPAddressService>();
 
             services.AddSingleton<ITimeZoneService, TimeZoneService>();
-            services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();   
-            services.AddScoped<INotificationLevelHierarchyCommandRepository, NotificationLevelHierarchyCommandRepository>();  
-            services.AddScoped<INotificationLevelHierarchyQueryRepository, NotificationLevelHierarchyQueryRepository>();  
+
+
+            services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();         
             services.AddScoped<INotificationTemplateCommandRepository, NotificationTemplateCommandRepository>();  
             services.AddScoped<INotificationTemplateQueryRepository, NotificationTemplateQueryRepository>();
             services.AddScoped<INotificationUserResolver, NotificationUserResolver>();
             services.AddScoped<INotificationDetailRepository, NotificationDetailRepository>();
             services.AddScoped<NotificationResolverHandler>();
+
 			services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();
             services.AddScoped<IMiscMasterQueryRepository, MiscMasterQueryRepository>();
             services.AddScoped<IMiscTypeMasterCommandRepository , MiscTypeMasterCommandRepository>();
@@ -284,8 +287,9 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<IInAppNotifier, InAppNotifier>(); 
             services.AddScoped<INotificationGroupMemberCommand, NotificationGroupMemberCommandRepository >();
             services.AddScoped<INotificationGroupMemberQuery, NotificationGroupMemberQueryRepository >();
-            services.AddScoped<INotificationEventRuleCommand, NotificationEventRuleCommandRepository >();
-            services.AddScoped<INotificationEventRuleQuery, NotificationEventRuleQueryRepository >();
+
+            services.AddScoped<INotificationLevelHierarchyCommand, NotificationLevelHierarchyCommand>();
+            services.AddScoped<INotificationEventRuleCommand, NotificationEventRuleCommand>();
             services.AddScoped<INotificationLogger, NotificationLogger>();
             
 

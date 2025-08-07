@@ -1,13 +1,11 @@
 
 using BackgroundService.API.Validation.NotificationConfig;
-using BackgroundService.API.Validation.NotificationLevelHierarchy;
+
 using BackgroundService.API.Validation.NotificationGroup;
 using BackgroundService.Application.Notification.NotificationConfig.Command.CreateNotificationConfig;
 using BackgroundService.Application.Notification.NotificationConfig.Command.DeleteNotificationConfig;
 using BackgroundService.Application.Notification.NotificationConfig.Command.UpdateNotificationConfig;
-using BackgroundService.Application.Notification.NotificationLevelHierarchy.Command.CreateNotificationLevelHierarchy;
-using BackgroundService.Application.Notification.NotificationLevelHierarchy.Command.DeleteNotificationLevelHierarchy;
-using BackgroundService.Application.Notification.NotificationLevelHierarchy.Command.UpdateNotificationLevelHierarchy;
+
 using BackgroundService.Application.Notification.NotificationGroup.Commands.CreateNotificationGroup;
 using BackgroundService.Application.Notification.NotificationGroup.Commands.DeleteNotificationGroup;
 using BackgroundService.Application.Notification.NotificationGroup.Commands.UpdateNotificationGroup;
@@ -19,10 +17,7 @@ using BackgroundService.API.Validation.NotificationTemplate;
 using BackgroundService.Application.Notification.NotificationGroupMember.Commands.CreateNotificationGroupMember;
 using BackgroundService.API.Validation.NotificationGroupMember;
 using BackgroundService.Application.Notification.NotificationGroupMember.Commands.UpdateNotificationGroupMember;
-using BackgroundService.Application.Notification.NotificationEventRules.Commands.CreateNotificationEventRule;
-using BackgroundService.API.Validation.NotificationEventRule;
-using BackgroundService.Application.Notification.NotificationEventRules.Commands.UpdateNotificationEventRule;
-using BackgroundService.Application.Notification.NotificationEventRules.Commands.DeleteNotificationEventRule;
+
 using BackgroundService.Application.Workflow.WorkflowTypes.Commands.CreateWorkflowType;
 using BackgroundService.API.Validation.Workflow.WorkflowTypes;
 using BackgroundService.Application.Workflow.WorkflowTypes.Commands.UpdateWorkflowType;
@@ -44,6 +39,9 @@ using BackgroundService.Application.MiscMaster.Command.UpdateMiscMaster;
 using BackgroundService.API.Validation.MiscTypeMaster;
 using BackgroundService.Application.MiscMaster;
 using BackgroundService.API.Validation.MiscMaster;
+using BackgroundService.Application.Notification.NotificationHierarchyAndEventRule.Commands.UpdateNotificationEventRule;
+using BackgroundService.Application.Notification.NotificationHierarchyAndEventRule.Queries.DeleteNotificationEventRule;
+using BackgroundService.API.Validation.NotificationHierarchyAndEventRule;
 
 namespace BackgroundService.API.Validation.Common
 {
@@ -55,8 +53,9 @@ namespace BackgroundService.API.Validation.Common
             services.AddScoped<IValidator<CreateNotificationConfigCommand>, CreateNotificationConfigCommandValidator>();
             services.AddScoped<IValidator<UpdateNotificationConfigCommand>, UpdateNotificationConfigCommandValidator>();
             services.AddScoped<IValidator<DeleteNotificationConfigCommand>, DeleteNotificationConfigCommandValidator>();
-            services.AddScoped<IValidator<CreateNotificationLevelHierarchyCommand>, CreateNotificationLevelHierarchyCommandValidator>();
-            services.AddScoped<IValidator<UpdateNotificationLevelHierarchyCommand>, UpdateNotificationLevelHierarchyCommandValidator>();
+
+            services.AddScoped<IValidator<InsertNotificationHierarchyAndEventRuleCommand>, InsertNotificationHierarchyAndEventRuleCommandValidator>();
+            services.AddScoped<IValidator<UpdateNotificationHierarchyAndEventRuleCommand>, UpdateNotificationHierarchyAndEventRuleCommandValidator>();
             services.AddScoped<IValidator<DeleteNotificationLevelHierarchyCommand>, DeleteNotificationLevelHierarchyCommandValidator>();
 
             services.AddScoped<IValidator<CreateNotificationGroupCommand>, CreateNotificationGroupCommandValidator>();
@@ -69,10 +68,8 @@ namespace BackgroundService.API.Validation.Common
 
             services.AddScoped<IValidator<CreateNotificationGroupMemberCommand>, CreateNotificationGroupMemberCommandValidator>();
             services.AddScoped<IValidator<UpdateNotificationGroupMemberCommand>, UpdateNotificationGroupMemberCommandValidator>();            
+            
 
-            services.AddScoped<IValidator<CreateNotificationEventRuleCommand>, CreateNotificationEventRuleCommandValidator>();
-            services.AddScoped<IValidator<UpdateNotificationEventRuleCommand>, UpdateNotificationEventRuleCommandValidator>();
-            services.AddScoped<IValidator<DeleteNotificationEventRuleCommand>, DeleteNotificationEventRuleCommandValidator>();
 
             services.AddScoped<IValidator<CreateWorkflowTypeCommand>, CreateWorkflowTypeCommandValidator>();
             services.AddScoped<IValidator<UpdateWorkflowTypeCommand>, UpdateWorkflowTypeCommandValidator>();
