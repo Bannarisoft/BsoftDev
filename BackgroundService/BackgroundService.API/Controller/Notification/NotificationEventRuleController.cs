@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BackgroundService.Application.Notification.NotificationEventRules.Commands.CreateNotificationEventRule;
-using BackgroundService.Application.Notification.NotificationEventRules.Commands.DeleteNotificationEventRule;
-using BackgroundService.Application.Notification.NotificationEventRules.Commands.UpdateNotificationEventRule;
-using BackgroundService.Application.Notification.NotificationEventRules.Queries.GetAllNotificationEventRule;
+using BackgroundService.Application.Notification.NotificationHierarchyAndEventRule.Commands.UpdateNotificationEventRule;
+using BackgroundService.Application.Notification.NotificationHierarchyAndEventRule.Queries.DeleteNotificationEventRule;
+using BackgroundService.Application.Notification.NotificationHierarchyAndEventRule.Queries.GetAllNotificationHierarchy;
+using BackgroundService.Application.Notification.NotificationHierarchyAndEventRule.Queries.GetNotificationHierarchyById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,58 +17,48 @@ namespace BackgroundService.API.Controller.Notification
         {
             _mediator = mediator;
         }
-         [HttpGet]
-        public async Task<IActionResult> GetAllNotificationGroupMemberAsync([FromQuery] int PageNumber, [FromQuery] int PageSize, [FromQuery] string? SearchTerm = null)
+         /// ✅ Get All
+        [HttpGet]
+        public async Task<IActionResult> GetAll([FromQuery] GetAllNotificationHierarchyQuery query)
         {
-            var Notification = await Mediator.Send(
-             new GetAllNotificationEventRuleQuery
-             {
-                 PageNumber = PageNumber,
-                 PageSize = PageSize,
-                 SearchTerm = SearchTerm
-             });
-            return Ok(new
-            {
-                StatusCode = StatusCodes.Status200OK,
-                data = Notification.Data,
-                TotalCount = Notification.TotalCount,
-                PageNumber = Notification.PageNumber,
-                PageSize = Notification.PageSize
-            });
-        }
-           [HttpPost]
-        public async Task<IActionResult> CreateAsync(CreateNotificationEventRuleCommand createNotificationGroupMemberCommand)
-        {            
-            var CreatedNotificationId = await _mediator.Send(createNotificationGroupMemberCommand);            
-            return Ok(new
-            {
-                StatusCode = StatusCodes.Status201Created,
-                message ="Created successfully.",
-                data = CreatedNotificationId
-            });            
-        
-        }
-        [HttpPut]
-        public async Task<IActionResult> UpdateAsync(UpdateNotificationEventRuleCommand updateNotificationEventRuleCommand)
-        {
-            await _mediator.Send(updateNotificationEventRuleCommand);            
-            return Ok(new
-            {
-                message = "Updated successfully.",
-                statusCode = StatusCodes.Status200OK
-            });                
+            var result = await _mediator.Send(query);
+            return Ok(result);
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> DeleteAsync(int id)
+        /// ✅ Get By ID
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            await _mediator.Send(new DeleteNotificationEventRuleCommand { Id = id });
-            return Ok(new
-            {
-                message = "Deleted successfully.",
-                statusCode = StatusCodes.Status200OK
-            });
-        
+            var result = await _mediator.Send(new GetNotificationHierarchyByIdQuery { Id = id });
+            if (result == null)
+                return NotFound(new { message = "Record not found" });
+
+            return Ok(result);
         }
+
+        /// ✅ Insert
+        [HttpPost]
+        public async Task<IActionResult> Insert([FromBody] NotificationHierarchyAndEventRuleDto dto)
+        {
+            var result = await _mediator.Send(new InsertNotificationHierarchyAndEventRuleCommand(dto));
+            return Ok(new { message = "Inserted successfully", success = result });
+        }
+
+        /// ✅ Update
+        [HttpPut]
+        public async Task<IActionResult> Update([FromBody] UpdateNotificationHierarchyAndEventRuleCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return Ok(new { message = "Updated successfully", success = result });
+        }
+
+        /// ✅ Delete
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var result = await _mediator.Send(new DeleteNotificationLevelHierarchyCommand { Id = id });
+            return Ok(new { message = "Deleted successfully", success = result });
+        }
+        
     }
 }
