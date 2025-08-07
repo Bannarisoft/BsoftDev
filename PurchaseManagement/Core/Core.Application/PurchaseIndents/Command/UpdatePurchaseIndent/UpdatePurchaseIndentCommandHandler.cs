@@ -19,33 +19,19 @@ namespace Core.Application.PurchaseIndents.Command.UpdatePurchaseIndent
         private readonly IPurchaseIndentCommand _purchaseIndentCommand;
         private readonly IMediator _imediator;
         private readonly IMapper _imapper;
-        private readonly ILogServiceCommand _logServiceCommand;
-        private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
-        public UpdatePurchaseIndentCommandHandler(IPurchaseIndentCommand purchaseIndentCommand, IMediator imediator, IMapper imapper,
-            ILogServiceCommand logServiceCommand, IMiscMasterQueryRepository miscMasterQueryRepository)
+        public UpdatePurchaseIndentCommandHandler(IPurchaseIndentCommand purchaseIndentCommand, IMediator imediator, IMapper imapper)
         {
             _purchaseIndentCommand = purchaseIndentCommand;
             _imediator = imediator;
             _imapper = imapper;
-            _logServiceCommand = logServiceCommand;
-            _miscMasterQueryRepository = miscMasterQueryRepository;
         }
         public async Task<bool> Handle(UpdatePurchaseIndentCommand request, CancellationToken cancellationToken)
         {
             var Indent = _imapper.Map<IndentHeader>(request);
-            var result = await _purchaseIndentCommand.UpdateAsync(Indent);
             
-             var StatusMisc = await _miscMasterQueryRepository.GetMiscMasterByName(MiscEnumEntity.Status, MiscEnumEntity.Open);
-             var IndentLog = new IndentLog
-            {
-                IndentHeaderId = request.Id,
-                ActionType = "Updated",
-                ActionRemarks = "Indent Updated",
-                NewData = JsonSerializer.Serialize(request),
-                StatusId = StatusMisc.Id
-            };
-
-                await _logServiceCommand.CreateAsync(IndentLog);
+            var result = await _purchaseIndentCommand.UpdateAsync(Indent,JsonSerializer.Serialize(request));
+            
+          
             return result == true ? result : throw new ExceptionRules("Indent update failed."); 
         }
     }

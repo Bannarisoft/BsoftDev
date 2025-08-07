@@ -15,6 +15,11 @@ namespace PurchaseManagement.Infrastructure.GrpcClients
     {
          private readonly UnitService.UnitServiceClient _client;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        public UnitGrpcClient(UnitService.UnitServiceClient client, IHttpContextAccessor httpContextAccessor)
+        {
+            _client = client;
+            _httpContextAccessor = httpContextAccessor;
+        }
         public async Task<List<Contracts.Dtos.Maintenance.UnitDto>> GetAllUnitAsync()
         {
             var token = _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].ToString();

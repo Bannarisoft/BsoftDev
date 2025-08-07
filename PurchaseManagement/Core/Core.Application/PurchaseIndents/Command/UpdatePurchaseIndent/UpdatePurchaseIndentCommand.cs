@@ -9,7 +9,6 @@ namespace Core.Application.PurchaseIndents.Command.UpdatePurchaseIndent
     public class UpdatePurchaseIndentCommand : IRequest<bool>
     {
         public int Id { get; set; }
-         public string IndentNumber { get; set; }
         public DateOnly IndentDate { get; set; }
         public int IndentTypeId { get; set; }
         public int UnitId { get; set; }

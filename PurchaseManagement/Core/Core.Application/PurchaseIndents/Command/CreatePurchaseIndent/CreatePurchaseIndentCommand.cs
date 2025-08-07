@@ -8,7 +8,7 @@ namespace Core.Application.PurchaseIndents.Command.CreatePurchaseIndent
 {
     public class CreatePurchaseIndentCommand : IRequest<int>
     {
-        public string IndentNumber { get; set; }
+        
         public DateOnly IndentDate { get; set; }
         public int IndentTypeId { get; set; }
         public int UnitId { get; set; }

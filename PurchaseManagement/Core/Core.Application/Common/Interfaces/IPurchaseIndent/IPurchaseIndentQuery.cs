@@ -11,5 +11,6 @@ namespace Core.Application.Common.Interfaces.IPurchaseIndent
         Task<(List<IndentHeader>, int)> GetAllPurchaseIndentAsync(int PageNumber, int PageSize, string? SearchTerm);
         Task<bool> NotFoundAsync(int id);
         Task<IndentHeader> GetByIdAsync(int id);
+        Task<string> GeneratePurchaseIndentNumberAsync(int unitId);
     }
 }

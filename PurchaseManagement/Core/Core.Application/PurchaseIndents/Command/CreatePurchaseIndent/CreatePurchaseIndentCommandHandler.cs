@@ -21,20 +21,25 @@ namespace Core.Application.PurchaseIndents.Command.CreatePurchaseIndent
         private readonly IPurchaseIndentCommand _purchaseIndentCommand;
         private readonly ILogServiceCommand _logServiceCommand;
         private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
+        private readonly IPurchaseIndentQuery _purchaseIndentQuery;
         public CreatePurchaseIndentCommandHandler(IPurchaseIndentCommand purchaseIndentCommand, IMapper imapper,
-        IMediator mediator, ILogServiceCommand logServiceCommand, IMiscMasterQueryRepository miscMasterQueryRepository)
+        IMediator mediator, ILogServiceCommand logServiceCommand, IMiscMasterQueryRepository miscMasterQueryRepository, IPurchaseIndentQuery purchaseIndentQuery)
         {
             _purchaseIndentCommand = purchaseIndentCommand;
             _imapper = imapper;
             _mediator = mediator;
             _logServiceCommand = logServiceCommand;
             _miscMasterQueryRepository = miscMasterQueryRepository;
+            _purchaseIndentQuery = purchaseIndentQuery;
         }
         public async Task<int> Handle(CreatePurchaseIndentCommand request, CancellationToken cancellationToken)
         {
-            var IndentHeader = _imapper.Map<IndentHeader>(request);
+            var Indent = _imapper.Map<IndentHeader>(request);
+
+            var IndentNumber = await _purchaseIndentQuery.GeneratePurchaseIndentNumberAsync(request.UnitId);
+            Indent.IndentNumber = IndentNumber;
             
-            var result = await _purchaseIndentCommand.CreateAsync(IndentHeader);
+            var result = await _purchaseIndentCommand.CreateAsync(Indent);
 
             var StatusMisc = await _miscMasterQueryRepository.GetMiscMasterByName(MiscEnumEntity.Status, MiscEnumEntity.Open);
 

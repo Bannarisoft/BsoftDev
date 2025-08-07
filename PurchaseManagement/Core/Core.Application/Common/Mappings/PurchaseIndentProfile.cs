@@ -40,11 +40,21 @@ namespace Core.Application.Common.Mappings
             CreateMap<IndentDepartmentUpdateDto, IndentDepartmentMapping>();
 
             CreateMap<IndentHeader, IndentDto>()
-            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == Status.Active ? 1 : 0));
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == Status.Active ? 1 : 0))
+            .ForMember(dest => dest.IndentType, opt => opt.MapFrom(src => src.IndentType.Code));
 
             CreateMap<IndentHeader, IndentByIdDto>()
             .ForMember(dest => dest.IndentDepartments, opt => opt.MapFrom(src => src.IndentDepartmentMappings));
-            CreateMap<IndentDepartmentMapping,IndentDepartmentByIdDto>();
+            CreateMap<IndentDepartmentMapping, IndentDepartmentByIdDto>();
+            CreateMap<IndentDetail, IndentDetailByIdDto>();
+
+            CreateMap<IndentHeader, UpdatePurchaseIndentCommand>()
+              .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == Status.Active ? 1 : 0))
+              .ForMember(dest => dest.IndentDetails, opt => opt.MapFrom(src => src.IndentDetails))
+               .ForMember(dest => dest.IndentDepartments, opt => opt.MapFrom(src => src.IndentDepartmentMappings));
+               
+                CreateMap<IndentDetail, IndentDetailUpdateDto>();
+            CreateMap<IndentDepartmentMapping, IndentDepartmentUpdateDto>();
         }
         
     }

@@ -41,7 +41,6 @@ namespace Core.Application.PurchaseIndents.Command.DeletePurchaseIndent
                 IndentHeaderId = request.Id,
                 ActionType = "Deleted",
                 ActionRemarks = "Indent Deleted",
-                NewData = JsonSerializer.Serialize(request),
                 StatusId = StatusMisc.Id
             };
 

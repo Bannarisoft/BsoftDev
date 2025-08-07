@@ -20,7 +20,7 @@ namespace PurchaseManagement.API.Controllers
         public PurchaseIndentController(IMediator mediator)
         : base(mediator)
         {
-
+            _mediator = mediator;
         }
         [HttpGet]
         public async Task<IActionResult> GetAllPurchaseIndentAsync([FromQuery] int PageNumber, [FromQuery] int PageSize, [FromQuery] string? SearchTerm = null)

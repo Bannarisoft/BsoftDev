@@ -14,5 +14,6 @@ namespace Core.Application.PurchaseIndents.Queries.GetPurchaseIndentById
         public int UnitId { get; set; }
         public string Purpose { get; set; }
         public ICollection<IndentDepartmentByIdDto> IndentDepartments { get; set; }
+        public ICollection<IndentDetailByIdDto> IndentDetails { get; set; }
     }
 }

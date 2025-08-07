@@ -42,12 +42,12 @@ namespace PurchaseManagement.Infrastructure.Data.Configurations
             builder.Property(m => m.PreviousData)
                    .HasColumnName("PreviousData")
                    .HasColumnType("nvarchar(max)")
-                   .IsRequired();
+                   .IsRequired(false);
 
                     builder.Property(m => m.NewData) 
                 .HasColumnName("NewData")
                 .HasColumnType("nvarchar(max)")  
-                .IsRequired();
+                .IsRequired(false);
 
                  builder.Property(m => m.StatusId) 
                 .HasColumnName("StatusId")
