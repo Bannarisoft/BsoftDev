@@ -9,7 +9,7 @@ namespace BackgroundService.Application.Notification.NotificationGroup.Queries.G
     {
         public int Id { get; set; }
         public string? GroupName { get; set; }
-        public byte IsActive { get; set; }
+        public int IsActive { get; set; }
         public int CreatedBy { get; set; }
         public DateTimeOffset CreatedDate { get; set; }
         public string? CreatedByName { get; set; }

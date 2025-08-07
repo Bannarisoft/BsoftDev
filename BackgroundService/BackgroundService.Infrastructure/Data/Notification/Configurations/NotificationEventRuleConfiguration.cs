@@ -44,9 +44,9 @@ namespace BackgroundService.Infrastructure.Data.Notification.Configurations
            .HasColumnType("int")
            .IsRequired();
             builder.HasOne(ac => ac.RecipientType)
-          .WithMany(am => am.RecipientType)
-          .HasForeignKey(ac => ac.RecipientTypeId)
-          .OnDelete(DeleteBehavior.NoAction);
+            .WithMany(am => am.RecipientType)
+            .HasForeignKey(ac => ac.RecipientTypeId)
+            .OnDelete(DeleteBehavior.NoAction);
 
             builder.Property(t => t.NotificationChannelId)
            .HasColumnName("NotificationChannelId")
