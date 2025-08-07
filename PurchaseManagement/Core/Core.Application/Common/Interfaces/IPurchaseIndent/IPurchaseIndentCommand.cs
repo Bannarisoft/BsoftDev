@@ -9,7 +9,7 @@ namespace Core.Application.Common.Interfaces.IPurchaseIndent
     public interface IPurchaseIndentCommand
     {
          Task<int> CreateAsync(IndentHeader indentHeader);     
-        Task<bool> UpdateAsync(IndentHeader indentHeader);
+        Task<bool> UpdateAsync(IndentHeader indentHeader,string request);
         Task<bool> DeleteAsync(int id,IndentHeader indentHeader); 
     }
 }

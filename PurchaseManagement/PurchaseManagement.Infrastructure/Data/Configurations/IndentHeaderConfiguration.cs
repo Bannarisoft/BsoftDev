@@ -88,6 +88,11 @@ namespace PurchaseManagement.Infrastructure.Data.Configurations
             builder.Property(b => b.ModifiedIP)
                     .HasColumnType("varchar(20)");
 
+                builder.HasOne(m => m.IndentType)
+                .WithMany(t => t.IndentType)
+                .HasForeignKey(m => m.IndentTypeId) 
+                .HasPrincipalKey(t => t.Id)  
+                .OnDelete(DeleteBehavior.Restrict);
            
         }
     }

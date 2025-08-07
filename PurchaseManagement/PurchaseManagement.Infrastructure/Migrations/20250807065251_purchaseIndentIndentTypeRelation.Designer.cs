@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PurchaseManagement.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using PurchaseManagement.Infrastructure.Data;
 namespace PurchaseManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250807065251_purchaseIndentIndentTypeRelation")]
+    partial class purchaseIndentIndentTypeRelation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -235,10 +238,12 @@ namespace PurchaseManagement.Infrastructure.Migrations
                         .HasColumnName("IndentHeaderId");
 
                     b.Property<string>("NewData")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("NewData");
 
                     b.Property<string>("PreviousData")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("PreviousData");
 
