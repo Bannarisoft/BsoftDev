@@ -12,5 +12,10 @@ namespace Core.Application.Budget.Queries.GetBudgetLogs
         public string? CreatedByName { get; set; }
         public DateTimeOffset? CreatedDate { get; set; }
         public string? CreatedIP { get; set; }
+        public int Month { get; set; }
+        public string? BudgetGroupName { get; set; }
+        public string? ItemGroupName { get; set; }
+        public int FiscalYear { get; set; }   
+        public string? ActionName { get; set; }     
     }
 }

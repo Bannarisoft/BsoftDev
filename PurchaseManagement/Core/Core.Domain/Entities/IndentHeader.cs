@@ -15,5 +15,6 @@ namespace Core.Domain.Entities
         public string Purpose { get; set; }
         public ICollection<IndentDetail> IndentDetails { get; set; }
         public ICollection<IndentDepartmentMapping> IndentDepartmentMappings { get; set; }
+        public MiscMaster IndentType { get; set; }
     }
 }

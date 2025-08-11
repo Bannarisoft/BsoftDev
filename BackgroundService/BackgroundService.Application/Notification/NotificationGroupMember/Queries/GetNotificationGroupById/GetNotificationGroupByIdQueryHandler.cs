@@ -3,12 +3,13 @@ using System.Threading.Tasks;
 using AutoMapper;
 using BackgroundService.Application.Notification.Common.HttpResponse;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationGroupMembers;
+using BackgroundService.Application.Notification.NotificationGroupMember.Queries.GetAllNotificationGroupMember;
 using BackgroundService.Application.Notification.NotificationGroupMember.Queries.GetNotificationGroupById;
 using MediatR;
 
 namespace BackgroundService.Application.Notification.NotificationGroupMember.Queries.GetNotificationGroupMemberById
 {
-    public class GetNotificationGroupByIdQueryHandler : IRequestHandler<GetNotificationGroupByIdQuery, ApiResponseDTO<NotificationGroupDto>>
+    public class GetNotificationGroupByIdQueryHandler : IRequestHandler<GetNotificationGroupByIdQuery, ApiResponseDTO<GetNotificationGroupMemberDto>>
     {
         private readonly INotificationGroupMemberQuery _notificationGroupMemberQuery;
         private readonly IMediator _mediator;
@@ -21,13 +22,13 @@ namespace BackgroundService.Application.Notification.NotificationGroupMember.Que
             _mapper = mapper;
         }
 
-        public async Task<ApiResponseDTO<NotificationGroupDto>> Handle(GetNotificationGroupByIdQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<GetNotificationGroupMemberDto>> Handle(GetNotificationGroupByIdQuery request, CancellationToken cancellationToken)
         {
             var notificationGroup = await _notificationGroupMemberQuery.GetByIdAsync(request.Id);
 
             if (notificationGroup == null)
             {
-                return new ApiResponseDTO<NotificationGroupDto>
+                return new ApiResponseDTO<GetNotificationGroupMemberDto>
                 {
                     IsSuccess = false,
                     Message = $"Notification Group with Id {request.Id} not found.",
@@ -36,9 +37,9 @@ namespace BackgroundService.Application.Notification.NotificationGroupMember.Que
             }
 
             // If AutoMapper is needed (optional, since repository already returns NotificationGroupDto)
-            var notificationGroupDto = _mapper.Map<NotificationGroupDto>(notificationGroup);
+            var notificationGroupDto = _mapper.Map<GetNotificationGroupMemberDto>(notificationGroup);
 
-            return new ApiResponseDTO<NotificationGroupDto>
+            return new ApiResponseDTO<GetNotificationGroupMemberDto>
             {
                 IsSuccess = true,
                 Message = "Success",

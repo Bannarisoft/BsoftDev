@@ -22,7 +22,7 @@ namespace BackgroundService.Application.Notification.NotificationGroup.Queries.G
         }
         public async Task<ApiResponseDTO<List<NotificationGroupDto>>> Handle(GetAllNotificationGroupQuery request, CancellationToken cancellationToken)
         {
-             var (NotificationGroup, TotalCount) = await _notificationGroupQuery.GetAllNotificationGroupAsync(request.PageNumber, request.PageSize, request.SearchTerm);
+            var (NotificationGroup, TotalCount) = await _notificationGroupQuery.GetAllNotificationGroupAsync(request.PageNumber, request.PageSize, request.SearchTerm);
             var NotificationGroupDto = _mapper.Map<List<NotificationGroupDto>>(NotificationGroup);
 
 

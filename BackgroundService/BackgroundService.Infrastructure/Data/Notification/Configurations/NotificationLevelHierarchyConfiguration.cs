@@ -61,6 +61,11 @@ namespace BackgroundService.Infrastructure.Data.Notification.Configurations
             .HasColumnType("Varchar(Max)")
             .IsRequired(false);
 
+            builder.HasMany(h => h.NotificationEventRules)
+            .WithOne(e => e.NotificationLevelHierarchy)
+            .HasForeignKey(e => e.NotificationLevelHierarchyId)
+            .OnDelete(DeleteBehavior.Cascade);
+
             builder.Property(cf => cf.IsActive)
             .HasColumnName("IsActive")
             .HasColumnType("bit")

@@ -25,17 +25,12 @@ using BackgroundService.Infrastructure.Repositories.Notification.NotificationTem
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationGroupMembers;
 using BackgroundService.Infrastructure.Repositories.Notification.NotificationGroupMember;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationEventRule;
-using BackgroundService.Infrastructure.Repositories.Notification.NotificationEventRules;
-using BackgroundService.Domain.Entities.Notification;
 using BackgroundService.Application.Notification.Common.Mappings;
 using MassTransit;
 using BackgroundService.Application.Consumers;
 using BackgroundService.Application.Interfaces.Notification;
 using BackgroundService.Infrastructure.Services.Notification;
 using BackgroundService.Application.Notification;
-using Contracts.Events.Notifications.WorkOrder.Sms;
-using Contracts.Events.Notifications.WorkOrder.Email;
-using Contracts.Events.Notifications.WorkOrder.InApp;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationDetail;
 using BackgroundService.Infrastructure.Repositories.Notification.NotificationDetail;
 using BackgroundService.Application.Interfaces.IMiscMaster;
@@ -200,7 +195,7 @@ namespace BackgroundService.Infrastructure
                policyBuilder.WaitAndRetryAsync(3, retryAttempt =>
                    TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
 
-            services.AddAutoMapper(typeof(NotificationEventRuleProfile));
+            services.AddAutoMapper(typeof(NotificationHierarchyAndEventRuleProfile));
 
             services.AddHttpClient();
             services.AddScoped<IEmailService, RealEmailService>();
@@ -215,9 +210,7 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<INotificationGroupQuery, NotificationGroupQueryRepository >();
             services.AddScoped<IIPAddressService, IPAddressService>();
             services.AddSingleton<ITimeZoneService, TimeZoneService>();
-            services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();   
-            services.AddScoped<INotificationLevelHierarchyCommandRepository, NotificationLevelHierarchyCommandRepository>();  
-            services.AddScoped<INotificationLevelHierarchyQueryRepository, NotificationLevelHierarchyQueryRepository>();  
+            services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();         
             services.AddScoped<INotificationTemplateCommandRepository, NotificationTemplateCommandRepository>();  
             services.AddScoped<INotificationTemplateQueryRepository, NotificationTemplateQueryRepository>();
             services.AddScoped<INotificationUserResolver, NotificationUserResolver>();
@@ -233,8 +226,8 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<IInAppNotifier, InAppNotifier>(); 
             services.AddScoped<INotificationGroupMemberCommand, NotificationGroupMemberCommandRepository >();
             services.AddScoped<INotificationGroupMemberQuery, NotificationGroupMemberQueryRepository >();
-            services.AddScoped<INotificationEventRuleCommand, NotificationEventRuleCommandRepository >();
-            services.AddScoped<INotificationEventRuleQuery, NotificationEventRuleQueryRepository >();
+            services.AddScoped<INotificationLevelHierarchyCommand, NotificationLevelHierarchyCommand>();
+            services.AddScoped<INotificationEventRuleCommand, NotificationEventRuleCommand>();
             services.AddScoped<INotificationLogger, NotificationLogger>();
             
             return services;

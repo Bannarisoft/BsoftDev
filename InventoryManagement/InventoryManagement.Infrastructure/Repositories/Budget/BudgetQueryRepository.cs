@@ -1,3 +1,4 @@
+using System.Globalization;
 using Core.Application.Budget.Queries.GetAllBudgets;
 using Core.Application.Budget.Queries.GetBudgetById;
 using Core.Application.Common.Interfaces.Budget;
@@ -33,7 +34,7 @@ namespace Infrastructure.Persistence.Repositories
                 Id = master.BudgetMaster.Id,
                 UnitId = master.BudgetMaster.UnitId,
                 BudgetGroupId = master.BudgetMaster.BudgetGroupId,
-                BudgetGroupName = master.ItemCategory.ItemCategoryName,  // ✅ Added
+                BudgetGroupName = master.ItemCategory.ItemCategoryName,
                 FiscalYear = master.BudgetMaster.FiscalYear,
                 YearBudgetAmount = master.BudgetMaster.YearBudgetAmount,
                 Is_MRApplicable = master.BudgetMaster.Is_MRApplicable,
@@ -44,6 +45,7 @@ namespace Infrastructure.Persistence.Repositories
                 {
                     DetailId = d.Id,
                     Month = d.Month,
+                    MonthName = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(d.Month), 
                     BudgetAmount = d.BudgetAmount,    
                 }).ToList() ?? new()
             };

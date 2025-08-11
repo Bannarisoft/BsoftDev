@@ -192,6 +192,8 @@ namespace PurchaseManagement.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("IndentTypeId");
+
                     b.ToTable("IndentHeader", "Purchase");
                 });
 
@@ -233,12 +235,10 @@ namespace PurchaseManagement.Infrastructure.Migrations
                         .HasColumnName("IndentHeaderId");
 
                     b.Property<string>("NewData")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("NewData");
 
                     b.Property<string>("PreviousData")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("PreviousData");
 
@@ -400,6 +400,17 @@ namespace PurchaseManagement.Infrastructure.Migrations
                     b.Navigation("IndentHeader");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.IndentHeader", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "IndentType")
+                        .WithMany("IndentType")
+                        .HasForeignKey("IndentTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("IndentType");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
                 {
                     b.HasOne("Core.Domain.Entities.MiscTypeMaster", "MiscTypeMaster")
@@ -416,6 +427,11 @@ namespace PurchaseManagement.Infrastructure.Migrations
                     b.Navigation("IndentDepartmentMappings");
 
                     b.Navigation("IndentDetails");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
+                {
+                    b.Navigation("IndentType");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>

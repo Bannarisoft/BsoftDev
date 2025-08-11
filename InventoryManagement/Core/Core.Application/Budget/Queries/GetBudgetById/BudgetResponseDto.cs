@@ -18,6 +18,7 @@ namespace Core.Application.Budget.Queries.GetBudgetById
     {
         public int DetailId { get; set; }
         public int Month { get; set; }
+        public string? MonthName { get; set; }
         public decimal BudgetAmount { get; set; }
         //public List<BudgetLogDto> Logs { get; set; } = new();
     }

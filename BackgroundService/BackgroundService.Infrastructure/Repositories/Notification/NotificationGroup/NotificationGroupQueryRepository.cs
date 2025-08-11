@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BackgroundService.Application.Notification.Common.Interfaces;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationGroup;
+using BackgroundService.Application.Notification.NotificationGroup.Queries.GetAllNotificationGroup;
 using Dapper;
 
 namespace BackgroundService.Infrastructure.Repositories.Notification.NotificationGroup
@@ -34,29 +35,36 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
                 return count > 0;
         }
 
-        public async Task<(List<Domain.Entities.Notification.NotificationGroup>, int)> GetAllNotificationGroupAsync(int PageNumber, int PageSize, string? SearchTerm)
+     public async Task<(List<NotificationGroupDto>, int)> GetAllNotificationGroupAsync(
+            int PageNumber, 
+            int PageSize, 
+            string? SearchTerm)
         {
             var UnitId = _ipAddressService.GetUnitId();
-             var query = $$"""
-             DECLARE @TotalCount INT;
-             SELECT @TotalCount = COUNT(*) 
-               FROM [AppNotification].[NotificationGroup]
-              WHERE UnitId=@UnitId AND IsDeleted = 0
-            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (GroupName LIKE @Search)")}};
+
+            var query = $$"""
+                DECLARE @TotalCount INT;
+                SELECT @TotalCount = COUNT(*) 
+                FROM [AppNotification].[NotificationGroup]
+                WHERE UnitId=@UnitId AND IsDeleted = 0
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (GroupName LIKE @Search)")}};
 
                 SELECT 
-                Id, 
-                GroupName,
-                IsActive,CreatedDate,CreatedBy,CreatedByName,ModifiedBy,ModifiedDate,ModifiedByName
-            FROM [AppNotification].[NotificationGroup]
-            WHERE UnitId=@UnitId AND  IsDeleted = 0
-                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (GroupName LIKE @Search )")}}
-                ORDER BY Id desc
+                    Id, 
+                    GroupName,
+                    IsActive,
+                    CreatedDate,
+                    CreatedByName,
+                    ModifiedByName,
+                    ModifiedDate
+                FROM [AppNotification].[NotificationGroup]
+                WHERE UnitId=@UnitId AND IsDeleted = 0
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (GroupName LIKE @Search)")}}
+                ORDER BY Id DESC
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
                 SELECT @TotalCount AS TotalCount;
             """;
-
 
             var parameters = new
             {
@@ -66,12 +74,14 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
                 PageSize
             };
 
-            var NotificationGroup = await _dbConnection.QueryMultipleAsync(query, parameters);
-            var NotificationGrouplist = (await NotificationGroup.ReadAsync<Domain.Entities.Notification.NotificationGroup>()).ToList();
-            int totalCount = await NotificationGroup.ReadFirstAsync<int>();
+            using var multi = await _dbConnection.QueryMultipleAsync(query, parameters);
 
-            return (NotificationGrouplist, totalCount);
+            var list = (await multi.ReadAsync<NotificationGroupDto>()).ToList();
+            int totalCount = await multi.ReadFirstAsync<int>();
+
+            return (list, totalCount);
         }
+
 
         public async Task<List<Domain.Entities.Notification.NotificationGroup>> GetNotificationGroupsAutoComplete(string searchPattern)
         {
