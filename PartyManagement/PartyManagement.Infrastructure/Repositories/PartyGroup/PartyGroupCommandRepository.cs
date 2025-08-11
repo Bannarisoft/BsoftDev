@@ -74,6 +74,9 @@ namespace PartyManagement.Infrastructure.Repositories.PartyGroup
             existingpartyGroup.PartyGroupName = partyGroup.PartyGroupName;
             existingpartyGroup.ParentPartyGroupId = partyGroup.ParentPartyGroupId;
             existingpartyGroup.Description = partyGroup.Description;
+            existingpartyGroup.Glcode= partyGroup.Glcode;
+            existingpartyGroup.GlCategoryId = partyGroup.GlCategoryId;
+
             existingpartyGroup.IsActive = partyGroup.IsActive;
 
             // Mark the entity as modified

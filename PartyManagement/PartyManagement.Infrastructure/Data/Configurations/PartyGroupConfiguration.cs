@@ -64,6 +64,24 @@ namespace PartyManagement.Infrastructure.Data.Configurations
             builder.Property(m => m.Description)
                 .HasColumnName("Description")
                 .HasColumnType("varchar(250)");
+
+            
+            // Description column
+            builder.Property(m => m.Glcode)
+                .HasColumnName("Glcode")
+                .HasColumnType("varchar(10)");
+
+
+              builder.Property(m => m.GlCategoryId)  // Foreign Key column
+              .HasColumnName("GlCategoryId")
+              .HasColumnType("int")  // Set as int
+              .IsRequired();
+
+            // Foreign Key Relationship
+            builder.HasOne(m => m.GlCategory)
+                .WithMany(t => t.PartyGlCategoryCode)
+                .HasForeignKey(m => m.GlCategoryId) // Foreign Key property in MiscMaster
+                .OnDelete(DeleteBehavior.Restrict); // Use .Cascade if needed
                 
 
             builder.Property(t => t.IsGroup)

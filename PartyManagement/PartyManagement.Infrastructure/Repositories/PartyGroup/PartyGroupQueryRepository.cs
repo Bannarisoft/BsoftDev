@@ -35,6 +35,9 @@ namespace PartyManagement.Infrastructure.Repositories.PartyGroup
                         pg.GroupTypeId,
                         mm.Description AS GroupName,
                         pg.Description,
+                        pg.GlCategoryId,
+                        ms.Description AS GlCategoryName,
+                        pg.Glcode,
                         CAST(pg.IsGroup AS BIT) AS IsGroup,
                         CAST(pg.IsActive AS BIT) AS IsActive,
                         pg.CreatedDate,
@@ -44,6 +47,7 @@ namespace PartyManagement.Infrastructure.Repositories.PartyGroup
                     FROM Party.PartyGroup pg
                     LEFT JOIN Party.PartyGroup ppg ON pg.ParentPartyGroupId = ppg.Id
                     INNER JOIN Party.MiscMaster mm ON pg.GroupTypeId = mm.MiscTypeId
+                    INNER JOIN Party.MiscMaster ms ON pg.GlCategoryId = ms.Id
                     WHERE pg.IsDeleted = 0
                     {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (pg.PartyGroupName LIKE @Search OR ppg.PartyGroupName LIKE @Search OR mm.Description LIKE @Search OR pg.Description LIKE @Search)")}}
                 )
@@ -55,6 +59,9 @@ namespace PartyManagement.Infrastructure.Repositories.PartyGroup
                     GroupTypeId,
                     GroupName,
                     Description,
+                    GlCategoryId,
+                    GlCategoryName,
+                    Glcode,
                     IsGroup,
                     IsActive,
                     CreatedDate,
@@ -73,6 +80,7 @@ namespace PartyManagement.Infrastructure.Repositories.PartyGroup
                     FROM Party.PartyGroup pg
                     LEFT JOIN Party.PartyGroup ppg ON pg.ParentPartyGroupId = ppg.Id
                     INNER JOIN Party.MiscMaster mm ON pg.GroupTypeId = mm.MiscTypeId
+                    INNER JOIN Party.MiscMaster ms ON pg.GlCategoryId = ms.Id
                     WHERE pg.IsDeleted = 0
                     {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (pg.PartyGroupName LIKE @Search OR ppg.PartyGroupName LIKE @Search OR mm.Description LIKE @Search OR pg.Description LIKE @Search)")}}
                 )
@@ -129,10 +137,17 @@ namespace PartyManagement.Infrastructure.Repositories.PartyGroup
             searchPattern = searchPattern ?? string.Empty; // Prevent null issues
 
             const string query = @"
-             SELECT Id, PartyGroupName 
-            FROM Party.PartyGroup 
-            WHERE IsDeleted = 0 AND IsGroup=0 and IsActive=1
-            AND PartyGroupName LIKE @SearchPattern";
+                SELECT 
+                pg.Id, 
+                pg.PartyGroupName,
+                ppg.PartyGroupName AS ParentPartyGroupName
+                FROM Party.PartyGroup pg
+                LEFT JOIN Party.PartyGroup ppg 
+                ON pg.ParentPartyGroupId = ppg.Id
+                WHERE pg.IsDeleted = 0 
+                AND pg.IsGroup = 0 
+                AND pg.IsActive = 1
+                AND pg.PartyGroupName LIKE @SearchPattern";
             var parameters = new
             {
                 SearchPattern = $"%{searchPattern}%"

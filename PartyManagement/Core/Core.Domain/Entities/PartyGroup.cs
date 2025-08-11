@@ -15,7 +15,11 @@ namespace Core.Domain.Entities
         public MiscMaster GroupType { get; set; } = null!;
         public string? Description { get; set; }
         public bool IsGroup { get; set; }
+        public string? Glcode { get; set; }
+        public int GlCategoryId { get; set; }
+        public MiscMaster GlCategory { get; set; } = null!;
         public ICollection<PartyGroup>? ChildPartyGroups { get; set; }
+        public ICollection<PartyType>? PartyTypeGroups { get; set; }
 
     }
 }

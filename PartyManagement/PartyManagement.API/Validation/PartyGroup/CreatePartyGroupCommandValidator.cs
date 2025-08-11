@@ -35,9 +35,9 @@ namespace PartyManagement.API.Validation.PartyGroup
                         RuleFor(x => x.GroupTypeId)
                           .NotEmpty()
                           .WithMessage($"{nameof(CreatePartyGroupCommand.GroupTypeId)} {rule.Error} {0}");
-                        RuleFor(x => x.IsGroup)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(CreatePartyGroupCommand.IsGroup)} {rule.Error} {0}");
+                        // RuleFor(x => x.IsGroup)
+                        //     .NotEmpty()
+                        //     .WithMessage($"{nameof(CreatePartyGroupCommand.IsGroup)} {rule.Error} {0}");
                         break;
 
                     case "MinLength":
