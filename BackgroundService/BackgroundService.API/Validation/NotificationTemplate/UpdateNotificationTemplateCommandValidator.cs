@@ -52,7 +52,7 @@ namespace BackgroundService.API.Validation.NotificationTemplate
                         .WithMessage($"{nameof(UpdateNotificationTemplateCommand.NotificationConfigId)} {rule.Error}")
                         .MustAsync(async (command, notificationConfigId, cancellation) =>
                             !await _NotificationTemplateCommandRepository
-                                .IsNameDuplicateAsync(notificationConfigId, command.NotificationTypeId, command.LanguageCode))
+                                .IsNameDuplicateAsync(notificationConfigId, command.NotificationTypeId, command.LanguageCode,command.Id))
                         .WithMessage("The combination already exists.");
                         break;
                     case "RecordNotFound":

@@ -20,7 +20,7 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
             _dbConnection = dbConnection;
             _ipAddressService = iPAddressService;
         }
-        public async Task<NotificationGroupDto> GetByIdAsync(int id)
+        public async Task<GetNotificationGroupMemberDto> GetByIdAsync(int id)
         {
             var UnitId = _ipAddressService.GetUnitId();
 
@@ -50,7 +50,7 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
                 return null;
 
             // Build NotificationGroupDto manually
-            var groupDto = new NotificationGroupDto
+            var groupDto = new GetNotificationGroupMemberDto
             {
                 GroupId = result.First().GroupId,
                 GroupName = result.First().GroupName,
@@ -85,7 +85,7 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
             return count > 0;
         }
 
-        public async Task<(List<NotificationGroupDto>, int)> GetAllNotificationGroupAsync(
+        public async Task<(List<GetNotificationGroupMemberDto>, int)> GetAllNotificationGroupAsync(
             int pageNumber, int pageSize, string? searchTerm)
         {
             var UnitId = _ipAddressService.GetUnitId();
@@ -94,14 +94,14 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
                     NGM.GroupId,
                     NG.GroupName,
                     NGM.UserId,
-                    U.UserName
+                    U.UserName,NG.IsActive
                 FROM [AppNotification].[NotificationGroupMembers] NGM
                 INNER JOIN [AppNotification].[NotificationGroup] NG ON NG.Id = NGM.GroupId
                 LEFT JOIN Bannari.AppSecurity.Users U ON U.UserId = NGM.UserId
                 WHERE NG.UnitId=@UnitId 
                 AND NGM.IsDeleted = 0              
                 AND (@Search IS NULL OR NG.GroupName LIKE @Search)
-                ORDER BY NG.GroupName
+                ORDER BY NG.Id
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
             ";
 
@@ -131,10 +131,11 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
             // ✅ Group users under their GroupId
             var groupedResult = rawData
                 .GroupBy(x => new { x.GroupId, x.GroupName })
-                .Select(g => new NotificationGroupDto
+                .Select(g => new GetNotificationGroupMemberDto
                 {
                     GroupId = g.Key.GroupId,
                     GroupName = g.Key.GroupName,
+                    IsActive = g.First().IsActive,
                     Users = g.Select(u => new UserDto
                     {
                         UserId = u.UserId,
