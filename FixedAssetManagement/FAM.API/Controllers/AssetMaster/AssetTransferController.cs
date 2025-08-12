@@ -240,7 +240,11 @@ namespace FAM.API.Controllers.AssetMaster
 
             var response = await Mediator.Send(query);
 
-            return Ok(response);
+            return Ok( new 
+            {
+                StatusCode = StatusCodes.Status200OK,
+                response
+            });
         }
 
         [HttpGet("GetCategoriesByCustodian")]
