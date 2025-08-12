@@ -157,7 +157,12 @@ namespace FAM.API.Controllers.AssetMaster
         {
             var query = new GetAssetsByCategoryQuery { AssetCategoryId = categoryId, AssetDepartmentId = assetDepartmentId };
             var result = await Mediator.Send(query);
-            return Ok(result);
+            return StatusCode(StatusCodes.Status200OK, new
+            {
+                statusCode = StatusCodes.Status200OK,
+                message = "Assets retrieved successfully.",
+                data = result
+            });
 
         }
         [HttpGet("GetAssetDetailsToTransfer/{AssetId}")]
