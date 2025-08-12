@@ -8,6 +8,7 @@ namespace Core.Application.Common.Interfaces.Item.ItemGroup
         Task<ItemGroupDto> GetByIdAsync(int id);
         Task<(IEnumerable<dynamic>, int)> GetAllItemGroupAsync(int PageNumber, int PageSize, string? SearchTerm);
         Task<List<ItemGroupAutoCompleteDto>> GetItemGroupAutoCompleteAsync(string searchPattern);
-        Task<bool> SoftDeleteValidation(int Id);                
+        Task<bool> SoftDeleteValidation(int Id);     
+        Task<List<Core.Domain.Entities.Item.ItemGroup>> GetAllItemGroupsAsync();           
     }
 }

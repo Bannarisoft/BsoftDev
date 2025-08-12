@@ -12,48 +12,36 @@ namespace InventoryManagement.API.GrpcServices
     public class MiscMasterGrpcService : MiscMasterService.MiscMasterServiceBase
     {
         private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
-        public MiscMasterGrpcService(IMiscMasterQueryRepository miscMasterQueryRepository)
+        private readonly ILogger<MiscMasterGrpcService> _logger ;
+        public MiscMasterGrpcService(IMiscMasterQueryRepository miscMasterQueryRepository, ILogger<MiscMasterGrpcService> logger)
         {
             _miscMasterQueryRepository = miscMasterQueryRepository;
-        }
-       
-       
-       
-       public override async Task<MiscMastersListResponse> GetMiscMasterById(GetMiscMasterByIdRequest request, ServerCallContext context)
-        {
-            var warehouseTypes = await _miscMasterQueryRepository.GetMiscMaster("", MiscEnumEntity.MiscTypes.WarehouseType);
-            var storageTypes = await _miscMasterQueryRepository.GetMiscMaster("", MiscEnumEntity.MiscTypes.StorageType);
-
-            var allTypes = warehouseTypes.Concat(storageTypes).ToList();
-
-            var response = new MiscMastersListResponse();
-            response.Items.AddRange(allTypes.Select(d => new MiscMasterDto
+            _logger = logger;
+        }   
+        public override async Task<MiscMastersListResponse> GetMiscMasterById( GetMiscMasterByIdRequest request, ServerCallContext context)
             {
-                Id = d.Id,
-                Code = d.Code,
-                Description = d.Description,
-                MiscTypeId = d.MiscTypeId
-            }));
+                if (string.IsNullOrWhiteSpace(request.Misctype))
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "misctype is required."));
 
-            return response;
-        }
+                var key = request.Misctype.Trim().ToLowerInvariant();
+                var typeKey = key switch
+                {
+                    "warehouse" or "warehousetype" => Core.Domain.Common.MiscEnumEntity.WarehouseType, // "WarehouseType"
+                    "storage"   or "storagetype"   => Core.Domain.Common.MiscEnumEntity.StorageType,
+                    "area"      or "areatype"      => Core.Domain.Common.MiscEnumEntity.AreaType,
+                    "operation" or "operationtype" => Core.Domain.Common.MiscEnumEntity.OperationType,
+                    _ => throw new RpcException(new Status(StatusCode.InvalidArgument, $"Unsupported misctype: {request.Misctype}"))
+                };
 
-    //    public override async Task<MiscMastersListResponse> GetMiscMasterById(GetMiscMasterByIdRequest request, ServerCallContext context)
-        //     {
-        //         var inventorymiscmaster = await _miscMasterQueryRepository.GetMiscMaster("", "WarehouseType");
+                var list = await _miscMasterQueryRepository.GetMiscMaster("", typeKey);
 
-        //         var response = new MiscMastersListResponse();
+                var resp = new MiscMastersListResponse();
+                resp.Items.AddRange(list.Select(d => new MiscMasterDto {
+                    Id = d.Id, Code = d.Code, Description = d.Description, MiscTypeId = d.MiscTypeId
+                }));
+                return resp;
+            }
+        
 
-        //        response.Items.AddRange(inventorymiscmaster.Select(d => new MiscMasterDto
-        //        {
-        //            Id = d.Id,
-        //            Code = d.Code,
-        //            Description = d.Description,
-        //            MiscTypeId = d.MiscTypeId
-
-        //         }));
-
-        //         return response;
-        //     } 
     }
 }
