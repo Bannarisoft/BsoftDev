@@ -69,7 +69,10 @@ namespace FAM.API.Controllers.AssetMaster
             {
                 return NotFound($"Asset Transfer with ID {id} not found.");
             }
-            return Ok(result);
+            return Ok(new {
+                StatusCode = StatusCodes.Status200OK,
+                Data = result
+            });
         }
 
 
@@ -240,7 +243,8 @@ namespace FAM.API.Controllers.AssetMaster
 
             var response = await Mediator.Send(query);
 
-            return Ok( new 
+            
+            return Ok(new 
             {
                 StatusCode = StatusCodes.Status200OK,
                 response
