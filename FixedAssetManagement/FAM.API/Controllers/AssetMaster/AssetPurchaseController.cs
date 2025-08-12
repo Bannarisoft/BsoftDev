@@ -95,7 +95,7 @@ namespace FAM.API.Controllers.AssetPurchase
 
               
 
-                return Ok(result);
+                return Ok(new { StatusCode = StatusCodes.Status200OK, Data = result });
             }
 
             [HttpGet("GetGrnDetails/{oldUnitId}/{assetSourceId}/{grnNo}/{grnSerialNo}")]
@@ -114,7 +114,7 @@ namespace FAM.API.Controllers.AssetPurchase
 
                
 
-                return Ok(result);
+                return Ok(new { StatusCode = StatusCodes.Status200OK, Data = result }); 
             }
 
             [HttpPost]

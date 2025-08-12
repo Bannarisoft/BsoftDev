@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BackgroundService.Domain.Common;
+using BackgroundService.Domain.Entities.Workflow;
 
 namespace BackgroundService.Domain.Entities.Notification
 {
@@ -22,5 +23,8 @@ namespace BackgroundService.Domain.Entities.Notification
         public ICollection<NotificationEventLog> NotificationStatus { get; set; } = new List<NotificationEventLog>();
         public ICollection<NotificationTemplate> NotificationTemplates { get; set; } = new List<NotificationTemplate>();
         public ICollection<NotificationEventLog> ReadStatus { get; set; } = new List<NotificationEventLog>();
+        public ICollection<ApprovalStepDetail> ApprovalStep { get; set; }
+        public ICollection<ApprovalStepDetail> ApprovalType { get; set; }
+        public ICollection<ApprovalRequest> ApprovalRequestStatus { get; set; }
     }
 }

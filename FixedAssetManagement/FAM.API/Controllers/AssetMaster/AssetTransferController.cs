@@ -69,7 +69,10 @@ namespace FAM.API.Controllers.AssetMaster
             {
                 return NotFound($"Asset Transfer with ID {id} not found.");
             }
-            return Ok(result);
+            return Ok(new {
+                StatusCode = StatusCodes.Status200OK,
+                Data = result
+            });
         }
 
 
@@ -157,7 +160,12 @@ namespace FAM.API.Controllers.AssetMaster
         {
             var query = new GetAssetsByCategoryQuery { AssetCategoryId = categoryId, AssetDepartmentId = assetDepartmentId };
             var result = await Mediator.Send(query);
-            return Ok(result);
+            return StatusCode(StatusCodes.Status200OK, new
+            {
+                statusCode = StatusCodes.Status200OK,
+                message = "Assets retrieved successfully.",
+                data = result
+            });
 
         }
         [HttpGet("GetAssetDetailsToTransfer/{AssetId}")]
@@ -235,7 +243,11 @@ namespace FAM.API.Controllers.AssetMaster
 
             var response = await Mediator.Send(query);
 
-            return Ok(response);
+            return Ok(new 
+            {
+                StatusCode = StatusCodes.Status200OK,
+                response
+            });
         }
 
         [HttpGet("GetCategoriesByCustodian")]

@@ -14,9 +14,13 @@ namespace Core.Domain.Entities
         // Self-referencing FK for Parent Group
         public int? ParentWarehouseId { get; set; }
         public bool IsGroup { get; set; }
+
+        public bool IsVirtualWarehouse { get; set; }
         // External FK values (soft foreign keys validated via gRPC)
         public int WarehouseTypeId { get; set; }
         public int StorageTypeId { get; set; }
+        public int AreaTypeId { get; set; }
+        public int OperationTypeId { get; set; }
         public int CapacityUOMId { get; set; }
         public int? AccountId { get; set; }
         public string? ContactPersonName { get; set; }
