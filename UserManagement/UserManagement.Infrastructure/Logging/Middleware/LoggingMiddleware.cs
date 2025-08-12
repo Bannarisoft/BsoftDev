@@ -59,12 +59,21 @@ namespace UserManagement.Infrastructure.Logging.Middleware
                 // Handle 400 - Validation Error
                 context.Response.ContentType = "application/json";
                 context.Response.StatusCode = StatusCodes.Status400BadRequest;
+
+                var errors = (ex.Errors ?? Enumerable.Empty<FluentValidation.Results.ValidationFailure>())
+                .Select(e => e.ErrorMessage)
+                .Where(m => !string.IsNullOrWhiteSpace(m))
+                .Distinct()
+                .ToArray();
+
+                if (errors.Length == 0)
+                errors = new[] { ex.Message };
     
                 var response = new
                 {
                     statusCode = context.Response.StatusCode,
                     message = "Validation failed",
-                    errors = ex.Errors.Select(e => e.ErrorMessage).ToArray()
+                    errors 
                 };
     
                 await context.Response.WriteAsync(JsonSerializer.Serialize(response));
