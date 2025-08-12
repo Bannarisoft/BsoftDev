@@ -1,7 +1,9 @@
 using BackgroundService.Application.Notification.Common.Interfaces;
 using BackgroundService.Domain.Common;
 using BackgroundService.Domain.Entities.Notification;
+using BackgroundService.Domain.Entities.Workflow;
 using BackgroundService.Infrastructure.Data.Notification.Configurations;
+using BackgroundService.Infrastructure.Data.Workflow.Configurations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -27,7 +29,15 @@ namespace BackgroundService.Infrastructure.Data.Notification
         public DbSet<NotificationTemplate> NotificationTemplate { get; set; }
         public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
         public DbSet<MiscMaster> MiscMaster { get; set; }
-        
+        public DbSet<WorkflowType> WorkflowType { get; set; }
+        public DbSet<ApprovalStepDetail> ApprovalStepDetail { get; set; }
+        public DbSet<ApprovalStepUnitMapping> ApprovalStepUnitMapping { get; set; }
+        public DbSet<ApprovalRule> ApprovalRule { get; set; }
+        public DbSet<RuleSkipApproverMapping> RuleSkipApproverMapping { get; set; }
+        public DbSet<ApprovalRequest> ApprovalRequest { get; set; }
+        public DbSet<ApprovalStepDepartmentMapping> ApprovalStepDepartmentMapping { get; set; }
+        public DbSet<ApprovalDocument> ApprovalDocument { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new NotificationConfigConfiguration());
@@ -39,6 +49,14 @@ namespace BackgroundService.Infrastructure.Data.Notification
             modelBuilder.ApplyConfiguration(new NotificationTemplateConfiguration());
             modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
             modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new WorkflowTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new ApprovalStepDetailConfiguration());
+            modelBuilder.ApplyConfiguration(new ApprovalStepUnitMappingConfiguration());
+            modelBuilder.ApplyConfiguration(new ApprovalRuleConfiguration());
+            modelBuilder.ApplyConfiguration(new RuleSkipApproverMappingConfiguration());
+            modelBuilder.ApplyConfiguration(new ApprovalRequestConfiguration());
+            modelBuilder.ApplyConfiguration(new ApprovalStepDepartmentMappingConfiguration());
+            modelBuilder.ApplyConfiguration(new ApprovalDocumentConfiguration());
         }
           public override int SaveChanges()
         {

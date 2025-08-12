@@ -25,14 +25,33 @@ using BackgroundService.Infrastructure.Repositories.Notification.NotificationTem
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationGroupMembers;
 using BackgroundService.Infrastructure.Repositories.Notification.NotificationGroupMember;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationEventRule;
+
 using BackgroundService.Application.Notification.Common.Mappings;
 using MassTransit;
 using BackgroundService.Application.Consumers;
 using BackgroundService.Application.Interfaces.Notification;
 using BackgroundService.Infrastructure.Services.Notification;
 using BackgroundService.Application.Notification;
+
+using BackgroundService.Application.Workflow.Common.Interfaces.IWorkflowType;
+using BackgroundService.Infrastructure.Repositories.Workflow.WorkflowTypes;
+using BackgroundService.Application.Workflow.Common.Interfaces.IApprovalStepDetail;
+using BackgroundService.Infrastructure.Repositories.Workflow.ApprovalStepDetails;
+using BackgroundService.Application.Workflow.Common.Interfaces.IApprovalRule;
+using BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRules;
+using Contracts.Events.Notifications.WorkOrder.Sms;
+using Contracts.Events.Notifications.WorkOrder.Email;
+using Contracts.Events.Notifications.WorkOrder.InApp;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationDetail;
 using BackgroundService.Infrastructure.Repositories.Notification.NotificationDetail;
+using BackgroundService.Application.Consumer.Workflow;
+using BackgroundService.Application.Workflow.Common.Interfaces.IApprovalRequest;
+using BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequests;
+using MongoDB.Driver;
+using BackgroundService.Infrastructure.Persistence;
+using BackgroundService.Infrastructure.Data;
+using BackgroundService.Application.Workflow.Common.Interfaces;
+using BackgroundService.Infrastructure.Repositories.Workflow;
 using BackgroundService.Application.Interfaces.IMiscMaster;
 using BackgroundService.Infrastructure.Repositories.MiscMaster;
 using BackgroundService.Application.Common.Interfaces.IMiscTypeMaster;
@@ -43,6 +62,7 @@ namespace BackgroundService.Infrastructure
     public static class DependencyInjection
     {
         private static readonly string[] HangfireQueues = ["schedule_work_order_queue","forgot_password_queue","user_unlock_queue"];
+
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration, IServiceCollection builder)
         {
             var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection")
@@ -64,13 +84,41 @@ namespace BackgroundService.Infrastructure
                 throw new InvalidOperationException("Connection string 'NotificationConnectionString' not found or is empty.");
             }
 
-
             services.AddTransient<IHangfireDbConnectionFactory>(sp => new HangfireDbConnectionFactory(HangfireConnectionString));
             services.AddTransient<INotificationDbConnectionFactory>(sp => new NotificationDbConnectionFactory(NotificationConnectionString));
             services.AddScoped<IDbConnection>(sp =>
             {
                 var factory = sp.GetRequiredService<INotificationDbConnectionFactory>();
                 return factory.CreateConnection();
+            });
+
+              // MongoDB Context
+            services.AddSingleton<IMongoClient>(sp =>
+            {
+                var mongoConnectionString = configuration.GetConnectionString("MongoDbConnectionString");
+                if (string.IsNullOrWhiteSpace(mongoConnectionString))
+                {
+                    throw new InvalidOperationException("MongoDB connection string is missing or empty.");
+                }
+                return new MongoClient(mongoConnectionString);
+            });
+
+            services.AddSingleton<IMongoDbContext>(sp =>
+            {
+                var client = sp.GetRequiredService<IMongoClient>();
+                var databaseName = configuration["MongoDb:DatabaseName"];
+                if (string.IsNullOrWhiteSpace(databaseName))
+                {
+                    throw new InvalidOperationException("MongoDB database name is missing or empty.");
+                }
+                return new MongoDbContext(client, databaseName);
+            });
+
+            // Optional: Register IMongoDatabase if needed directly
+            services.AddSingleton(sp =>
+            {
+                var mongoDbContext = (MongoDbContext)sp.GetRequiredService<IMongoDbContext>();
+                return mongoDbContext.GetDatabase();
             });
             // Register Hangfire services
             services.AddHangfire(config =>
@@ -106,6 +154,7 @@ namespace BackgroundService.Infrastructure
                 x.AddConsumer<SendEmailNotificationConsumer>();
                 x.AddConsumer<SendSmsNotificationConsumer>();
                 x.AddConsumer<SendInAppNotificationConsumer>();
+                x.AddConsumer<ApprovalRequestConsumer>();
                 
 
                 x.UsingRabbitMq((context, cfg) =>
@@ -115,16 +164,18 @@ namespace BackgroundService.Infrastructure
                         h.Username("guest");
                         h.Password("guest");
                     });
-                
+
 
                     cfg.ReceiveEndpoint("resolve-notification-channels-queue", e =>
                     {
                         e.ConfigureConsumer<ResolveNotificationChannelsConsumer>(context);
-                         
+
                     });
-             
+
                     cfg.ReceiveEndpoint("email-notification-queue", e =>
-                    {                        
+
+
+                    {
                         e.Bind("Contracts.Events.Notifications.WorkOrder.Email:SendEmailNotificationInternalCommand", s =>
                         {
                             s.ExchangeType = "fanout"; // Required if you're using fanout-based exchange
@@ -140,15 +191,19 @@ namespace BackgroundService.Infrastructure
                         });
 
                         e.ConfigureConsumer<SendSmsNotificationConsumer>(context);
-                    }); 
-                     cfg.ReceiveEndpoint("inapp-notification-queue", e =>
+                    });
+                    
+                    cfg.ReceiveEndpoint("inapp-notification-queue", e =>
+                   {
+                       e.Bind("Contracts.Events.Notifications.WorkOrder.InApp:SendInAppNotificationInternalCommand", s =>
+                       {
+                           s.ExchangeType = "fanout"; // Required if you're using fanout-based exchange
+                       });
+                       e.ConfigureConsumer<SendInAppNotificationConsumer>(context);
+                   }); 
+                      cfg.ReceiveEndpoint("approval-request-task-queue", e =>
                     {
-                        e.Bind("Contracts.Events.Notifications.WorkOrder.InApp:SendInAppNotificationInternalCommand", s =>
-                        {
-                            s.ExchangeType = "fanout"; // Required if you're using fanout-based exchange
-                        });
-
-                        e.ConfigureConsumer<SendInAppNotificationConsumer>(context);
+                        e.ConfigureConsumer<ApprovalRequestConsumer>(context);
                     });
                      
                 });
@@ -169,6 +224,7 @@ namespace BackgroundService.Infrastructure
             services.AddHttpClient("UserManagementClient", client =>
            {
                //client.BaseAddress = new Uri("http://localhost:5174"); 
+
                client.BaseAddress = new Uri(configuration["HttpClientSettings:UserManagementService"]);          
            })
 
@@ -195,6 +251,7 @@ namespace BackgroundService.Infrastructure
                policyBuilder.WaitAndRetryAsync(3, retryAttempt =>
                    TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
 
+
             services.AddAutoMapper(typeof(NotificationHierarchyAndEventRuleProfile));
 
             services.AddHttpClient();
@@ -209,14 +266,18 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<INotificationGroupCommand, NotificationGroupCommandRepository >();
             services.AddScoped<INotificationGroupQuery, NotificationGroupQueryRepository >();
             services.AddScoped<IIPAddressService, IPAddressService>();
+
             services.AddSingleton<ITimeZoneService, TimeZoneService>();
+
+
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();         
             services.AddScoped<INotificationTemplateCommandRepository, NotificationTemplateCommandRepository>();  
             services.AddScoped<INotificationTemplateQueryRepository, NotificationTemplateQueryRepository>();
             services.AddScoped<INotificationUserResolver, NotificationUserResolver>();
             services.AddScoped<INotificationDetailRepository, NotificationDetailRepository>();
             services.AddScoped<NotificationResolverHandler>();
-            services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();
+
+			services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();
             services.AddScoped<IMiscMasterQueryRepository, MiscMasterQueryRepository>();
             services.AddScoped<IMiscTypeMasterCommandRepository , MiscTypeMasterCommandRepository>();
             services.AddScoped<IMiscTypeMasterQueryRepository , MiscTypeMasterQueryRepository>();
@@ -226,11 +287,31 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<IInAppNotifier, InAppNotifier>(); 
             services.AddScoped<INotificationGroupMemberCommand, NotificationGroupMemberCommandRepository >();
             services.AddScoped<INotificationGroupMemberQuery, NotificationGroupMemberQueryRepository >();
+
             services.AddScoped<INotificationLevelHierarchyCommand, NotificationLevelHierarchyCommand>();
             services.AddScoped<INotificationEventRuleCommand, NotificationEventRuleCommand>();
             services.AddScoped<INotificationLogger, NotificationLogger>();
             
+
+             services.AddScoped<IWorkflowTypeQuery, WorkflowTypeQueryRepository >();
+            services.AddScoped<IWorkflowTypeCommand, WorkflowTypeCommandRepository >();
+             services.AddScoped<IApprovalStepDetailQuery, ApprovalStepDetailQueryRepository >();
+            services.AddScoped<IApprovalStepDetailCommand, ApprovalStepDetailCommandRepository >();
+             services.AddScoped<IApprovalRuleQuery, ApprovalRuleQueryRepository >();
+            services.AddScoped<IApprovalRuleCommand, ApprovalRuleCommandRepository >();
+            services.AddScoped<IApprovalRequestQuery, ApprovalRequestQueryRepository >();
+            services.AddScoped<IApprovalRequestCommand, ApprovalRequestCommandRepository >();
+            services.AddScoped<IEventPublisher, EventPublisher>();
+
+                  services.AddScoped<IMongoCollection<OutboxMessage>>(sp =>
+            {
+                var database = sp.GetRequiredService<IMongoDatabase>();
+                var collectionName = configuration["MongoDbSettings:OutboxCollectionName"] ?? "OutboxMessages";
+                return database.GetCollection<OutboxMessage>(collectionName);
+            });
+            services.AddScoped<IFileStorageService, FileStorageService>();
             return services;
         }
     }
 }
+

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option csharp_namespace = "GrpcServices.BackgroundService";
+
+service ApprovedApprovalRequestService {
+    rpc GetApprovedApprovalRequest (ApprovedApprovalRequest) returns (ApprovedTransactionIdListResponse);
+}
+message ApprovedApprovalRequest {
+    string ModuleTypeName = 1;
+}
+
+message ApprovedTransactionIdListResponse {
+    repeated int32 moduleTransactionIds = 1;
+}

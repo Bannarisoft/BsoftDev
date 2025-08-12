@@ -9,11 +9,13 @@ using SagaOrchestrator.Application.Orchestration.Interfaces.IUsers;
 using SagaOrchestrator.Application.Orchestration.Models;
 using SagaOrchestrator.Application.Orchestration.Models.Notifications;
 using SagaOrchestrator.Application.Orchestration.Models.PreventiveSchedule;
+using SagaOrchestrator.Application.Orchestration.Models.Workflow;
 using SagaOrchestrator.Application.Orchestration.Services.AssetServices;
 using SagaOrchestrator.Application.Orchestration.Services.MaintenanceServices;
 using SagaOrchestrator.Application.Orchestration.Services.UserServices;
 using SagaOrchestrator.Application.StateMachines;
 using SagaOrchestrator.Application.StateMachines.Notification;
+using SagaOrchestrator.Application.StateMachines.Workflow;
 using SagaOrchestrator.Infrastructure.Consumers;
 using SagaOrchestrator.Infrastructure.Services.AssetServices;
 using SagaOrchestrator.Infrastructure.Services.MaintenanceServices;
@@ -57,6 +59,7 @@ namespace SagaOrchestrator.Infrastructure
                 // ✅ Register WorkOrderNotificationState saga and activity
                 x.AddSagaStateMachine<WorkOrderNotificationState, NotificationWorkOrder>()
                     .InMemoryRepository();
+                x.AddSagaStateMachine<ApprovalRequestStateMachine, ApprovalRequestState>().InMemoryRepository();
 
                 x.AddConsumer<UserCreatedEventConsumer>();
                 x.AddConsumer<AssetCreatedEventConsumer>();
