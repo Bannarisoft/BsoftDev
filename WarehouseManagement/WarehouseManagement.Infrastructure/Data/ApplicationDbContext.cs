@@ -22,6 +22,7 @@ namespace WarehouseManagement.Infrastructure.Data
         
          public DbSet<WarehouseItemGroupMapping> GetWarehouseItemGroupMappings  { get; set; }
          public DbSet<WarehouseMaster> WarehouseMasters  { get; set; }
+         public DbSet<RackMaster> RackMasters { get; set; }
           
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
