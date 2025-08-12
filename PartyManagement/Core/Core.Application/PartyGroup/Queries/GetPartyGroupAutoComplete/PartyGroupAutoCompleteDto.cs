@@ -9,5 +9,6 @@ namespace Core.Application.PartyGroup.Queries.GetPartyGroupAutoComplete
     {
         public int Id { get; set; }
         public string? PartyGroupName { get; set; }
+        public string? ParentPartyGroupName { get; set; }
     }
 }

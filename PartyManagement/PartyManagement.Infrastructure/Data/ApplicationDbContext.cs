@@ -23,6 +23,12 @@ namespace PartyManagement.Infrastructure.Data
         public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
         public DbSet<MiscMaster> MiscMaster { get; set; }
         public DbSet<PartyGroup> PartyGroup { get; set; }
+        public DbSet<PartyMaster> PartyMaster { get; set; }
+        public DbSet<PartyType> PartyType { get; set; }
+        public DbSet<PartyContact> PartyContact { get; set; }
+        public DbSet<PartyAddress> PartyAddress { get; set; }
+        public DbSet<PartyBank> PartyBank { get; set; }
+        public DbSet<PartyDocument> PartyDocument { get; set; }
 
 
 
@@ -32,6 +38,16 @@ namespace PartyManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
             modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
             modelBuilder.ApplyConfiguration(new PartyGroupConfiguration());
+            modelBuilder.ApplyConfiguration(new PartyMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new PartyTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new PartyContactConfiguration());
+            modelBuilder.ApplyConfiguration(new PartyAddressConfiguration());
+            modelBuilder.ApplyConfiguration(new PartyBankConfiguration());
+            modelBuilder.ApplyConfiguration(new PartyDocumentConfiguration());
+
+
+
+
 
             base.OnModelCreating(modelBuilder);
         }

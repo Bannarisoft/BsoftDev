@@ -4,6 +4,7 @@ using Core.Application.Common.Interfaces.AuditLog;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IMiscTypeMaster;
 using Core.Application.Common.Interfaces.IPartyGroup;
+using Core.Application.Common.Interfaces.IPartyMaster;
 using Core.Application.Common.Mappings;
 using Core.Application.Interfaces.GST;
 using Infrastructure.Data;
@@ -18,6 +19,7 @@ using PartyManagement.Infrastructure.Repositories;
 using PartyManagement.Infrastructure.Repositories.MiscMaster;
 using PartyManagement.Infrastructure.Repositories.MiscTypeMaster;
 using PartyManagement.Infrastructure.Repositories.PartyGroup;
+using PartyManagement.Infrastructure.Repositories.PartyMaster;
 using PartyManagement.Infrastructure.Services;
 using Serilog;
 
@@ -103,7 +105,7 @@ namespace PartyManagement.Infrastructure
             services.AddScoped<IMiscTypeMasterQueryRepository, MiscTypeMasterQueryRepository>();
             services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();
             services.AddScoped<IMiscMasterQueryRepository, MiscMasterQueryRepository>();
-
+            services.AddScoped<IPartyMasterQueryRepository, PartyMasterQueryRepository>();
 
 
             // Miscellaneous services
@@ -116,7 +118,8 @@ namespace PartyManagement.Infrastructure
             services.AddAutoMapper(
             typeof(PartyGroupProfile),
             typeof(MiscTypeMasterProfile),
-            typeof(MiscMasterProfile)
+            typeof(MiscMasterProfile),
+            typeof(PartyMasterProfile)
 
             );
             return services;
