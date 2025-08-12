@@ -36,28 +36,18 @@ namespace Core.Application.AssetMaster.AssetTranferIssueApproval.Queries.GetAsse
 
         public async Task<ApiResponseDTO<List<AssetTransferIssueApprovalDto>>> Handle(GetAssetTranferIssueApprovalQuery request, CancellationToken cancellationToken)
         {
-           var (assetIssueTransfer, totalCount) = await _assetTransferIssueQueryRepository
+          var (assetIssueTransfer, totalCount) = await _assetTransferIssueQueryRepository
                                                 .GetAllPendingAssetTransferAsync(request.PageNumber, request.PageSize, request.SearchTerm, request.FromDate, request.ToDate);
             var assetIssueTransferList = _mapper.Map<List<AssetTransferIssueApprovalDto>>(assetIssueTransfer);
-            // 🔥 Fetch departments using gRPC
-            // var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
-            // var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
-            
-               var PendingTransfer = await _workflowGrpcClient.GetAllApprovalRequestByApprover(MiscEnumEntity.AssetTransfer,_ipAddressService.GetUserId());
-            var TransferStatusDict = PendingTransfer.ToDictionary(u => u.ModuleTransactionId, u => u.CurrentStatus);
+               // 🔥 Fetch departments using gRPC
+            var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
+            var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
                  var filteredassetIssueTransfer = assetIssueTransferList
-            .Where(p => TransferStatusDict.ContainsKey(p.Id))
+            .Where(p => departmentLookup.ContainsKey(p.FromDepartmentId))
             .ToList();
           
-             foreach (var status in filteredassetIssueTransfer)
-            {
-                if (TransferStatusDict.TryGetValue(status.Id, out var approvalstatus))
-                {
-                    status.ApprovalStatus = approvalstatus;
-                }
-                
-            }
+
 
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
