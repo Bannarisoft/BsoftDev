@@ -1,4 +1,5 @@
 using Core.Domain.Common;
+using Core.Domain.Entities.Item.ItemDetail;
 
 namespace Core.Domain.Entities.Item
 {
@@ -14,5 +15,6 @@ namespace Core.Domain.Entities.Item
         public byte? IsBudgetApplicable { get; set; }
         public int? RootCategoryId { get; set; }
         public ItemCategory? RootCategory { get; set; } 
+        public ICollection<ItemMaster>? ItemMasterCategory { get; set; } 
     }
 }

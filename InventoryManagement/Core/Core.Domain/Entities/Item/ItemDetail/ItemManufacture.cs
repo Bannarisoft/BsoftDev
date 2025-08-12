@@ -1,0 +1,14 @@
+using Core.Domain.Common;
+
+namespace Core.Domain.Entities.Item.ItemDetail
+{
+    public class ItemManufacture : BaseEntity
+    {
+        public int ItemId { get; set; }
+        public ItemMaster Item { get; set; } = null!;
+
+        public int UnitId { get; set; }
+        public int ManufacturingTypeId { get; set; }   
+        public MiscMaster MiscManufactureType { get; set; } = null!;
+    }
+}

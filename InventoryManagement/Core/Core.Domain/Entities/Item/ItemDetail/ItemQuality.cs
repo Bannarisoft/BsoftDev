@@ -1,0 +1,15 @@
+namespace Core.Domain.Entities.Item.ItemDetail
+{
+    public class ItemQuality
+    {
+        public int ItemId { get; set; }
+        public ItemMaster Item { get; set; } = null!;
+        public int? InspectionTemplateId { get; set; }
+        public int? CertificateTypeId { get; set; }
+        public MiscMaster MiscCertificateType { get; set; } = null!;
+        public int? InspLotProcessingTime { get; set; }
+        public bool InspectionRequired { get; set; }
+        public bool QualityInspectionFree { get; set; }
+        public bool IsCertificateRequiredFromSupplier { get; set; }
+    }
+}

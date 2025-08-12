@@ -9,6 +9,8 @@ using InventoryManagement.Infrastructure.Data.Configurations;
 using InventoryManagement.Infrastructure.Data.Configurations.Budget;
 using Core.Domain.Entities.Budget;
 using Microsoft.Identity.Client;
+using Core.Domain.Entities.Item.ItemDetail;
+using Core.Domain.Entities.Item.ItemDetail.Variant;
 
 namespace InventoryManagement.Infrastructure.Data
 {
@@ -36,6 +38,21 @@ namespace InventoryManagement.Infrastructure.Data
         public DbSet<BudgetMaster> BudgetMaster { get; set; }
         public DbSet<BudgetDetail> BudgetDetail { get; set; }
         public DbSet<BudgetLog> BudgetLog { get; set; }
+        // Item related DbSets
+        public DbSet<ItemMaster> ItemMaster { get; set; }        
+        public DbSet<ItemSupplier> ItemSupplier => Set<ItemSupplier>();
+        public DbSet<ItemManufacture> ItemManufacture => Set<ItemManufacture>();
+        public DbSet<ItemPurchase> ItemPurchase => Set<ItemPurchase>();
+        public DbSet<ItemInventory> ItemInventory => Set<ItemInventory>();
+        public DbSet<ItemQuality> ItemQuality => Set<ItemQuality>();
+        public DbSet<ItemVariantDef> ItemVariantDef => Set<ItemVariantDef>();
+        public DbSet<ItemVariantDefOption> ItemVariantDefOption => Set<ItemVariantDefOption>();
+        public DbSet<ItemVariantValue> ItemVariantValue => Set<ItemVariantValue>();
+        public DbSet<ItemLog> ItemLog => Set<ItemLog>();
+        public DbSet<ItemUOM> ItemUOMs => Set<ItemUOM>();
+        
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
