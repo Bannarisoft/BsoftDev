@@ -59,17 +59,22 @@ namespace FAM.API.Controllers.AssetMaster
             });
         }
 
-          [HttpGet("GetAssetTransferReceiptDtlPending/{id}")]       
-              public async Task<IActionResult> GetAssetTransferReceiptDtlPendingAsync(int id)
-              {
-                  var query = new GetAssetRecieptDtlPendingQuery { AssetTransferId = id };  
-                  var result = await Mediator.Send(query);
-                 if (result == null) 
-                  {
-                      return NotFound($"Asset Transfer with ID {id} not found.");
-                  }
-                 return Ok(result);
-              }
+        [HttpGet("GetAssetTransferReceiptDtlPending/{id}")]
+        public async Task<IActionResult> GetAssetTransferReceiptDtlPendingAsync(int id)
+        {
+            var query = new GetAssetRecieptDtlPendingQuery { AssetTransferId = id };
+            var result = await Mediator.Send(query);
+            if (result == null)
+            {
+                return NotFound($"Asset Transfer with ID {id} not found.");
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Data = result
+            });
+        }
+              
 
         [HttpGet]
         public async Task<IActionResult> GetAssetTransferReceiptDetails([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? AssetReceiptId = null,[FromQuery] DateTimeOffset? FromDate = null,
