@@ -32,7 +32,9 @@
   </ItemGroup>
 
   <ItemGroup>
-   <Protobuf Include="..\..\Shared\Contracts\Protos\inventorymiscmaster.proto" GrpcServices="Server"/>
+   <Protobuf Include="..\..\Shared\Contracts\Protos\inventorymisc.proto" GrpcServices="Server"/>
+   <Protobuf Include="..\..\Shared\Contracts\Protos\Inventory_Itemgroup.proto" GrpcServices="Server"/>
+   <Protobuf Include="..\..\Shared\Contracts\Protos\Inventory_uom.proto" GrpcServices="Server"/>
   </ItemGroup>
 
 </Project>

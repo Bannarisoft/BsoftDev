@@ -4,6 +4,8 @@ using WarehouseManagement.Infrastructure.Logging.Middleware;
 using WarehouseManagement.API.Configurations;
 using WarehouseManagement.Infrastructure;
 using WarehouseManagement.API.Validation.Common;
+using MediatR;
+using Core.Application.Common.Behaviors;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +40,7 @@ builder.Services.AddHttpContextAccessor();
 //builder.Services.AddProblemDetails();
 // Register gRPC
 builder.Services.AddGrpc();
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 
 var app = builder.Build();
@@ -61,7 +64,6 @@ app.UseMiddleware<LoggingMiddleware>();
 app.UseAuthorization();
 app.UseEndpoints(endpoints =>
 {
-
     endpoints.MapControllers();
 });
 app.Run();

@@ -100,6 +100,9 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<int>("AreaTypeId")
+                        .HasColumnType("int");
+
                     b.Property<int>("CapacityUOMId")
                         .HasColumnType("int");
 
@@ -151,6 +154,9 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<bool>("IsTransitWarehouse")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsVirtualWarehouse")
+                        .HasColumnType("bit");
+
                     b.Property<decimal>("MaxCapacity")
                         .HasColumnType("decimal(18,2)");
 
@@ -169,6 +175,9 @@ namespace WarehouseManagement.Infrastructure.Migrations
 
                     b.Property<string>("ModifiedIP")
                         .HasColumnType("varchar(255)");
+
+                    b.Property<int>("OperationTypeId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("ParentWarehouseId")
                         .HasColumnType("int");

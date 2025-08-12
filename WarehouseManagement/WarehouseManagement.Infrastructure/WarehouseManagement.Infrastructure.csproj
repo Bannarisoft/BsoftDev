@@ -42,7 +42,13 @@
   </ItemGroup>
    <ItemGroup>
   <Protobuf Include="..\..\Shared\Contracts\Protos\session.proto" GrpcServices="Client" />
-  <Protobuf Include="..\..\Shared\Contracts\Protos\inventorymiscmaster.proto" GrpcServices="Client" />
+  <Protobuf Include="..\..\Shared\Contracts\Protos\inventorymisc.proto" GrpcServices="Client" />
+  <Protobuf Include="..\..\Shared\Contracts\Protos\Inventory_Itemgroup.proto" GrpcServices="Client" />
+  <Protobuf Include="..\..\Shared\Contracts\Protos\Inventory_uom.proto" GrpcServices="Client" />
+  <Protobuf Include="..\..\Shared\Contracts\Protos\unit.proto" GrpcServices="Client" />
+  <Protobuf Include="..\..\Shared\Contracts\Protos\city.proto" GrpcServices="Client" />
+  <Protobuf Include="..\..\Shared\Contracts\Protos\states.proto" GrpcServices="Client" />
+  <Protobuf Include="..\..\Shared\Contracts\Protos\country.proto" GrpcServices="Client" />
 </ItemGroup>
 
   <PropertyGroup>
