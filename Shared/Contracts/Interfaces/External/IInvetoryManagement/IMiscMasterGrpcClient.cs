@@ -8,6 +8,9 @@ namespace Contracts.Interfaces.External.IInvetoryManagement
 {
     public interface IMiscMasterGrpcClient
     {
-              Task<List<MiscMasterDto>> GetMiscMasterByIdAsync(string miscType);
+       // Task<List<MiscMasterDto>> GetMiscMasterByIdAsync(string miscType);
+
+        Task<List<MiscMasterDto>> GetMiscMasterByIdAsync(string miscType);
+        Task<(int WarehouseTypeId, int StorageTypeId, int AreaTypeId, int OperationTypeId)> GetMiscTypeIdsAsync();
     }
 }

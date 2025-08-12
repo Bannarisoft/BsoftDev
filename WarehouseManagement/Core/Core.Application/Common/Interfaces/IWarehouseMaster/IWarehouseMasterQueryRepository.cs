@@ -10,7 +10,9 @@ namespace Core.Application.Common.Interfaces.IWarehouseMaster
     {
 
         Task<(List<WarehouseMasterDto>, int)> GetAllAsync(int PageNumber, int PageSize, string SearchTerm);
-        
+
         Task<WarehouseMasterDto> GetByIdAsync(int id);
+        
+        Task<bool> ExistsByNameAsync(string warehouseName , int? excludeId = null);
     }
 }

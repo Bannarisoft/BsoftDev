@@ -10,7 +10,9 @@ namespace Core.Domain.Common
             public const string Update = "UPDATE";
             public const string Delete = "DELETE";
         }
-			public const string WarehouseType = "WarehouseType";
-            public const string StorageType= "StorageType"; 
+        public const string WarehouseType = "WarehouseType";
+        public const string StorageType = "StorageType";
+        public const string AreaType = "AreaType";   
+        public const string OperationType = "OperationType";   
     }
 }

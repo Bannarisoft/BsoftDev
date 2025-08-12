@@ -17,4 +17,4 @@ namespace Core.Domain.Entities
         // Navigation property
         public WarehouseMaster Warehouse { get; set; } = null!;
     }
-}
+}   

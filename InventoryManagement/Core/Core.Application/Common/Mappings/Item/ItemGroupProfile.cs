@@ -13,25 +13,26 @@ namespace Core.Application.Common.Mappings.Item
     {
         public ItemGroupProfile()
         {
-           CreateMap<Domain.Entities.Item.ItemGroup,ItemGroupDto>();
-           CreateMap<Domain.Entities.Item.ItemGroup, ItemGroupAutoCompleteDto>();
+            CreateMap<Domain.Entities.Item.ItemGroup, ItemGroupDto>();
+            CreateMap<Domain.Entities.Item.ItemGroup, ItemGroupAutoCompleteDto>();
             CreateMap<CreateItemGroupCommand, Domain.Entities.Item.ItemGroup>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.ItemGroupCode, opt => opt.MapFrom(src => src.ItemGroupCode))
-                .ForMember(dest => dest.ItemGroupName, opt => opt.MapFrom(src => src.ItemGroupName))               
+                .ForMember(dest => dest.ItemGroupName, opt => opt.MapFrom(src => src.ItemGroupName))
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
 
 
             CreateMap<UpdateItemGroupCommand, Domain.Entities.Item.ItemGroup>()
                  .ForMember(dest => dest.ItemGroupCode, opt => opt.MapFrom(src => src.ItemGroupCode))
-                .ForMember(dest => dest.ItemGroupName, opt => opt.MapFrom(src => src.ItemGroupName))           
-                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));
+                .ForMember(dest => dest.ItemGroupName, opt => opt.MapFrom(src => src.ItemGroupName))
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == 1 ? Status.Active : Status.Inactive));
 
 
-              CreateMap<DeleteItemGroupCommand, Domain.Entities.Item.ItemGroup>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id)) 
-                .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));    
+            CreateMap<DeleteItemGroupCommand, Domain.Entities.Item.ItemGroup>()
+              .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+              .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));
+
         }
     }
 }
