@@ -139,7 +139,7 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
                 INNER JOIN [Bannari].AppData.Department G ON A.ToDepartmentId = G.Id
                 LEFT JOIN FixedAsset.AssetTransferReceiptHdr RH ON A.Id = RH.AssetTransferId
                 LEFT JOIN FixedAsset.AssetTransferReceiptDtl RD ON RH.Id = RD.AssetReceiptId AND B.AssetId = RD.AssetId
-                WHERE A.Status = 'Approved' AND A.ToUnitId = @UnitId 
+                WHERE  A.ToUnitId = @UnitId 
                 AND (RD.AckStatus = 0 OR RD.AckStatus IS NULL) -- Consider pending receipts only
                 {{(AssetTransferId.HasValue ? "AND A.Id = @AssetTransferId" : "")}}
                 {{(string.IsNullOrEmpty(TransferType) ? "" : "AND A.TransferType LIKE @Search")}}
@@ -171,7 +171,7 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
                 INNER JOIN [Bannari].AppData.Department G ON A.ToDepartmentId = G.Id
                 LEFT JOIN FixedAsset.AssetTransferReceiptHdr RH ON A.Id = RH.AssetTransferId
                 LEFT JOIN FixedAsset.AssetTransferReceiptDtl RD ON RH.Id = RD.AssetReceiptId AND B.AssetId = RD.AssetId
-                WHERE A.Status = 'Approved' AND A.ToUnitId = @UnitId
+                WHERE  A.ToUnitId = @UnitId
                 AND (RD.AckStatus = 0 OR RD.AckStatus IS NULL)
                 {{(AssetTransferId.HasValue ? "AND A.Id = @AssetTransferId" : "")}}
                 {{(string.IsNullOrEmpty(TransferType) ? "" : "AND A.TransferType LIKE @Search")}}

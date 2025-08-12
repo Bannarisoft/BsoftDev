@@ -4,8 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Contracts.Interfaces.External.IUser;
+using Contracts.Interfaces.External.IWorkflow;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IAssetTransferIssueApproval;
+using Core.Domain.Common;
 using Core.Domain.Events;
 using MediatR;
 
@@ -17,18 +20,23 @@ namespace Core.Application.AssetMaster.AssetTranferIssueApproval.Queries.GetAsse
         private readonly IMapper _mapper;        
         private readonly IMediator _mediator; 
         private readonly IDepartmentGrpcClient _departmentGrpcClient;
+        private readonly IWorkflowGrpcClient _workflowGrpcClient;
+        private readonly IIPAddressService _ipAddressService;
 
-        public GetAssetTranferIssueApprovalQueryHandler(IAssetTransferIssueApprovalQueryRepository assetTransferIssueQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentGrpcClient)
+        public GetAssetTranferIssueApprovalQueryHandler(IAssetTransferIssueApprovalQueryRepository assetTransferIssueQueryRepository, IMapper mapper, IMediator mediator,
+        IDepartmentGrpcClient departmentGrpcClient, IWorkflowGrpcClient workflowGrpcClient, IIPAddressService ipAddressService)
         {
             _assetTransferIssueQueryRepository = assetTransferIssueQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
             _departmentGrpcClient = departmentGrpcClient;
+            _workflowGrpcClient = workflowGrpcClient;
+            _ipAddressService = ipAddressService;
         }
 
         public async Task<ApiResponseDTO<List<AssetTransferIssueApprovalDto>>> Handle(GetAssetTranferIssueApprovalQuery request, CancellationToken cancellationToken)
         {
-           var (assetIssueTransfer, totalCount) = await _assetTransferIssueQueryRepository
+          var (assetIssueTransfer, totalCount) = await _assetTransferIssueQueryRepository
                                                 .GetAllPendingAssetTransferAsync(request.PageNumber, request.PageSize, request.SearchTerm, request.FromDate, request.ToDate);
             var assetIssueTransferList = _mapper.Map<List<AssetTransferIssueApprovalDto>>(assetIssueTransfer);
                // 🔥 Fetch departments using gRPC
