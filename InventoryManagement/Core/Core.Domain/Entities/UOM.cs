@@ -22,6 +22,7 @@ namespace Core.Domain.Entities
         public ICollection<ItemMaster>? ItemMasterUOM { get; set; }
         public ICollection<ItemUOM>? ItemUOM { get; set; }
         public ICollection<ItemPurchase>? PurchaseUOM { get; set; }
+        public ICollection<ItemInventory>? InventoryUOM { get; set; }
 
     }
 }

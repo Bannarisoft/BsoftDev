@@ -30,17 +30,24 @@ namespace InventoryManagement.API.Controllers.Item
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] ItemDto payload)
+        public async Task<IActionResult> Create([FromBody] CreateItemCommand command, CancellationToken ct)
         {
-            var id = await _mediator.Send(new CreateItemCommand { Payload = payload });
+            var id = await _mediator.Send(command, ct);
             return CreatedAtAction(nameof(GetById), new { id }, new { id });
         }
 
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] ItemDto payload)
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateItemCommand cmd, CancellationToken ct)
         {
-            await _mediator.Send(new UpdateItemCommand { Id = id, Payload = payload });
-            return Ok(new { message = "Item updated." });
+            var command = new UpdateItemCommand
+            {
+                Id = id,
+                Payload = cmd.Payload
+            };
+
+            await _mediator.Send(command, ct);
+            return NoContent();
         }
+
     }
 }

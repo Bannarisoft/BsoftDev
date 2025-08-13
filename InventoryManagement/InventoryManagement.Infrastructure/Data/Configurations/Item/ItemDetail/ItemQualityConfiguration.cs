@@ -8,8 +8,54 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
     {
         public void Configure(EntityTypeBuilder<ItemQuality> b)
         {
-            b.ToTable("ItemQuality");
+            b.ToTable("ItemQuality", "Inventory");
+
+            // Shared PK with ItemMaster (1:1)
             b.HasKey(x => x.ItemId);
+
+            b.Property(x => x.ItemId)
+             .HasColumnName("ItemId")
+             .HasColumnType("int")
+             .IsRequired();
+            b.HasOne(x => x.Item)
+             .WithOne(i => i.Quality)
+             .HasForeignKey<ItemQuality>(x => x.ItemId)
+             .OnDelete(DeleteBehavior.Cascade);
+
+            b.Property(x => x.InspectionTemplateId)
+             .HasColumnName("InspectionTemplateId")
+             .HasColumnType("int")
+             .IsRequired(false);
+
+            b.Property(x => x.CertificateTypeId)
+             .HasColumnName("CertificateTypeId")
+             .HasColumnType("int")
+             .IsRequired(false);
+            b.HasOne(x => x.MiscCertificateType)
+            .WithMany(i => i.ItemQualityCertificateType)             
+             .HasForeignKey(x => x.CertificateTypeId)
+             .OnDelete(DeleteBehavior.Restrict);
+
+            b.Property(x => x.InspLotProcessingTime)
+             .HasColumnName("InspLotProcessingTime")
+             .HasColumnType("int")
+             .IsRequired(false);
+
+            b.Property(x => x.InspectionRequired)
+             .HasColumnName("InspectionRequired")
+             .HasColumnType("bit")
+             .IsRequired();
+
+            b.Property(x => x.QualityInspectionFree)
+             .HasColumnName("QualityInspectionFree")
+             .HasColumnType("bit")
+             .IsRequired();
+
+            b.Property(x => x.IsCertificateRequiredFromSupplier)
+             .HasColumnName("IsCertificateRequiredFromSupplier")
+             .HasColumnType("bit")
+             .IsRequired();
+          
         }
     }
 }

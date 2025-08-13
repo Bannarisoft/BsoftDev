@@ -29,6 +29,8 @@ namespace Core.Application.Common.Mappings.Item.ItemDetail
 
             CreateMap<ItemQualityDto, ItemQuality>()
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+            
+             CreateMap<ItemDto, ItemDetailsDto>();
         }
     }
 }

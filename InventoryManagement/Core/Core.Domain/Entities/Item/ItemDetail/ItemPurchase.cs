@@ -3,6 +3,7 @@ namespace Core.Domain.Entities.Item.ItemDetail
 {
     public class ItemPurchase
     {
+        public int Id { get; set; }
         public int ItemId { get; set; }
         public ItemMaster Item { get; set; } = null!;
         public int? PurchaseUomId { get; set; }

@@ -6,7 +6,7 @@ namespace Core.Application.Common.Interfaces.Item.ItemDetail.Commands
 {
     public interface IItemGeneralCommandRepository
     {
-        Task CreateAsync(ItemGeneral general, CancellationToken ct = default);
-        Task UpdateAsync(ItemGeneral entity, CancellationToken ct = default);        
+        Task CreateAsync(ItemMaster general, CancellationToken ct = default);
+        Task UpdateAsync(ItemMaster entity, CancellationToken ct = default);        
     }
 }

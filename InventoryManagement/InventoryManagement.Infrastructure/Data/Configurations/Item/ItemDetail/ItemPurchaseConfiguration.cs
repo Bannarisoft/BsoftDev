@@ -1,4 +1,3 @@
-
 using Core.Domain.Entities.Item.ItemDetail;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -9,10 +8,58 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
     {
         public void Configure(EntityTypeBuilder<ItemPurchase> b)
         {
-            b.ToTable("ItemPurchase");
+            b.ToTable("ItemPurchase", "Inventory");
+
+            // Shared PK with Item (1:1)
             b.HasKey(x => x.ItemId);
-            b.Property(x => x.PurchaseRate).HasColumnType("decimal(18,2)");
-            b.Property(x => x.TariffNumber).HasMaxLength(50);
+
+            b.Property(x => x.ItemId)
+             .HasColumnName("ItemId")
+             .HasColumnType("int")
+             .IsRequired();
+            b.HasOne(x => x.Item)
+             .WithOne(i => i.Purchase)
+             .HasForeignKey<ItemPurchase>(x => x.ItemId)
+             .OnDelete(DeleteBehavior.Cascade);
+
+            b.Property(x => x.PurchaseUomId)
+             .HasColumnName("PurchaseUomId")
+             .HasColumnType("int")
+             .IsRequired(false);
+            b.HasOne(x => x.PurchaseUOM)             
+             .WithMany(i => i.PurchaseUOM)
+             .HasForeignKey(x => x.PurchaseUomId)
+             .OnDelete(DeleteBehavior.Restrict);
+
+            b.Property(x => x.LeadTimeDays)
+             .HasColumnName("LeadTimeDays")
+             .HasColumnType("int")
+             .IsRequired(false);
+
+            b.Property(x => x.SafetyStock)
+             .HasColumnName("SafetyStock")
+             .HasColumnType("int")
+             .IsRequired(false);
+
+            b.Property(x => x.GrProcessingTimeDays)
+             .HasColumnName("GrProcessingTimeDays")
+             .HasColumnType("int")
+             .IsRequired(false);
+
+            b.Property(x => x.AutomaticPo)
+             .HasColumnName("AutomaticPo")
+             .HasColumnType("bit")
+             .IsRequired();
+
+            b.Property(x => x.OriginCountryId)
+             .HasColumnName("OriginCountryId")
+             .HasColumnType("int")
+             .IsRequired(false);
+
+            b.Property(x => x.TariffNumber)
+             .HasColumnName("TariffNumber")
+             .HasColumnType("varchar(50)")
+             .IsRequired(false);          
         }
     }
 }

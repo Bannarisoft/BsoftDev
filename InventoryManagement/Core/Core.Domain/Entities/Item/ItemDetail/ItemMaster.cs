@@ -18,26 +18,25 @@ namespace Core.Domain.Entities.Item.ItemDetail
         public UOM UOM { get; set; } = null!;
         public int? ItemClassificationId { get; set; }
         public MiscMaster MiscClassification { get; set; } = null!;
-
         public string? Description { get; set; }
         public DateOnly? ValidFrom { get; set; }
         public int? XPlantMaterialStatusId { get; set; }
         public MiscMaster MiscStatus { get; set; } = null!;
-        public int? DepartmentId { get; set; }
+        //public int? DepartmentId { get; set; }
         public bool IsStockItem { get; set; }
         public bool MaintainStock { get; set; }
         public bool HasVariants { get; set; }
         public int? ParentItemId { get; set; }
         public ItemMaster? ParentItem { get; set; }
         public ICollection<ItemMaster> ChildItems { get; set; } = new List<ItemMaster>();
+        public string? ItemImage { get; set; }
+
 
         public ItemPurchase? Purchase { get; set; }
         public ItemInventory? Inventory { get; set; }
         public ItemQuality? Quality { get; set; }
-
-        // Variants
-        public ICollection<ItemVariantValue>? VariantValues { get; set; }
-        public ICollection<ItemVariantDef>? VariantDefs { get; set; }
+     
+        public ICollection<ItemVariantValue> VariantValues { get; set; } = new List<ItemVariantValue>();
         public ICollection<ItemSupplier> Suppliers { get; set; } = new List<ItemSupplier>();
         public ICollection<ItemManufacture> Manufacture { get; set; } = new List<ItemManufacture>();
         public ICollection<ItemUOM> ItemUOMs { get; set; } = new List<ItemUOM>();        

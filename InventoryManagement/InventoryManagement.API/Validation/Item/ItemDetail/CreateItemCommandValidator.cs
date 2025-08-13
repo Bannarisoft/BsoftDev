@@ -3,6 +3,8 @@ using Core.Application.Common.Interfaces.Item.ItemDetail.Commands;
 using Core.Application.Item.ItemDetail.Commands.CreateItem;
 using Core.Application.Common.Interfaces;
 using InventoryManagement.API.Validation.Common;
+using Core.Application.Common.Text;
+using Core.Application.Common.Interfaces.Item.ItemDetail.Queries;
 
 namespace InventoryManagement.API.Validation.Item.ItemDetail
 {
@@ -16,7 +18,8 @@ namespace InventoryManagement.API.Validation.Item.ItemDetail
             ItemQualityDtoValidator qualityV,
             ItemSupplierDtoValidator supplierRowV,
             ItemManufacturingDtoValidator manuRowV,
-            ItemUomDtoValidator uomRowV // optional
+            ItemUomDtoValidator uomRowV ,
+            IItemQueryRepository qryRepo
         )
         {
             var rules = ValidationRuleLoader.LoadValidationRules();
@@ -26,7 +29,7 @@ namespace InventoryManagement.API.Validation.Item.ItemDetail
             // DB max lengths (fallbacks used if provider returns null)
             var codeMax = maxLenProvider.GetMaxLength<Core.Domain.Entities.Item.ItemDetail.ItemMaster>(nameof(Core.Domain.Entities.Item.ItemDetail.ItemMaster.ItemCode)) ?? 50;
             var nameMax = maxLenProvider.GetMaxLength<Core.Domain.Entities.Item.ItemDetail.ItemMaster>(nameof(Core.Domain.Entities.Item.ItemDetail.ItemMaster.ItemName)) ?? 200;
-            var hsnMax = maxLenProvider.GetMaxLength<Core.Domain.Entities.Item.ItemDetail.ItemMaster>(nameof(Core.Domain.Entities.Item.ItemDetail.ItemMaster.HSNCode)) ?? 20;
+            var hsnMax = maxLenProvider.GetMaxLength<Core.Domain.Entities.Item.ItemDetail.ItemMaster>(nameof(Core.Domain.Entities.Item.ItemDetail.ItemMaster.HSNId)) ?? 20;
 
             foreach (var rule in rules)
             {
@@ -41,8 +44,6 @@ namespace InventoryManagement.API.Validation.Item.ItemDetail
                     case "MaxLength":
                         RuleFor(x => x.Payload.ItemCode).MaximumLength(codeMax).WithMessage($"{nameof(CreateItemCommand.Payload.ItemCode)} {rule.Error}");
                         RuleFor(x => x.Payload.ItemName).MaximumLength(nameMax).WithMessage($"{nameof(CreateItemCommand.Payload.ItemName)} {rule.Error}");
-                        RuleFor(x => x.Payload.HSNCode).MaximumLength(hsnMax).When(x => !string.IsNullOrWhiteSpace(x.Payload.HSNCode))
-                            .WithMessage($"{nameof(CreateItemCommand.Payload.HSNCode)} {rule.Error}");
                         break;
 
                     case "AlreadyExists":
@@ -77,6 +78,26 @@ namespace InventoryManagement.API.Validation.Item.ItemDetail
                 .Select(u => u.ConversionUOMId!.Value)
                 .Distinct().Count() == list.Count)
             .WithMessage("Duplicate ConversionUOM not allowed for the same Item.");
+
+
+            RuleFor(x => x.Payload.ItemName)
+                .NotEmpty().MaximumLength(200)
+                // Hard normalized duplicate check (no DB column)
+                .MustAsync(async (name, ct) =>
+                    !(await itemRepo.ExistsByNameSmartForCreateAsync(name, ct)))
+                .WithMessage("An item with a very similar name already exists.");
+             RuleFor(x => x.Payload.ItemName)
+                .MustAsync(async (cmd, name, ct) =>
+                {
+                    var norm = NameSimilarity.Normalize(name);
+                    var candidates = await qryRepo.GetCandidateItemNamesAsync(norm, 200, ct);
+                    var hit = candidates
+                        .Select(c => NameSimilarity.JaroWinkler(norm, NameSimilarity.Normalize(c)))
+                        .OrderByDescending(s => s)
+                        .FirstOrDefault();
+                    return hit < 0.92; // fail when too similar
+                })
+                .WithMessage("This name is highly similar to an existing item. Please choose a more distinct name.");
         }
     }
 }

@@ -24,7 +24,7 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item
             builder.Property(b => b.Id)
                 .HasColumnName("Id")
                 .HasColumnType("int")
-                .IsRequired();
+                .IsRequired();                
 
             builder.Property(ag => ag.UnitId)
                 .HasColumnName("UnitId")

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Core.Domain.Common;
 using Core.Domain.Entities.Budget;
 using Core.Domain.Entities.Item.ItemDetail;
+using Core.Domain.Entities.Item.ItemDetail.Variant;
 
 namespace Core.Domain.Entities
 {
@@ -29,6 +30,8 @@ namespace Core.Domain.Entities
         public ICollection<ItemInventory>? ItemInventoryDefaultMaterialRequestType { get; set; }
         public ICollection<ItemManufacture>? ItemManufactureType { get; set; }
         public ICollection<ItemQuality>? ItemQualityCertificateType { get; set; }
+        public ICollection<ItemVariantValue>? ItemAttribute { get; set; }
+        public ICollection<ItemVariantValue>? ItemAttributeBasedOn { get; set; }
         
     }
 }

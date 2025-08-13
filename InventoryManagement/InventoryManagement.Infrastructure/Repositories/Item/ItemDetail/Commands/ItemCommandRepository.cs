@@ -2,13 +2,14 @@
 using Core.Application.Common.Interfaces.Item.ItemDetail.Commands;
 using Core.Domain.Common;
 using Core.Domain.Entities.Item.ItemDetail;
+using Dapper;
 using InventoryManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Commands
 {
-    public class ItemCommandRepository :ItemLogRepositoryBase, IItemCommandRepository
-    { 
+    public class ItemCommandRepository : ItemLogRepositoryBase, IItemCommandRepository
+    {
         public ItemCommandRepository(ApplicationDbContext db, IExecutionContext ctx) : base(db, ctx) { }
         public async Task<int> CreateAsync(ItemMaster item, CancellationToken ct = default)
         {
@@ -49,18 +50,85 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Comman
 
             AddUpdateLog(nameof(ItemMaster), entity.Id, changes);
         }
-         public async Task<ItemMaster?> GetTrackingAsync(int id, CancellationToken ct = default)
+        public async Task<ItemMaster?> GetTrackingAsync(int id, CancellationToken ct = default)
         {
             return await _db.ItemMaster.FirstOrDefaultAsync(x => x.Id == id, ct);
         }
         public async Task<bool> ExistsByCodeForUpdateAsync(string itemCode, int excludeId, CancellationToken ct = default)
         {
             return await _db.ItemMaster
-                .AnyAsync(x => x.ItemCode == itemCode && x.Id != excludeId  && x.IsDeleted == BaseEntity.IsDelete.NotDeleted, ct);
+                .AnyAsync(x => x.ItemCode == itemCode && x.Id != excludeId, ct);
         }
 
-        public Task<bool> ExistsByCodeForCreateAsync(string itemCode, CancellationToken ct = default)
-        => _db.ItemMaster.AnyAsync(x => x.ItemCode == itemCode && x.IsDeleted == BaseEntity.IsDelete.NotDeleted, ct);
+        public async Task<bool> ExistsByCodeForCreateAsync(string itemCode, CancellationToken ct = default)
+        {
+            return await _db.ItemMaster
+                .AnyAsync(x => x.ItemCode == itemCode
+                               && x.IsDeleted == BaseEntity.IsDelete.NotDeleted, ct);
+        }
+        public async Task<List<int>> GetChildIdsAsync(int templateItemId, CancellationToken ct = default)
+        {
+            return await _db.ItemMaster
+                .Where(x => x.ParentItemId == templateItemId
+                            && x.IsDeleted == BaseEntity.IsDelete.NotDeleted)
+                .Select(x => x.Id)
+                .ToListAsync(ct);
+        }
+        public async Task<bool> UpdateItemImageAsync(int itemId, string imageName, CancellationToken ct = default)
+        {
+            var asset = await _db.ItemMaster.FindAsync(itemId);
+            if (asset == null)
+            {
+                return false;  
+            }
+            asset.ItemImage = imageName;
+            await _db.SaveChangesAsync();
+            return true;
+        }
 
+         public Task<bool> ExistsByNameSmartForCreateAsync(string name, CancellationToken ct = default)
+        {
+            var normInput = NormalizeClient(name);
+            return _db.ItemMaster
+                .Where(x => x.IsDeleted ==BaseEntity.IsDelete.NotDeleted )
+                .AnyAsync(x =>
+                    NormalizeSql(EF.Functions.Collate(x.ItemName, "Latin1_General_CI_AI")) == normInput, ct);
+        }
+
+        public Task<bool> ExistsByNameSmartForUpdateAsync(string name, int excludeId, CancellationToken ct = default)
+        {
+            var normInput = NormalizeClient(name);
+            return _db.ItemMaster
+                .Where(x => x.Id != excludeId && x.IsDeleted == BaseEntity.IsDelete.NotDeleted)
+                .AnyAsync(x =>
+                    NormalizeSql(EF.Functions.Collate(x.ItemName, "Latin1_General_CI_AI")) == normInput, ct);
+        }
+
+        // Inline-translatable: chain .Replace so EF generates SQL REPLACE(...)
+        private static string NormalizeSql(string s) =>
+            s.ToLower()
+             .Replace(" ", "")
+             .Replace("-", "")
+             .Replace("_", "")
+             .Replace(".", "")
+             .Replace("/", "")
+             .Replace("\\", "")
+             .Replace("'", "")
+             .Replace("(", "")
+             .Replace(")", "");
+
+        private static string NormalizeClient(string? s)
+        {
+            s = (s ?? string.Empty).ToLowerInvariant();
+            return s.Replace(" ", "")
+                    .Replace("-", "")
+                    .Replace("_", "")
+                    .Replace(".", "")
+                    .Replace("/", "")
+                    .Replace("\\", "")
+                    .Replace("'", "")
+                    .Replace("(", "")
+                    .Replace(")", "");
+        }    
     }
 }
