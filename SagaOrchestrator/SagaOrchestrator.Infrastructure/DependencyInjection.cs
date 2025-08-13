@@ -3,7 +3,6 @@ using Contracts.Events.Notifications.WorkOrder.Sms;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MongoDB.Driver;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IAssets;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IMaintenance;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IUsers;
@@ -42,13 +41,6 @@ namespace SagaOrchestrator.Infrastructure
                 client.BaseAddress = new Uri("http://192.168.1.126:81");
             });
 
-              // MongoDB Context
-         var mongoConn = configuration.GetConnectionString("MongoDbConnectionString");
-        var mongoDb   = configuration["MongoDb:DatabaseName"];
-
-        services.AddSingleton<IMongoClient>(_ => new MongoClient(mongoConn));
-        services.AddSingleton<IMongoDatabase>(sp => sp.GetRequiredService<IMongoClient>().GetDatabase(mongoDb));
-
             // ✅ Domain Services
             services.AddScoped<UserSagaService>();
             services.AddScoped<AssetSagaService>();
@@ -60,30 +52,10 @@ namespace SagaOrchestrator.Infrastructure
                 x.SetKebabCaseEndpointNameFormatter();
 
                 // ✅ Saga registrations
-                x.AddSagaStateMachine<WorkOrderSchedulerStateMachine, WorkOrderSchedulerState>().MongoDbRepository(r =>
-                {
-                    
-                    r.Connection    = mongoConn;
-                    r.DatabaseName  = mongoDb;
-                    r.CollectionName = "preventive_create_state"; 
-
-                });
-                x.AddSagaStateMachine<PreventiveSchedulerStateMachine, PreventiveSchedulerState>().MongoDbRepository(r =>
-                {
-                    
-                    r.Connection    = mongoConn;
-                    r.DatabaseName  = mongoDb;
-                    r.CollectionName = "preventive_create_state"; 
-
-                });
-                x.AddSagaStateMachine<PreventiveSchedulerUpdateStateMachine, PreventiveUpdateState>().MongoDbRepository(r =>
-                {
-                    
-                    r.Connection    = mongoConn;
-                    r.DatabaseName  = mongoDb;
-                    r.CollectionName = "preventive_update_state"; 
-
-                });
+                x.AddSagaStateMachine<WorkOrderSchedulerStateMachine, WorkOrderSchedulerState>().InMemoryRepository();
+                x.AddSagaStateMachine<PreventiveSchedulerStateMachine, PreventiveSchedulerState>().InMemoryRepository();
+                x.AddSagaStateMachine<PreventiveSchedulerUpdateStateMachine, PreventiveUpdateState>().InMemoryRepository();
+                
 
                 // ✅ Register WorkOrderNotificationState saga and activity
                 x.AddSagaStateMachine<WorkOrderNotificationState, NotificationWorkOrder>()
