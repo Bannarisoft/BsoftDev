@@ -2,7 +2,7 @@ using MassTransit;
 
 namespace SagaOrchestrator.Application.Orchestration.Models
 {
-    public class WorkOrderSchedulerState : SagaStateMachineInstance
+    public class WorkOrderSchedulerState : SagaStateMachineInstance, ISagaVersion
     {
         public Guid CorrelationId { get; set; }
         public int CurrentState { get; set; }
@@ -11,5 +11,6 @@ namespace SagaOrchestrator.Application.Orchestration.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public string? FailureReason { get; set; }
         public string token { get; set; }
+        public int Version { get; set; }
     }
 }
