@@ -7,7 +7,7 @@ using MassTransit;
 
 namespace SagaOrchestrator.Application.Orchestration.Models.PreventiveSchedule
 {
-    public class PreventiveUpdateState : SagaStateMachineInstance, ISagaVersion
+    public class PreventiveUpdateState : SagaStateMachineInstance
     {
         public Guid CorrelationId { get; set; }
         public int CurrentState { get; set; }
@@ -21,6 +21,5 @@ namespace SagaOrchestrator.Application.Orchestration.Models.PreventiveSchedule
         public RollbackHeaderDto rollbackHeaders { get; set; }
         public string token { get; set; }
         public bool isFrequencyChanged { get; set; }
-        public int Version { get; set; }
     }
 }
