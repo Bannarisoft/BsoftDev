@@ -4,7 +4,7 @@
     <ProjectReference Include="..\Core\Core.Domain\Core.Domain.csproj"/>
     <ProjectReference Include="..\..\Shared\Contracts\Contracts.csproj"/>
     <ProjectReference Include="..\..\Shared\Shared.Infrastructure\Shared.Infrastructure.csproj"/>
-    <ProjectReference Include="..\SagaOrchestrator\SagaOrchestrator.csproj" />
+    <!-- <ProjectReference Include="..\SagaOrchestrator\SagaOrchestrator.csproj" /> -->
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3"/>

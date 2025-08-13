@@ -27,6 +27,8 @@ namespace MaintenanceManagement.Infrastructure
             // Configure MassTransit with RabbitMQ
             services.AddMassTransit(x =>
             {
+                x.SetKebabCaseEndpointNameFormatter();
+
                 // Register Consumer
                 x.AddConsumer<ScheduleNextPreventiveTaskConsumer>();
                 x.AddConsumer<RollbackWorkOrderConsumer>();
@@ -83,7 +85,7 @@ namespace MaintenanceManagement.Infrastructure
 
 
                 });
-                services.AddMassTransitHostedService();
+                // services.AddMassTransitHostedService();
             });
             return services;
         }
