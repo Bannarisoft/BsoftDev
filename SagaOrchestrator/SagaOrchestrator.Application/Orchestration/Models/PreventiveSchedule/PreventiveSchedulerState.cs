@@ -6,7 +6,7 @@ using MassTransit;
 
 namespace SagaOrchestrator.Application.Orchestration.Models.PreventiveSchedule
 {
-    public class PreventiveSchedulerState : SagaStateMachineInstance
+    public class PreventiveSchedulerState : SagaStateMachineInstance, ISagaVersion
     {
         public Guid CorrelationId { get; set; }
         public int CurrentState { get; set; }
@@ -27,5 +27,6 @@ namespace SagaOrchestrator.Application.Orchestration.Models.PreventiveSchedule
         public string? FailureReason { get; set; }
         public int UnitId { get; set; }
         public string token { get; set; }
+        public int Version { get; set; }
     }
 }
