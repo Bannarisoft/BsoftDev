@@ -64,7 +64,7 @@ namespace FAM.API.Controllers.AssetMaster
 
                 return Ok(new
                 {
-                    message = response,
+                    message = "Success",
                     statusCode = StatusCodes.Status200OK,
                     data = response
                 });
