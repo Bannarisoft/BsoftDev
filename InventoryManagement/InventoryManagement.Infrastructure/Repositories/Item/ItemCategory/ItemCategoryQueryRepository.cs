@@ -63,14 +63,20 @@ namespace  InventoryManagement.Infrastructure.Repositories.Item.ItemCategory
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ItemCategoryName LIKE @Search )")}};
 
                 SELECT 
-                    IC.Id, IC.ItemCategoryName, IG.Id AS ItemGroupId, IG.ItemGroupName,
-                    IC.IsGroup, IC.ParentCategoryId,
-                    IC1.ItemCategoryName AS ParentCategoryName,
-                    IC.IsBudgetApplicable, IC.IsActive, IC.IsDeleted,
+                IC.Id,
+                    IC.ItemCategoryName,
+                    IG.Id AS ItemGroupId,
+                    IG.ItemGroupName,
+                    IC.IsGroup,
+                    CASE WHEN IC.ParentCategoryId = IC.Id THEN NULL ELSE IC.ParentCategoryId END AS ParentCategoryId,
+                    CASE WHEN IC.ParentCategoryId = IC.Id THEN NULL ELSE IC1.ItemCategoryName END AS ParentCategoryName,
+                    IC.IsBudgetApplicable,
+                    IC.IsActive,
+                    IC.IsDeleted,
                     IC.CreatedBy, IC.CreatedDate, IC.CreatedByName, IC.CreatedIP,
                     IC.ModifiedBy, IC.ModifiedDate, IC.ModifiedByName, IC.ModifiedIP
                 FROM Inventory.ItemCategory IC
-                INNER JOIN Inventory.ItemGroup IG ON IG.Id = IC.ItemGroupId
+                JOIN Inventory.ItemGroup IG ON IG.Id = IC.ItemGroupId
                 LEFT JOIN Inventory.ItemCategory IC1 ON IC.ParentCategoryId = IC1.Id
                 WHERE IC.IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (IC.ItemCategoryName LIKE @Search )")}}
@@ -90,23 +96,31 @@ namespace  InventoryManagement.Infrastructure.Repositories.Item.ItemCategory
                 var flatList = (await result.ReadAsync<ItemCategoryDto>()).ToList();
                 int totalCount = await result.ReadFirstAsync<int>();
 
-                // Build hierarchy
-                var lookup = flatList.ToDictionary(x => x.Id);
+                var ids = flatList.Select(x => x.Id).ToHashSet();
                 foreach (var node in flatList)
                 {
-                    if (node.ParentCategoryId.HasValue && lookup.ContainsKey(node.ParentCategoryId.Value))
-                    {
-                        var parent = lookup[node.ParentCategoryId.Value];
-                        parent.SubGroups.Add(node);
-                    }
+                    if (!node.ParentCategoryId.HasValue || node.ParentCategoryId == node.Id || !ids.Contains(node.ParentCategoryId.Value))
+                        node.ParentCategoryId = null;
                 }
 
-                // Return only root-level nodes (where ParentCategoryId == null)
-                var rootCategories = flatList
-                    .Where(x => x.ParentCategoryId == null)
+                // Build hierarchy
+                var byId = flatList.ToDictionary(x => x.Id);
+                foreach (var node in flatList)
+                {
+                    if (node.ParentCategoryId is int pid && byId.TryGetValue(pid, out var parent) && parent.Id != node.Id)
+                        parent.SubGroups.Add(node);
+                }
+
+                // Only roots (ParentCategoryId == null)
+                var roots = flatList.Where(x => x.ParentCategoryId == null).OrderBy(x => x.Id);
+
+                // IMPORTANT: paginate at the root level (children come with each root)
+                var pagedRoots = roots
+                    .Skip((PageNumber - 1) * PageSize)
+                    .Take(PageSize)
                     .ToList();
 
-                return (rootCategories, totalCount);
+                return (pagedRoots, totalCount);
         }
         public async Task<bool> SoftDeleteValidation(int Id)
         {

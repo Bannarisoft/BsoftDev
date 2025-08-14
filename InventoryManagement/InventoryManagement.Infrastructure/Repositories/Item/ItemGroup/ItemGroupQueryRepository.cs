@@ -29,7 +29,7 @@ namespace  InventoryManagement.Infrastructure.Repositories.Item.ItemGroup
             SELECT @TotalCount = COUNT(*) 
             FROM Inventory.ItemGroup 
             WHERE IsDeleted = 0
-            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ModuleName LIKE @Search)")}};
+            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ItemGroupName LIKE @Search)")}};
 
             SELECT 
                 Id,ItemGroupCode, ItemGroupName,UnitId 
