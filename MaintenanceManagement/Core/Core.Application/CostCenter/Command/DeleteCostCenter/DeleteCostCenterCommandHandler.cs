@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.Exceptions;
-using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.ICostCenter;
 using Core.Domain.Events;
 using MediatR;

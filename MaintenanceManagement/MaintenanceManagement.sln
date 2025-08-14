@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MaintenanceManagement.API",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MaintenanceManagement.Infrastructure", "MaintenanceManagement.Infrastructure\MaintenanceManagement.Infrastructure.csproj", "{49056495-CD14-4E4C-9BB5-6599B390DDFC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MaintenanceManagement.Tests", "MaintenanceManagement.Tests\MaintenanceManagement.Tests.csproj", "{6D78027D-E7D9-4288-A7A9-6F3209CA9633}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,10 @@ Global
 		{49056495-CD14-4E4C-9BB5-6599B390DDFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{49056495-CD14-4E4C-9BB5-6599B390DDFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{49056495-CD14-4E4C-9BB5-6599B390DDFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D78027D-E7D9-4288-A7A9-6F3209CA9633}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D78027D-E7D9-4288-A7A9-6F3209CA9633}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D78027D-E7D9-4288-A7A9-6F3209CA9633}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D78027D-E7D9-4288-A7A9-6F3209CA9633}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{AD4C12FD-B611-4F0E-BC10-93CF7533ADD2} = {A029F20A-D60F-466E-A693-31A5F3F7BD52}
