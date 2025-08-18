@@ -71,10 +71,10 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequest
                 dataQuery,
                 (approvalReq, detail, status, workFlow) =>
                 {
-                    approvalReq.ApprovalStepDetail = new ApprovalStepDetail
-                    {
-                        TargetTypeId = detail.TargetTypeId
-                    };
+                    // approvalReq.ApprovalStepDetail = new ApprovalStepDetail
+                    // {
+                    //     TargetTypeId = detail.TargetTypeId
+                    // };
                     approvalReq.Status = new Domain.Entities.Notification.MiscMaster
                     {
                         Code = status.Code

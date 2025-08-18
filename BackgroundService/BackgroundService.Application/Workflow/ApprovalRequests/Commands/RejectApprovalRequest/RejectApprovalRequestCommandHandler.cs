@@ -43,7 +43,8 @@ namespace BackgroundService.Application.Workflow.ApprovalRequests.Commands.Rejec
                 ModifiedIP = currentIp,
                 ModifiedDate = currentTime,
                 ModifiedBy = userId,
-                ModifiedByName = username
+                ModifiedByName = username,
+                Action = "test"
             };
             var result = await _approvalRequestCommand.Approve(ApprovalReq);
 

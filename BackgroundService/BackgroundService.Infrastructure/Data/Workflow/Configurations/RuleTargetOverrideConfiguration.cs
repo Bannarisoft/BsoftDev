@@ -10,11 +10,11 @@ using static BackgroundService.Domain.Common.BaseEntity;
 
 namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
 {
-    public class ApprovalRuleConfiguration : IEntityTypeConfiguration<ApprovalRule>
+    public class RuleTargetOverrideConfiguration : IEntityTypeConfiguration<RuleTargetOverride>
     {
-        public void Configure(EntityTypeBuilder<ApprovalRule> builder)
+        public void Configure(EntityTypeBuilder<RuleTargetOverride> builder)
         {
-            var isActiveConverter = new ValueConverter<Status, bool>
+                 var isActiveConverter = new ValueConverter<Status, bool>
           (
                v => v == Status.Active,
                v => v ? Status.Active : Status.Inactive
@@ -26,7 +26,7 @@ namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
              v => v ? IsDelete.Deleted : IsDelete.NotDeleted
             );
 
-            builder.ToTable("ApprovalRule", "AppData");
+            builder.ToTable("RuleTargetOverride", "AppData");
 
             builder.HasKey(t => t.Id);
             builder.Property(t => t.Id)
@@ -34,41 +34,21 @@ namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
                 .HasColumnType("int")
                 .IsRequired();
 
-            builder.Property(t => t.ApprovalStepId)
-            .HasColumnName("ApprovalStepId")
+            builder.Property(t => t.RuleId)
+            .HasColumnName("RuleId")
             .HasColumnType("int")
             .IsRequired();
 
-            builder.Property(t => t.Priority)
-            .HasColumnName("Priority")
-            .HasColumnType("int")
+            builder.Property(t => t.Binding)
+            .HasColumnName("Binding")
+            .HasColumnType("nvarchar(10)")
             .IsRequired();
 
-            builder.Property(t => t.Action)
-            .HasColumnName("Action")
-            .HasColumnType("varchar(50)")
+            builder.Property(t => t.Value)
+            .HasColumnName("Value")
+            .HasColumnType("nvarchar(200)")
             .IsRequired();
 
-            builder.Property(t => t.UnitId)
-           .HasColumnName("UnitId")
-           .HasColumnType("int")
-           .IsRequired();
-
-            builder.Property(t => t.WorkflowTypeId)
-            .HasColumnName("WorkflowTypeId")
-            .HasColumnType("int")
-            .IsRequired();
-
-
-            builder.Property(t => t.EffectiveFrom)
-            .HasColumnName("EffectiveFrom")
-            .HasColumnType("date")
-            .IsRequired(true);
-
-            builder.Property(t => t.EffectiveTo)
-           .HasColumnName("EffectiveTo")
-           .HasColumnType("date")
-           .IsRequired(true);
 
             builder.Property(cf => cf.IsActive)
             .HasColumnName("IsActive")
@@ -96,14 +76,10 @@ namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
             builder.Property(cf => cf.ModifiedIP)
                 .HasColumnType("varchar(255)");
 
-            builder.HasOne(ac => ac.WorkflowType)
-      .WithMany(am => am.ApprovalRules)
-      .HasForeignKey(ac => ac.WorkflowTypeId)
-      .OnDelete(DeleteBehavior.NoAction);
           
-           builder.HasOne(ac => ac.ApprovalStep)
-          .WithMany(am => am.ApprovalRules)
-          .HasForeignKey(ac => ac.ApprovalStepId)
+           builder.HasOne(ac => ac.Rule)
+          .WithMany(am => am.RuleTargetOverride)
+          .HasForeignKey(ac => ac.RuleId)
           .OnDelete(DeleteBehavior.NoAction);
         }
     }

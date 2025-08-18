@@ -11,7 +11,7 @@ using Dapper;
 
 namespace PurchaseManagement.Infrastructure.Repositories.PurchaseIndents
 {
-    public class PurchaseIndentQueryRepository : IPurchaseIndentQuery
+    public class PurchaseIndentQueryRepository : IPurchaseIndentQuery,IPurchaseIndentGrpcQuery
     {
         private readonly IDbConnection _dbConnection;
         private readonly IIPAddressService _ipAddressService;
@@ -131,6 +131,62 @@ namespace PurchaseManagement.Infrastructure.Repositories.PurchaseIndents
                 IH.UnitId,
                 IH.Purpose,
                 IH.IsActive,
+                ID.Id,ID.IndentHeaderId,ID.ItemId,
+                ID.QuantityRequired,ID.RequiredDate,ID.TotalEstimatedCost,ID.PRConsumptionDays,ID.Remark,ID.IsActive,
+                IDM.Id,IDM.IndentHeaderId,IDM.DepartmentId
+            FROM [Purchase].[IndentHeader] IH
+            INNER JOIN [Purchase].[IndentDetail] ID on ID.IndentHeaderId=IH.Id
+            INNER JOIN [Purchase].[IndentDepartmentMapping] IDM on IDM.IndentHeaderId=IH.Id
+            WHERE IH.IsDeleted = 0 
+              AND IH.IsActive = 1 AND IH.Id = @Id;";
+
+              var IndentDictionary = new Dictionary<int, IndentHeader>();
+
+            var IndentResponse = await _dbConnection.QueryAsync<IndentHeader, IndentDetail,IndentDepartmentMapping, IndentHeader>(
+                query,
+                (indentHeader, indentDetail,indentDepart) =>
+                {
+                    if (!IndentDictionary.TryGetValue(indentHeader.Id, out var existingIndentHeader))
+                    {
+                        existingIndentHeader = indentHeader;
+                        existingIndentHeader.IndentDetails = new List<IndentDetail>();
+                        existingIndentHeader.IndentDepartmentMappings = new List<IndentDepartmentMapping>();
+                        IndentDictionary[indentHeader.Id] = existingIndentHeader;
+                    }
+                     if (!existingIndentHeader.IndentDetails!
+                        .Any(a => a.Id == indentDetail.Id))
+                    {
+                        existingIndentHeader.IndentDetails.Add(indentDetail);
+                    }
+
+                    if (!existingIndentHeader.IndentDepartmentMappings!
+                        .Any(a => a.Id == indentDepart.Id))
+                    {
+                        existingIndentHeader.IndentDepartmentMappings.Add(indentDepart);
+                    }
+
+                   
+
+                    return existingIndentHeader;
+                },
+                new { id },
+                splitOn: "Id,Id"
+                );
+
+            return IndentResponse.FirstOrDefault()!;
+        }
+
+        public async Task<IndentHeader> GetByIdGrpcAsync(int id)
+        {
+             const string query = @"
+                SELECT 
+                IH.Id, 
+                IH.IndentNumber,
+                IH.IndentDate,
+                IH.IndentTypeId,
+                IH.UnitId,
+                IH.Purpose,
+                IH.CreatedBy,IH.CreatedDate,
                 ID.Id,ID.IndentHeaderId,ID.ItemId,
                 ID.QuantityRequired,ID.RequiredDate,ID.TotalEstimatedCost,ID.PRConsumptionDays,ID.Remark,ID.IsActive,
                 IDM.Id,IDM.IndentHeaderId,IDM.DepartmentId

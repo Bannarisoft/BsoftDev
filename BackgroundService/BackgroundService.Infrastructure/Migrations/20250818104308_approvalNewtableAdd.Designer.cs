@@ -4,6 +4,7 @@ using BackgroundService.Infrastructure.Data.Notification;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackgroundService.Infrastructure.Migrations
 {
     [DbContext(typeof(NotificationDbContext))]
-    partial class NotificationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250818104308_approvalNewtableAdd")]
+    partial class approvalNewtableAdd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -657,8 +660,7 @@ namespace BackgroundService.Infrastructure.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
@@ -666,59 +668,51 @@ namespace BackgroundService.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset?>("CreatedDate")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FieldKey")
                         .IsRequired()
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("FieldKey");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsActive");
+                    b.Property<int>("IsActive")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsDeleted");
+                    b.Property<int>("IsDeleted")
+                        .HasColumnType("int");
 
                     b.Property<string>("JsonPath")
                         .IsRequired()
-                        .HasColumnType("nvarchar(200)")
-                        .HasColumnName("JsonPath");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("ModifiedBy")
                         .HasColumnType("int");
 
                     b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset?>("ModifiedDate")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Scope")
                         .IsRequired()
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("Scope");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ValueType")
                         .IsRequired()
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("ValueType");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("ApprovalDataField", "AppData");
+                    b.ToTable("ApprovalDataField");
                 });
 
             modelBuilder.Entity("BackgroundService.Domain.Entities.Workflow.ApprovalDocument", b =>
@@ -910,9 +904,9 @@ namespace BackgroundService.Infrastructure.Migrations
                         .HasColumnType("varchar(50)")
                         .HasColumnName("Action");
 
-                    b.Property<int>("ApprovalStepId")
+                    b.Property<int>("ApprovalDetailId")
                         .HasColumnType("int")
-                        .HasColumnName("ApprovalStepId");
+                        .HasColumnName("ApprovalDetailId");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
@@ -970,7 +964,7 @@ namespace BackgroundService.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApprovalStepId");
+                    b.HasIndex("ApprovalDetailId");
 
                     b.HasIndex("WorkflowTypeId");
 
@@ -1166,9 +1160,9 @@ namespace BackgroundService.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ApprovalStepId")
+                    b.Property<int>("ApprovalStepDetailId")
                         .HasColumnType("int")
-                        .HasColumnName("ApprovalStepId");
+                        .HasColumnName("ApprovalStepDetailId");
 
                     b.Property<string>("Binding")
                         .IsRequired()
@@ -1216,7 +1210,7 @@ namespace BackgroundService.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApprovalStepId");
+                    b.HasIndex("ApprovalStepDetailId");
 
                     b.ToTable("ApprovalTarget", "AppData");
                 });
@@ -1549,9 +1543,9 @@ namespace BackgroundService.Infrastructure.Migrations
 
             modelBuilder.Entity("BackgroundService.Domain.Entities.Workflow.ApprovalRule", b =>
                 {
-                    b.HasOne("BackgroundService.Domain.Entities.Notification.MiscMaster", "ApprovalStep")
+                    b.HasOne("BackgroundService.Domain.Entities.Workflow.ApprovalStepDetail", "ApprovalStepDetail")
                         .WithMany("ApprovalRules")
-                        .HasForeignKey("ApprovalStepId")
+                        .HasForeignKey("ApprovalDetailId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
@@ -1561,7 +1555,7 @@ namespace BackgroundService.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("ApprovalStep");
+                    b.Navigation("ApprovalStepDetail");
 
                     b.Navigation("WorkflowType");
                 });
@@ -1621,13 +1615,13 @@ namespace BackgroundService.Infrastructure.Migrations
 
             modelBuilder.Entity("BackgroundService.Domain.Entities.Workflow.ApprovalTarget", b =>
                 {
-                    b.HasOne("BackgroundService.Domain.Entities.Notification.MiscMaster", "ApprovalStep")
+                    b.HasOne("BackgroundService.Domain.Entities.Workflow.ApprovalStepDetail", "ApprovalStepDetail")
                         .WithMany("ApprovalTargets")
-                        .HasForeignKey("ApprovalStepId")
+                        .HasForeignKey("ApprovalStepDetailId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("ApprovalStep");
+                    b.Navigation("ApprovalStepDetail");
                 });
 
             modelBuilder.Entity("BackgroundService.Domain.Entities.Workflow.RuleTargetOverride", b =>
@@ -1647,11 +1641,7 @@ namespace BackgroundService.Infrastructure.Migrations
 
                     b.Navigation("ApprovalRequestStatus");
 
-                    b.Navigation("ApprovalRules");
-
                     b.Navigation("ApprovalStep");
-
-                    b.Navigation("ApprovalTargets");
 
                     b.Navigation("ApprovalType");
 
@@ -1729,7 +1719,11 @@ namespace BackgroundService.Infrastructure.Migrations
                 {
                     b.Navigation("ApprovalRequest");
 
+                    b.Navigation("ApprovalRules");
+
                     b.Navigation("ApprovalStepUnitMappings");
+
+                    b.Navigation("ApprovalTargets");
                 });
 
             modelBuilder.Entity("BackgroundService.Domain.Entities.Workflow.WorkflowType", b =>

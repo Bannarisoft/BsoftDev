@@ -60,6 +60,11 @@ namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
            .HasColumnType("int")
            .IsRequired();
 
+           builder.Property(t => t.Action)
+           .HasColumnName("Action")
+           .HasColumnType("Varchar(50)")
+           .IsRequired(true);
+
            builder.Property(t => t.Remark)
            .HasColumnName("Remark")
            .HasColumnType("Varchar(max)")

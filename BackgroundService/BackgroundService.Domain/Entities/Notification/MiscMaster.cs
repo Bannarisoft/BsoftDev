@@ -26,5 +26,7 @@ namespace BackgroundService.Domain.Entities.Notification
         public ICollection<ApprovalStepDetail> ApprovalStep { get; set; }
         public ICollection<ApprovalStepDetail> ApprovalType { get; set; }
         public ICollection<ApprovalRequest> ApprovalRequestStatus { get; set; }
+        public ICollection<ApprovalRule> ApprovalRules { get; set; }
+        public ICollection<ApprovalTarget> ApprovalTargets { get; set; }
     }
 }

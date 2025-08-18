@@ -9,13 +9,18 @@ namespace BackgroundService.Domain.Entities.Workflow
 {
     public class ApprovalRule : BaseEntity
     {
-        public required string ConditionKey { get; set; }
-        public required string Operator { get; set; }
-        public required string Value { get; set; }
+
+        public int WorkflowTypeId { get; set; }
+        public int ApprovalStepId { get; set; }
+        public int Priority { get; set; }
         public string? Action { get; set; }
         public int UnitId { get; set; }
-        public int WorkflowTypeId { get; set; }
+        public DateOnly EffectiveFrom { get; set; }
+        public DateOnly EffectiveTo { get; set; }
         public WorkflowType WorkflowType { get; set; }
         public ICollection<ApprovalRequest> ApprovalRequest { get; set; }
+        public MiscMaster ApprovalStep { get; set; }
+        public ICollection<ApprovalRuleCondition> Conditions { get; set; }
+        public ICollection<RuleTargetOverride> RuleTargetOverride { get; set; }
     }
 }

@@ -40,35 +40,35 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalStepDet
         {
              var existingApprovalStep = await _notificationDbContext.ApprovalStepDetail
               .Include(cf => cf.ApprovalStepUnitMappings)
-            .Include(cf => cf.RuleSkipApproverMappings)
-            .Include(cf => cf.ApprovalStepDepartmentMappings)
+            // .Include(cf => cf.RuleSkipApproverMappings)
+            // .Include(cf => cf.ApprovalStepDepartmentMappings)
             .FirstOrDefaultAsync(u => u.Id == approvalStepDetail.Id);
             
             if (existingApprovalStep != null)
             {
                  _notificationDbContext.ApprovalStepUnitMapping.RemoveRange(existingApprovalStep.ApprovalStepUnitMappings);
 
-               _notificationDbContext.RuleSkipApproverMapping.RemoveRange(existingApprovalStep.RuleSkipApproverMappings);
-               _notificationDbContext.ApprovalStepDepartmentMapping.RemoveRange(existingApprovalStep.ApprovalStepDepartmentMappings);
+            //    _notificationDbContext.RuleSkipApproverMapping.RemoveRange(existingApprovalStep.RuleSkipApproverMappings);
+            //    _notificationDbContext.ApprovalStepDepartmentMapping.RemoveRange(existingApprovalStep.ApprovalStepDepartmentMappings);
 
                 existingApprovalStep.WorkFlowTypeId = approvalStepDetail.WorkFlowTypeId;
                 existingApprovalStep.StepOrder = approvalStepDetail.StepOrder;
-                existingApprovalStep.TargetTypeId = approvalStepDetail.TargetTypeId;
+                // existingApprovalStep.TargetTypeId = approvalStepDetail.TargetTypeId;
                 existingApprovalStep.ApprovalStepId = approvalStepDetail.ApprovalStepId;
-                existingApprovalStep.ApprovalTypeId = approvalStepDetail.ApprovalTypeId;
-                existingApprovalStep.SLAHours = approvalStepDetail.SLAHours;
-                existingApprovalStep.ApprovalTypeId = approvalStepDetail.ApprovalTypeId;
-                existingApprovalStep.OnSLAAction = approvalStepDetail.OnSLAAction;
+                // existingApprovalStep.ApprovalTypeId = approvalStepDetail.ApprovalTypeId;
+                // existingApprovalStep.SLAHours = approvalStepDetail.SLAHours;
+                // existingApprovalStep.ApprovalTypeId = approvalStepDetail.ApprovalTypeId;
+                // existingApprovalStep.OnSLAAction = approvalStepDetail.OnSLAAction;
                 existingApprovalStep.IsActive = approvalStepDetail.IsActive;
                 
                 if (approvalStepDetail.ApprovalStepUnitMappings?.Any() == true)
                    await _notificationDbContext.ApprovalStepUnitMapping.AddRangeAsync(approvalStepDetail.ApprovalStepUnitMappings);
 
-               if (approvalStepDetail.RuleSkipApproverMappings?.Any() == true)
-                   await _notificationDbContext.RuleSkipApproverMapping.AddRangeAsync(approvalStepDetail.RuleSkipApproverMappings);
+            //    if (approvalStepDetail.RuleSkipApproverMappings?.Any() == true)
+            //        await _notificationDbContext.RuleSkipApproverMapping.AddRangeAsync(approvalStepDetail.RuleSkipApproverMappings);
 
-                if (approvalStepDetail.ApprovalStepDepartmentMappings?.Any() == true)
-                   await _notificationDbContext.ApprovalStepDepartmentMapping.AddRangeAsync(approvalStepDetail.ApprovalStepDepartmentMappings);
+            //     if (approvalStepDetail.ApprovalStepDepartmentMappings?.Any() == true)
+            //        await _notificationDbContext.ApprovalStepDepartmentMapping.AddRangeAsync(approvalStepDetail.ApprovalStepDepartmentMappings);
 
                 return await _notificationDbContext.SaveChangesAsync() > 0;
             }

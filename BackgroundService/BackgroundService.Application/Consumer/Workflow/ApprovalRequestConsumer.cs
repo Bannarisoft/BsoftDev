@@ -48,11 +48,12 @@ namespace BackgroundService.Application.Consumer.Workflow
                 {
                     WorkflowTypeId = WorkflowType.Id,
                     ModuleTransactionId = context.Message.ModuleTransactionId,
-                    ApprovalStepDetailId = id, 
+                    ApprovalStepDetailId = id,
                     StatusId = status.Id,
                     RequestedDate = DateTimeOffset.Now,
                     UnitId = context.Message.UnitId,
-                    DepartmentId = context.Message.DepartmentId
+                    DepartmentId = context.Message.DepartmentId,
+                    Action ="test"
                 });
             }
 

@@ -10,9 +10,9 @@ using static BackgroundService.Domain.Common.BaseEntity;
 
 namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
 {
-    public class ApprovalRuleConfiguration : IEntityTypeConfiguration<ApprovalRule>
+    public class ApprovalRuleConditionConfiguration : IEntityTypeConfiguration<ApprovalRuleCondition>
     {
-        public void Configure(EntityTypeBuilder<ApprovalRule> builder)
+        public void Configure(EntityTypeBuilder<ApprovalRuleCondition> builder)
         {
             var isActiveConverter = new ValueConverter<Status, bool>
           (
@@ -26,7 +26,7 @@ namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
              v => v ? IsDelete.Deleted : IsDelete.NotDeleted
             );
 
-            builder.ToTable("ApprovalRule", "AppData");
+            builder.ToTable("ApprovalRuleCondition", "AppData");
 
             builder.HasKey(t => t.Id);
             builder.Property(t => t.Id)
@@ -34,41 +34,41 @@ namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
                 .HasColumnType("int")
                 .IsRequired();
 
-            builder.Property(t => t.ApprovalStepId)
-            .HasColumnName("ApprovalStepId")
+            builder.Property(t => t.RuleId)
+            .HasColumnName("RuleId")
             .HasColumnType("int")
             .IsRequired();
 
-            builder.Property(t => t.Priority)
-            .HasColumnName("Priority")
+            builder.Property(t => t.GroupKey)
+            .HasColumnName("GroupKey")
             .HasColumnType("int")
             .IsRequired();
 
-            builder.Property(t => t.Action)
-            .HasColumnName("Action")
-            .HasColumnType("varchar(50)")
-            .IsRequired();
-
-            builder.Property(t => t.UnitId)
-           .HasColumnName("UnitId")
-           .HasColumnType("int")
-           .IsRequired();
-
-            builder.Property(t => t.WorkflowTypeId)
-            .HasColumnName("WorkflowTypeId")
+            builder.Property(t => t.FieldId)
+            .HasColumnName("FieldId")
             .HasColumnType("int")
             .IsRequired();
 
+            builder.Property(t => t.Operator)
+           .HasColumnName("Operator")
+           .HasColumnType("nvarchar(10)")
+           .IsRequired(true);
 
-            builder.Property(t => t.EffectiveFrom)
-            .HasColumnName("EffectiveFrom")
-            .HasColumnType("date")
+            builder.Property(t => t.RightType)
+            .HasColumnName("RightType")
+            .HasColumnType("nvarchar(10)")
+            .IsRequired();
+
+
+            builder.Property(t => t.RightValue)
+            .HasColumnName("RightValue")
+            .HasColumnType("nvarchar(400)")
             .IsRequired(true);
 
-            builder.Property(t => t.EffectiveTo)
-           .HasColumnName("EffectiveTo")
-           .HasColumnType("date")
-           .IsRequired(true);
+            builder.Property(t => t.Aggregate)
+           .HasColumnName("Aggregate")
+           .HasColumnType("nvarchar(10)")
+           .IsRequired(false);
 
             builder.Property(cf => cf.IsActive)
             .HasColumnName("IsActive")
@@ -96,14 +96,14 @@ namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
             builder.Property(cf => cf.ModifiedIP)
                 .HasColumnType("varchar(255)");
 
-            builder.HasOne(ac => ac.WorkflowType)
-      .WithMany(am => am.ApprovalRules)
-      .HasForeignKey(ac => ac.WorkflowTypeId)
+            builder.HasOne(ac => ac.Rule)
+      .WithMany(am => am.Conditions)
+      .HasForeignKey(ac => ac.RuleId)
       .OnDelete(DeleteBehavior.NoAction);
           
-           builder.HasOne(ac => ac.ApprovalStep)
-          .WithMany(am => am.ApprovalRules)
-          .HasForeignKey(ac => ac.ApprovalStepId)
+           builder.HasOne(ac => ac.Field)
+          .WithMany(am => am.Conditions)
+          .HasForeignKey(ac => ac.FieldId)
           .OnDelete(DeleteBehavior.NoAction);
         }
     }
