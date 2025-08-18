@@ -1,0 +1,37 @@
+namespace Core.Domain.Entities.Item.ItemDetail
+{
+    public class ItemInventory
+    {
+        public int Id { get; set; }
+        public int ItemId { get; set; }
+        public ItemMaster Item { get; set; } = null!;   // 1:1 required to ItemMaster
+
+        public decimal? Weight { get; set; }
+
+        public int? WeightUomId { get; set; }
+        public UOM? WeightUOM { get; set; }             // ← nullable nav matches nullable FK
+
+        public int? DefaultMaterialRequestTypeId { get; set; }
+        public MiscMaster? MiscDefaultMaterialRequestType { get; set; }  // ← nullable
+
+        public int? ValuationMethodId { get; set; }
+        public MiscMaster? MiscValuationMethod { get; set; }             // ← nullable
+
+        public int? ShelfLife { get; set; }
+        public decimal? UpperTolerance { get; set; }
+        public decimal? LowerTolerance { get; set; }
+
+        public string? BatchNumberSeries { get; set; }
+        public string? SerialNumberSeries { get; set; }
+
+        public int? ReorderLevel { get; set; }
+        public int? ReorderQty { get; set; }
+
+        public int? RequestTypeId { get; set; }
+        public MiscMaster? MiscRequestType { get; set; }                 // ← nullable
+
+        public bool AllowNegativeStock { get; set; }
+        public bool BatchManagement { get; set; }
+        public bool ApplyBatchNumber { get; set; }
+    }
+}

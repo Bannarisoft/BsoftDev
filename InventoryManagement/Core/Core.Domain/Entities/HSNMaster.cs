@@ -3,17 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Domain.Common;
+using Core.Domain.Entities.Item.ItemDetail;
 
 namespace Core.Domain.Entities
 {
-    public class HSNMaster: BaseEntity
+    public class HSNMaster : BaseEntity
     {
-        public int TypeId { get; set; } 
-        public MiscMaster? Type { get; set; }        
-        public string? HSNCode { get; set; }      
-        public string? Description { get; set; }  
-        public int GSTCategoryId { get; set; } 
-        public MiscMaster? GstCategory { get; set; }  
+        public int TypeId { get; set; }
+        public MiscMaster? Type { get; set; }
+        public string? HSNCode { get; set; }
+        public string? Description { get; set; }
+        public int GSTCategoryId { get; set; }
+        public MiscMaster? GstCategory { get; set; }
         private decimal _gstPercentage;
         public decimal GSTPercentage
         {
@@ -27,7 +28,8 @@ namespace Core.Domain.Entities
         }
         public decimal CGSTPercentage { get; private set; }
         public decimal SGSTPercentage { get; private set; }
-        public decimal IGSTPercentage { get; set; }     
+        public decimal IGSTPercentage { get; set; }
         public DateTimeOffset ValidFrom { get; set; } 
+        public ICollection<ItemMaster>? ItemMasterHSN { get; set; } 
     }
 }
