@@ -4,7 +4,7 @@ namespace Core.Application.Common.Interfaces.Item.ItemDetail.Commands
 {
     public interface IItemManufactureCommandRepository
     {
-        Task UpdateAsync(int itemId, IEnumerable<ItemManufactureDto> rows, CancellationToken ct = default);
-        Task<List<ItemManufactureDto>> GetByItemIdAsync(int itemId, CancellationToken ct = default);
+        Task<IReadOnlyList<Core.Domain.Entities.Item.ItemDetail.ItemManufacture>> GetByItemIdAsync(int itemId, CancellationToken ct);
+        Task UpdateAsync(int itemId, IReadOnlyCollection<ItemManufactureDto> rows, CancellationToken ct);
     }
 }

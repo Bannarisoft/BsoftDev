@@ -1,78 +1,151 @@
+using System.Globalization;
 using System.Reflection;
-using System.Text.Json;
-using Core.Application.Common.Interfaces.Item.ItemDetail.Commands;
-using Core.Domain.Entities.Item.ItemDetail;
+using Core.Application.Common.Interfaces;
 using InventoryManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 public abstract class ItemLogRepositoryBase
 {
     protected readonly ApplicationDbContext _db;
-    protected readonly IExecutionContext _ctx;
+    private readonly IIPAddressService _ipAddressService;
 
-    protected ItemLogRepositoryBase(ApplicationDbContext db, IExecutionContext ctx)
+    public record PropertyChange(string Property, string? OldValue, string? NewValue);
+
+    // Properties we don't want to log (keys/audit/rowversion etc.)
+    private static readonly HashSet<string> IgnoredProps = new(StringComparer.OrdinalIgnoreCase)
     {
-        _db = db; _ctx = ctx;
+        "Id", "ItemId",
+        "CreatedBy", "CreatedByName", "CreatedDate", "CreatedIP",
+        "ModifiedBy", "ModifiedByName", "ModifiedDate", "ModifiedIP",
+        "RowVersion", "Timestamp"
+    };
+   
+    protected ItemLogRepositoryBase(ApplicationDbContext db, IIPAddressService ipAddressService)
+    {
+        _db = db;_ipAddressService = ipAddressService;
     }
 
-    // properties we never log (navs, audit columns, keys you don't change)
-    private static readonly HashSet<string> IgnoreProps = new(StringComparer.OrdinalIgnoreCase)
+    // ---------- value formatting helpers ----------
+    private static string? ToValueString(object? value)
     {
-        "Id","ItemId",
-        "Item","ParentItem","ChildItems","VariantValues","VariantDefs",
-        "CreatedBy","CreatedByName","CreatedIP","CreatedDate",
-        "ModifiedBy","ModifiedByName","ModifiedIP","ModifiedDate",
-        "IsDeleted"
-    };
+        if (value is null) return null;
 
-    protected sealed record PropertyChange(string Property, object? Old, object? New);
+        switch (value)
+        {
+            case DateTime dt:
+                return dt.ToString("yyyy-MM-dd HH:mm:ss.fffffff zzz", CultureInfo.InvariantCulture);
+            case DateTimeOffset dto:
+                return dto.ToString("yyyy-MM-dd HH:mm:ss.fffffff zzz", CultureInfo.InvariantCulture);
+            case decimal dec:
+                return dec.ToString(CultureInfo.InvariantCulture);
+            case double d:
+                return d.ToString(CultureInfo.InvariantCulture);
+            case float f:
+                return f.ToString(CultureInfo.InvariantCulture);
+            case bool b:
+                return b ? "true" : "false";
+            case Enum e:
+                return e.ToString(); // by name
+            default:
+                return Convert.ToString(value, CultureInfo.InvariantCulture);
+        }
+    }
 
-    protected List<PropertyChange> GetModifiedProps<TEntity>(EntityEntry<TEntity> entry)
-        where TEntity : class
+    private static bool IsIgnored(string propName) => IgnoredProps.Contains(propName);
+
+    // ---------- diff helpers ----------
+    protected List<PropertyChange> GetModifiedProps(EntityEntry entry)
     {
-        var list = new List<PropertyChange>();
+        var changes = new List<PropertyChange>();
+
         foreach (var p in entry.Properties)
         {
-            if (!p.IsModified || IgnoreProps.Contains(p.Metadata.Name)) continue;
-            var oldVal = p.OriginalValue;
-            var newVal = p.CurrentValue;
-            if (Equals(oldVal, newVal)) continue;
-            list.Add(new PropertyChange(p.Metadata.Name, oldVal, newVal));
+            // Only consider props EF marked as modified and that we don't ignore
+            if (!p.IsModified) continue;
+            if (IsIgnored(p.Metadata.Name)) continue;
+
+            var oldVal = ToValueString(p.OriginalValue);
+            var newVal = ToValueString(p.CurrentValue);
+
+            if (!string.Equals(oldVal, newVal, StringComparison.Ordinal))
+                changes.Add(new PropertyChange(p.Metadata.Name, oldVal, newVal));
         }
-        return list;
+
+        return changes;
     }
 
-    // Detached case: compute diffs by reflection (original vs updated)
-    protected static List<PropertyChange> DiffByReflection<TEntity>(TEntity original, TEntity updated)
+    /// <summary>
+    /// Use this when you had to attach/replace a detached entity (AsNoTracking retrieval).
+    /// </summary>
+    protected List<PropertyChange> DiffByReflection<T>(T original, T updated)
     {
-        var list = new List<PropertyChange>();
-        var props = typeof(TEntity).GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(p => p.CanRead && p.CanWrite && !IgnoreProps.Contains(p.Name));
+        var changes = new List<PropertyChange>();
+        if (original is null || updated is null) return changes;
+
+        var props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
         foreach (var pi in props)
         {
-            var oldVal = pi.GetValue(original);
-            var newVal = pi.GetValue(updated);
-            if (!Equals(oldVal, newVal))
-                list.Add(new PropertyChange(pi.Name, oldVal, newVal));
+            if (!pi.CanRead) continue;
+            if (IsIgnored(pi.Name)) continue;
+
+            var ov = ToValueString(pi.GetValue(original));
+            var nv = ToValueString(pi.GetValue(updated));
+
+            if (!string.Equals(ov, nv, StringComparison.Ordinal))
+                changes.Add(new PropertyChange(pi.Name, ov, nv));
         }
-        return list;
+
+        return changes;
     }
 
-    protected void AddUpdateLog(string entityName, int entityId, List<PropertyChange> changes)
+    // ---------- logging helpers ----------
+    /// <summary>
+    /// Adds Update logs only if there are real changes (returns true if log entries were added).
+    /// DO NOT call SaveChanges here; let the UoW handle it.
+    /// </summary>
+    protected bool TryAddUpdateLog(string entityName, int entityId, IEnumerable<PropertyChange> changes)
     {
-        if (changes.Count == 0) return;
-        var log = new ItemLog
+        if (changes is null) return false;
+
+        // Filter out any accidentals where old==new
+        var material = changes
+            .Where(c => !string.Equals(c.OldValue, c.NewValue, StringComparison.Ordinal))
+            .ToList();
+
+        if (material.Count == 0)
+            return false;
+
+        foreach (var c in material)
         {
-            CreatedDate = DateTimeOffset.UtcNow,
+            _db.ItemLog.Add(new Core.Domain.Entities.Item.ItemDetail.ItemLog
+            {
+                EntityName = entityName,
+                EntityId = entityId,
+                Action = "Update",
+                PropertyName = c.Property,
+                OldValue = c.OldValue,
+                NewValue = c.NewValue,
+                CreatedBy = int.Parse(_ipAddressService.GetCurrentUserId()),
+                CreatedDate = DateTime.UtcNow,
+                CreatedByName = _ipAddressService.GetUserName(),
+                CreatedIP = _ipAddressService.GetSystemIPAddress()
+            });
+        }
+
+        return true;
+    }
+
+    /* protected void AddInsertLog(string entityName, int entityId)
+    {
+        _db.ItemLog.Add(new Core.Domain.Entities.Item.ItemDetail.ItemLog
+        {
             EntityName = entityName,
             EntityId = entityId,
-            Action = "Update",
-            ChangesJson = JsonSerializer.Serialize(changes, new JsonSerializerOptions(JsonSerializerDefaults.Web)),
-            CreatedBy = _ctx.CreatedBy,
-            CreatedByName = _ctx.CreatedByName,
-            CreatedIP = _ctx.CreatedIP,
-            CorrelationId = _ctx.CorrelationId
-        };
-        _db.ItemLog.Add(log);
-    }
+            Action = "Insert",
+            PropertyName = "*",
+            OldValue = null,
+            NewValue = null
+        });
+    } */
 }

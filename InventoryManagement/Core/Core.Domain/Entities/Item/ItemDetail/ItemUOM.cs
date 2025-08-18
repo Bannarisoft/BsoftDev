@@ -5,9 +5,9 @@ namespace Core.Domain.Entities.Item.ItemDetail
     {
         public int Id { get; set; }
         public int ItemId { get; set; }
-        public ItemMaster Item { get; set; } = null!;                
+        public ItemMaster? Item { get; set; } 
         public int? ConversionUOMId { get; set; }
-        public UOM ConversionUOM { get; set; } = null!;
+        public UOM? ConversionUOM { get; set; }
         public decimal? ConversionRate { get; set; }
     }
 }

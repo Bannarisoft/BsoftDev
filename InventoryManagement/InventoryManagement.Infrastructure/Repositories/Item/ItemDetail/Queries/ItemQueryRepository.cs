@@ -42,14 +42,17 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Querie
                     ItemName = x.ItemName,
                     HasVariants = x.HasVariants,
                     IsStockItem = x.IsStockItem,
-                    UnitId = x.UnitId
+                    UnitId = x.UnitId,
+                    ParentItemName = x.ParentItem != null ? x.ParentItem.ItemName : null,
+                    ItemGroupName   = x.ItemGroup != null ? x.ItemGroup.ItemGroupName : null,
+                    ItemCategoryName= x.ItemCategory != null ? x.ItemCategory.ItemCategoryName : null
                 })
                 .ToListAsync(ct);
 
             return (list, total);
         }
 
-        public async Task<ItemDto?> GetByIdAsync(int id, CancellationToken ct = default)
+        public async Task<ItemDetailsDto?> GetByIdAsync(int id, CancellationToken ct = default)
         {
                 return await _db.ItemMaster
                 .AsNoTracking()
@@ -66,21 +69,27 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Querie
                     ItemGroupId          = i.ItemGroupId,
                     ItemGroupName = i.ItemGroup != null ? i.ItemGroup.ItemGroupName : null,
                     ItemCategoryId       = i.ItemCategoryId,
+                    ItemCategoryName = i.ItemCategory != null ? i.ItemCategory.ItemCategoryName : null,
                     StockUomId           = i.StockUomId,
+                    StockUOM = i.UOM != null ? i.UOM.UOMName : null,
                     ItemClassificationId = i.ItemClassificationId,
+                    ItemClassification = i.MiscClassification != null ? i.MiscClassification.Code : null,
                     Description          = i.Description,
                     ValidFrom            = i.ValidFrom,
                     XPlantMaterialStatusId = i.XPlantMaterialStatusId,
+                    XPlantMaterialStatus = i.MiscStatus != null ? i.MiscStatus.Code : null,                    
                     IsStockItem          = i.IsStockItem,
                     MaintainStock        = i.MaintainStock,
                     HasVariants          = i.HasVariants,
                     ParentItemId         = i.ParentItemId,
-                    ItemImage            = i.ItemImage, // assumes the column exists on ItemMaster
+                    ParentItemName = i.ParentItem != null ? i.ParentItem.ItemName : null,  
+                    ItemImage            = i.ItemImage,                                    
 
                     // tabs (1-1)
-                    Purchase = i.Purchase == null ? null : new ItemPurchaseDto
+                    Purchase = i.Purchase == null ? null : new ItemPurchaseDetailDto
                     {
-                        PurchaseUomId       = i.Purchase.PurchaseUomId,
+                        PurchaseUomId       = i.Purchase.PurchaseUomId,   
+                        PurchaseUOM = i.Purchase.PurchaseUOM != null ? i.Purchase.PurchaseUOM.UOMName : null,                                                               
                         LeadTimeDays        = i.Purchase.LeadTimeDays,
                         SafetyStock         = i.Purchase.SafetyStock,
                         GrProcessingTimeDays= i.Purchase.GrProcessingTimeDays,
@@ -88,8 +97,12 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Querie
                         OriginCountryId     = i.Purchase.OriginCountryId,
                         TariffNumber        = i.Purchase.TariffNumber
                     },
-                    Inventory = i.Inventory == null ? null : new ItemInventoryDto
+                    Inventory = i.Inventory == null ? null : new ItemInventoryDetailDto
                     {
+                        InventoryUOM = i.Inventory.WeightUOM != null ? i.Inventory.WeightUOM.UOMName : null,
+                        DefaultMaterialRequestType = i.MiscStatus != null ? i.MiscStatus.Code : null,    
+                        ValuationMethod = i.MiscStatus != null ? i.MiscStatus.Code : null,    
+                        RequestType = i.MiscStatus != null ? i.MiscStatus.Code : null,
                         Weight                    = i.Inventory.Weight,
                         WeightUomId               = i.Inventory.WeightUomId,
                         DefaultMaterialRequestTypeId = i.Inventory.DefaultMaterialRequestTypeId,
@@ -106,14 +119,15 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Querie
                         BatchManagement           = i.Inventory.BatchManagement,
                         ApplyBatchNumber          = i.Inventory.ApplyBatchNumber
                     },
-                    Quality = i.Quality == null ? null : new ItemQualityDto
+                    Quality = i.Quality == null ? null : new ItemQualityDetailDto
                     {
-                        InspectionTemplateId        = i.Quality.InspectionTemplateId,
-                        CertificateTypeId           = i.Quality.CertificateTypeId,
-                        InspLotProcessingTime       = i.Quality.InspLotProcessingTime,
-                        InspectionRequired          = i.Quality.InspectionRequired,
-                        QualityInspectionFree       = i.Quality.QualityInspectionFree,
-                        IsCertificateRequiredFromSupplier = i.Quality.IsCertificateRequiredFromSupplier
+                        InspectionTemplateId = i.Quality.InspectionTemplateId,
+                        CertificateTypeId = i.Quality.CertificateTypeId,
+                        InspLotProcessingTime = i.Quality.InspLotProcessingTime,
+                        InspectionRequired = i.Quality.InspectionRequired,
+                        QualityInspectionFree = i.Quality.QualityInspectionFree,
+                        IsCertificateRequiredFromSupplier = i.Quality.IsCertificateRequiredFromSupplier,
+                        CertificateType = i.MiscStatus != null ? i.MiscStatus.Code : null,    
                     },
 
                     // collections
@@ -126,30 +140,45 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Querie
                             SupplierPartNo= s.SupplierPartNo
                         }).ToList(),
 
-                    Manufacture = i.Manufacture                        
+                   Manufacture = i.Manufacture
                         .OrderBy(m => m.UnitId)
-                        .Select(m => new ItemManufactureDto
+                        .Select(m => new ItemManufactureDetailDto
                         {
-                            UnitId             = m.UnitId,
-                            ManufacturingTypeId= m.ManufacturingTypeId
-                        }).ToList(),
+                            UnitId = m.UnitId,
+                            ManufacturingTypeId = m.ManufacturingTypeId,
+                            ManufacturingType = _db.MiscMaster
+                                .Where(mm => mm.Id == m.ManufacturingTypeId)
+                                .Select(mm => mm.Code)
+                                .FirstOrDefault()
+                        })
+                        .ToList(),
 
                     Uoms = i.ItemUOMs
-                        .Select(u => new ItemUomDto
+                        .OrderBy(u => u.Id)
+                        .Select(u => new ItemDetailUomDto
                         {
                             ConversionUOMId = u.ConversionUOMId,
-                            ConversionRate  = u.ConversionRate
-                        }).ToList(),
+                            ConversionRate  = u.ConversionRate,
+                            ConversionUOM   = u.ConversionUOM != null ? u.ConversionUOM.UOMName : null
+                        })
+                        .ToList(),
 
                     // variant values (same table for template or child)
-                    VariantValues = _db.Set<ItemVariantValue>()
-                        .Where(v => v.ItemId == i.Id)
-                        .OrderBy(v => v.AttributeId)
-                        .Select(v => new VariantValueDto
-                        {
-                            AttributeId = v.AttributeId,
-                            OptionValue = v.OptionValue
-                        }).ToList()
+                  VariantValues = _db.Set<ItemVariantValue>()
+                    .Where(v => v.ItemId == i.Id)
+                    .OrderBy(v => v.AttributeId)
+                    .Select(v => new VariantDetailDto
+                    {
+                        AttributeId = v.AttributeId,
+                        OptionValue = v.OptionValue,
+                        VariantBasedOn = v.VariantBasedOn,
+                        AttributeGroupId = v.AttributeGroupId,
+                        
+                        VariantBasedOnValue = v.MiscVariantBasedOn != null ? v.MiscVariantBasedOn.Code : null,
+                        AttributeGroup = v.MiscAttributeGroup != null ? v.MiscAttributeGroup.Description : null,
+                        AttributeName      = v.MiscAttribute       != null ? v.MiscAttribute.Code       : null
+                    })
+                    .ToList(),
                 })
                 .FirstOrDefaultAsync(ct);
         }
@@ -157,7 +186,7 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Querie
         {
             const string query = @"
             SELECT Description AS BaseDirectory  
-                FROM Maintenance.MiscTypeMaster 
+                FROM Inventory.MiscTypeMaster 
                 WHERE MiscTypeCode='ItemImage'  
                 AND IsDeleted=0
             ";
@@ -201,16 +230,27 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Querie
         public async Task<List<string>> GetCandidateItemNamesAsync(string normalizedPrefix, int take = 200, CancellationToken ct = default)
         {
             // Use first 3 chars of normalized input as lightweight prefilter
-            if (string.IsNullOrWhiteSpace(normalizedPrefix)) return new();
-            var p = normalizedPrefix.Length >= 3 ? normalizedPrefix[..3] : normalizedPrefix;
+       /*      if (string.IsNullOrWhiteSpace(normalizedPrefix)) return new();
+            var p = normalizedPrefix.Length >= 3 ? normalizedPrefix[..3] : normalizedPrefix; */
 
-            return await _db.ItemMaster
+var hint = normalizedPrefix?.Replace("%", "").Replace("_", "") ?? "";
+return await _db.ItemMaster
+    .AsNoTracking()
+    .Where(i => i.IsDeleted == BaseEntity.IsDelete.NotDeleted && i.ItemName != null)
+    .Where(i => EF.Functions.Like(
+        EF.Functions.Collate(i.ItemName!, "Latin1_General_CI_AI"), $"%{hint}%"))
+    .OrderByDescending(i => i.Id)
+    .Select(i => i.ItemName!)
+    .Take(take <= 0 ? 100 : take)
+    .ToListAsync(ct);
+
+       /*      return await _db.ItemMaster
                 .Where(x => x.IsDeleted == BaseEntity.IsDelete.NotDeleted &&
                             EF.Functions.Like(x.ItemName, $"%{p}%"))
                 .OrderBy(x => x.ItemName)
                 .Select(x => x.ItemName)
                 .Take(take)
-                .ToListAsync(ct);
+                .ToListAsync(ct); */
         }
     }
 }

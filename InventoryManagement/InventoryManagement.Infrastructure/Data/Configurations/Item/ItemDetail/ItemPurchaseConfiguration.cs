@@ -10,13 +10,17 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
         {
             b.ToTable("ItemPurchase", "Inventory");
 
-            // Shared PK with Item (1:1)
-            b.HasKey(x => x.ItemId);
+            b.HasKey(x => x.Id);
+            b.Property(x => x.Id)
+             .HasColumnName("Id")
+             .HasColumnType("int")
+             .UseIdentityColumn();   
 
             b.Property(x => x.ItemId)
              .HasColumnName("ItemId")
              .HasColumnType("int")
              .IsRequired();
+            b.HasIndex(x => x.ItemId).IsUnique(); 
             b.HasOne(x => x.Item)
              .WithOne(i => i.Purchase)
              .HasForeignKey<ItemPurchase>(x => x.ItemId)

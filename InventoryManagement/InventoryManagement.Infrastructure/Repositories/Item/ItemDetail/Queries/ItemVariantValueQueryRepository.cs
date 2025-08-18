@@ -1,10 +1,11 @@
 // InventoryManagement.Infrastructure/Repositories/Item/ItemDetail/Variant/ItemVariantValueQueryRepository.cs
 using Core.Application.Common.Interfaces.Item.ItemDetail.Queries;
+using Core.Application.Item.ItemDetail.Queries.GetAllItems;   // VariantValueDto
+using Core.Domain.Common;
 using Core.Domain.Entities.Item.ItemDetail;
 using Core.Domain.Entities.Item.ItemDetail.Variant;
 using InventoryManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Text;
 
 namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Variant
 {
@@ -13,21 +14,41 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Varian
         private readonly ApplicationDbContext _db;
         public ItemVariantValueQueryRepository(ApplicationDbContext db) => _db = db;
 
-        public async Task<Dictionary<int, List<string>>> GetForItemGroupedAsync(int itemId, CancellationToken ct = default)
+        /// <summary>
+        /// Returns attributeId -> distinct option values (case-sensitive distinct; ordered).
+        /// </summary>
+        public async Task<Dictionary<int, List<string>>> GetForItemGroupedAsync(
+            int itemId, CancellationToken ct = default)
         {
-            return await _db.Set<ItemVariantValue>()
+            // Simple, fully translatable query.
+            var rows = await _db.Set<ItemVariantValue>()
                 .Where(v => v.ItemId == itemId)
-                .GroupBy(v => v.AttributeId)
-                .ToDictionaryAsync(
+                .Select(v => new { v.AttributeId, v.OptionValue })
+                .ToListAsync(ct);
+
+            return rows
+                .GroupBy(x => x.AttributeId)
+                .ToDictionary(
                     g => g.Key,
-                    g => g.Select(x => x.OptionValue).Distinct().OrderBy(x => x).ToList(),
-                    ct);
+                    g => g.Select(x => (x.OptionValue ?? string.Empty).Trim())
+                          .Where(s => s != string.Empty)
+                          .Distinct()               // EF distinct already materialized above
+                          .OrderBy(s => s)
+                          .ToList()
+                );
         }
 
-        public async Task<HashSet<string>> GetExistingChildComboKeysAsync(int templateItemId, CancellationToken ct = default)
+        /// <summary>
+        /// For a template item, builds a set of combo keys for all current children.
+        /// Key format: "attrId:value|attrId:value" ordered by attrId, value normalized (trim+lower).
+        /// </summary>
+        public async Task<HashSet<string>> GetExistingChildComboKeysAsync(
+            int templateItemId, CancellationToken ct = default)
         {
+            // Get current (not-deleted) child ids
             var childIds = await _db.Set<ItemMaster>()
-                .Where(i => i.ParentItemId == templateItemId && i.IsDeleted == Core.Domain.Common.BaseEntity.IsDelete.NotDeleted)
+                .Where(i => i.ParentItemId == templateItemId &&
+                            i.IsDeleted == BaseEntity.IsDelete.NotDeleted)
                 .Select(i => i.Id)
                 .ToListAsync(ct);
 
@@ -35,6 +56,7 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Varian
 
             var rows = await _db.Set<ItemVariantValue>()
                 .Where(v => childIds.Contains(v.ItemId))
+                .Select(v => new { v.ItemId, v.AttributeId, v.OptionValue })
                 .ToListAsync(ct);
 
             var keys = rows
@@ -48,11 +70,16 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Varian
 
             return new HashSet<string>(keys);
         }
-     
-        public async Task<Dictionary<string, int>> GetExistingChildCombosWithIdsAsync(int templateItemId, CancellationToken ct = default)
+
+        /// <summary>
+        /// Same as above, but returns a map key -> childId.
+        /// </summary>
+        public async Task<Dictionary<string, int>> GetExistingChildCombosWithIdsAsync(
+            int templateItemId, CancellationToken ct = default)
         {
             var childIds = await _db.Set<ItemMaster>()
-                .Where(i => i.ParentItemId == templateItemId && i.IsDeleted == Core.Domain.Common.BaseEntity.IsDelete.NotDeleted)
+                .Where(i => i.ParentItemId == templateItemId &&
+                            i.IsDeleted == BaseEntity.IsDelete.NotDeleted)
                 .Select(i => i.Id)
                 .ToListAsync(ct);
 
@@ -60,9 +87,9 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Varian
 
             var rows = await _db.Set<ItemVariantValue>()
                 .Where(v => childIds.Contains(v.ItemId))
+                .Select(v => new { v.ItemId, v.AttributeId, v.OptionValue })
                 .ToListAsync(ct);
 
-            // one key per child
             return rows
                 .GroupBy(r => r.ItemId)
                 .ToDictionary(
@@ -75,6 +102,27 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Varian
                     g => g.Key // childId
                 );
         }
-        private static string Normalize(string s) => (s ?? string.Empty).Trim().ToLowerInvariant();
+
+        /// <summary>
+        /// Returns the raw variant rows (AttributeId, OptionValue, VariantBasedOn) for an item.
+        /// </summary>
+        public Task<List<VariantValueDto>> GetForItemAsync(
+            int itemId, CancellationToken ct = default)
+        {
+            return _db.Set<ItemVariantValue>()
+                .Where(v => v.ItemId == itemId)
+                .OrderBy(v => v.AttributeId).ThenBy(v => v.OptionValue)
+                .Select(v => new VariantValueDto
+                {
+                    AttributeId = v.AttributeId,
+                    OptionValue = v.OptionValue,
+                    VariantBasedOn = v.VariantBasedOn,
+                    AttributeGroupId = v.AttributeGroupId
+                })
+                .ToListAsync(ct);
+        }
+
+        private static string Normalize(string? s)
+            => (s ?? string.Empty).Trim().ToLowerInvariant();
     }
 }

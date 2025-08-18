@@ -33,5 +33,6 @@ namespace Core.Domain.Entities
         public ICollection<ItemVariantValue>? ItemAttribute { get; set; }
         public ICollection<ItemVariantValue>? ItemAttributeBasedOn { get; set; }
         
+        
     }
 }

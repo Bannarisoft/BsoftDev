@@ -29,6 +29,7 @@ namespace Core.Domain.Entities.Item.ItemDetail
         public int? ParentItemId { get; set; }
         public ItemMaster? ParentItem { get; set; }
         public ICollection<ItemMaster> ChildItems { get; set; } = new List<ItemMaster>();
+        
         public string? ItemImage { get; set; }
 
 
@@ -37,6 +38,7 @@ namespace Core.Domain.Entities.Item.ItemDetail
         public ItemQuality? Quality { get; set; }
      
         public ICollection<ItemVariantValue> VariantValues { get; set; } = new List<ItemVariantValue>();
+        public ICollection<ItemVariantValue> VariantNewItem { get; set; } = new List<ItemVariantValue>();
         public ICollection<ItemSupplier> Suppliers { get; set; } = new List<ItemSupplier>();
         public ICollection<ItemManufacture> Manufacture { get; set; } = new List<ItemManufacture>();
         public ICollection<ItemUOM> ItemUOMs { get; set; } = new List<ItemUOM>();        

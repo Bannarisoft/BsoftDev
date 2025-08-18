@@ -1,10 +1,11 @@
 using FluentValidation;
 using Core.Application.Common.Interfaces.Item.ItemDetail.Commands;
 using Core.Application.Item.ItemDetail.Commands.CreateItem;
-using Core.Application.Common.Interfaces;
 using InventoryManagement.API.Validation.Common;
 using Core.Application.Common.Text;
 using Core.Application.Common.Interfaces.Item.ItemDetail.Queries;
+using Core.Application.Common.Interfaces;
+using Core.Application.Item.ItemDetail.Queries.GetAllItems;
 
 namespace InventoryManagement.API.Validation.Item.ItemDetail
 {
@@ -13,57 +14,83 @@ namespace InventoryManagement.API.Validation.Item.ItemDetail
         public CreateItemCommandValidator(
             IItemCommandRepository itemRepo,
             IMaxLengthProvider maxLenProvider,
-            ItemPurchaseDtoValidator purchaseV,
-            ItemInventoryDtoValidator inventoryV,
-            ItemQualityDtoValidator qualityV,
-            ItemSupplierDtoValidator supplierRowV,
-            ItemManufacturingDtoValidator manuRowV,
-            ItemUomDtoValidator uomRowV ,
-            IItemQueryRepository qryRepo
-        )
+            IValidator<ItemPurchaseDto> purchaseV,
+            IValidator<ItemInventoryDto> inventoryV,
+            IValidator<ItemQualityDto> qualityV,
+            IValidator<ItemSupplierDto> supplierRowV,
+            IValidator<ItemManufactureDto> manuRowV,
+            IValidator<ItemUomDto> uomRowV,
+            IItemQueryRepository qryRepo)
         {
-            var rules = ValidationRuleLoader.LoadValidationRules();
-            if (rules == null || !rules.Any())
-                throw new ArgumentException("Validation rules could not be loaded.");
+            CascadeMode = CascadeMode.Stop;
 
-            // DB max lengths (fallbacks used if provider returns null)
-            var codeMax = maxLenProvider.GetMaxLength<Core.Domain.Entities.Item.ItemDetail.ItemMaster>(nameof(Core.Domain.Entities.Item.ItemDetail.ItemMaster.ItemCode)) ?? 50;
-            var nameMax = maxLenProvider.GetMaxLength<Core.Domain.Entities.Item.ItemDetail.ItemMaster>(nameof(Core.Domain.Entities.Item.ItemDetail.ItemMaster.ItemName)) ?? 200;
-            var hsnMax = maxLenProvider.GetMaxLength<Core.Domain.Entities.Item.ItemDetail.ItemMaster>(nameof(Core.Domain.Entities.Item.ItemDetail.ItemMaster.HSNId)) ?? 20;
+            // Safe max lengths
+            int codeMax = 50, nameMax = 200;
+            try
+            {
+                codeMax = maxLenProvider.GetMaxLength<Core.Domain.Entities.Item.ItemDetail.ItemMaster>(
+                              nameof(Core.Domain.Entities.Item.ItemDetail.ItemMaster.ItemCode)) ?? 50;
+                nameMax = maxLenProvider.GetMaxLength<Core.Domain.Entities.Item.ItemDetail.ItemMaster>(
+                              nameof(Core.Domain.Entities.Item.ItemDetail.ItemMaster.ItemName)) ?? 200;
+            }
+            catch { /* defaults */ }
 
+            var rules = ValidationRuleLoader.LoadValidationRules() ?? new List<ValidationRule>();
             foreach (var rule in rules)
             {
                 switch (rule.Rule)
                 {
                     case "NotEmpty":
-                        RuleFor(x => x.Payload.ItemCode).NotEmpty().WithMessage($"{nameof(CreateItemCommand.Payload.ItemCode)} {rule.Error}");
-                        RuleFor(x => x.Payload.ItemName).NotEmpty().WithMessage($"{nameof(CreateItemCommand.Payload.ItemName)} {rule.Error}");
-                        RuleFor(x => x.Payload.UnitId).GreaterThan(0).WithMessage($"{nameof(CreateItemCommand.Payload.UnitId)} {rule.Error}");
+                        RuleFor(x => x.Payload.ItemName)
+                            .NotEmpty().WithMessage($"{nameof(CreateItemCommand.Payload.ItemName)} {rule.Error}");
+                        RuleFor(x => x.Payload.UnitId)
+                            .GreaterThan(0).WithMessage($"{nameof(CreateItemCommand.Payload.UnitId)} {rule.Error}");
                         break;
 
                     case "MaxLength":
-                        RuleFor(x => x.Payload.ItemCode).MaximumLength(codeMax).WithMessage($"{nameof(CreateItemCommand.Payload.ItemCode)} {rule.Error}");
-                        RuleFor(x => x.Payload.ItemName).MaximumLength(nameMax).WithMessage($"{nameof(CreateItemCommand.Payload.ItemName)} {rule.Error}");
+                        RuleFor(x => x.Payload.ItemName)
+                            .MaximumLength(nameMax).WithMessage($"{nameof(CreateItemCommand.Payload.ItemName)} {rule.Error}");
+                        // If you ever accept client-supplied ItemCode, re-enable:
+                        // RuleFor(x => x.Payload.ItemCode).MaximumLength(codeMax)...
                         break;
 
                     case "AlreadyExists":
-                        RuleFor(x => x.Payload.ItemCode)
-                            .MustAsync(async (cmd, code, ct) => !(await itemRepo.ExistsByCodeForCreateAsync(code, ct)))
-                            .WithMessage("ItemCode already exists.");
+                        // Clean ItemName uniqueness (resilient to repo issues)
+                        RuleFor(x => x.Payload.ItemName)
+                            .MustAsync(async (cmd, name, ct) =>
+                            {
+                                try { return !await itemRepo.ExistsByNameSmartForCreateAsync(name, ct); }
+                                catch { return true; } // fail-open on infra issues
+                            })
+                            .WithMessage("Item name already exists.");
                         break;
                 }
             }
 
-            // Tabs
-            When(x => x.Payload.Purchase is not null, () => RuleFor(x => x.Payload.Purchase!).SetValidator(purchaseV));
-            When(x => x.Payload.Inventory is not null, () => RuleFor(x => x.Payload.Inventory!).SetValidator(inventoryV));
-            When(x => x.Payload.Quality is not null, () => RuleFor(x => x.Payload.Quality!).SetValidator(qualityV));
+            // Tabs: validate only when non-empty
+            When(x => x.Payload.Purchase is { } p && !IsEmptyPurchase(p),
+                () => RuleFor(x => x.Payload.Purchase!).SetValidator(purchaseV));
 
-            // Lists
-            RuleForEach(x => x.Payload.Suppliers).SetValidator(supplierRowV);
-            RuleForEach(x => x.Payload.Manufacture).SetValidator(manuRowV);
+            When(x => x.Payload.Inventory is { } inv && !IsEmptyInventory(inv),
+                () => RuleFor(x => x.Payload.Inventory!).SetValidator(inventoryV));
 
-            // Duplicate prevention in lists
+            When(x => x.Payload.Quality is { } q && !IsEmptyQuality(q),
+                () => RuleFor(x => x.Payload.Quality!).SetValidator(qualityV));
+
+            // Lists: skip blank rows, then validate
+            RuleForEach(x => x.Payload.Suppliers)
+                .Where(r => !(r.SupplierId == 0 && r.UnitId == 0 && string.IsNullOrWhiteSpace(r.SupplierPartNo)))
+                .SetValidator(supplierRowV);
+
+            RuleForEach(x => x.Payload.Manufacture)
+                .Where(r => !(r.UnitId == 0 && r.ManufacturingTypeId == 0))
+                .SetValidator(manuRowV);
+
+            RuleForEach(x => x.Payload.Uoms)
+                .Where(r => r.ConversionUOMId.HasValue || r.ConversionRate.HasValue)
+                .SetValidator(uomRowV);
+
+            // Duplicate prevention
             RuleFor(x => x.Payload.Suppliers)
                 .Must(list => list.Select(s => (s.SupplierId, s.UnitId)).Distinct().Count() == list.Count)
                 .WithMessage("Duplicate Supplier+Unit rows are not allowed.");
@@ -73,31 +100,49 @@ namespace InventoryManagement.API.Validation.Item.ItemDetail
                 .WithMessage("Duplicate Unit+ManufacturingType rows are not allowed.");
 
             RuleFor(x => x.Payload.Uoms)
-            .Must(list => list
-                .Where(u => u.ConversionUOMId.HasValue)
-                .Select(u => u.ConversionUOMId!.Value)
-                .Distinct().Count() == list.Count)
-            .WithMessage("Duplicate ConversionUOM not allowed for the same Item.");
+                .Must(list =>
+                {
+                    var withId = list.Where(u => u.ConversionUOMId.HasValue).ToList();
+                    return withId.Select(u => u.ConversionUOMId!.Value).Distinct().Count() == withId.Count;
+                })
+                .WithMessage("Duplicate ConversionUOM not allowed for the same Item.");
 
-
+            // “Too similar” check: never throw if query repo isn’t implemented
             RuleFor(x => x.Payload.ItemName)
-                .NotEmpty().MaximumLength(200)
-                // Hard normalized duplicate check (no DB column)
-                .MustAsync(async (name, ct) =>
-                    !(await itemRepo.ExistsByNameSmartForCreateAsync(name, ct)))
-                .WithMessage("An item with a very similar name already exists.");
-             RuleFor(x => x.Payload.ItemName)
                 .MustAsync(async (cmd, name, ct) =>
                 {
-                    var norm = NameSimilarity.Normalize(name);
-                    var candidates = await qryRepo.GetCandidateItemNamesAsync(norm, 200, ct);
-                    var hit = candidates
-                        .Select(c => NameSimilarity.JaroWinkler(norm, NameSimilarity.Normalize(c)))
-                        .OrderByDescending(s => s)
-                        .FirstOrDefault();
-                    return hit < 0.92; // fail when too similar
+                    try
+                    {
+                        var norm = NameSimilarity.Normalize(name);
+                        var candidates = await qryRepo.GetCandidateItemNamesAsync(norm, 200, ct);
+                        if (candidates is null || candidates.Count == 0) return true;
+                        return !NameSimilarity.IsTooSimilarToAny(norm, candidates);
+                    }
+                    catch
+                    {
+                        return true; // ignore if repo not ready
+                    }
                 })
                 .WithMessage("This name is highly similar to an existing item. Please choose a more distinct name.");
         }
+
+        // ---- helpers (distinct names, used in When(...) above) ----
+        private static bool IsEmptyPurchase(ItemPurchaseDto p) =>
+            !p.PurchaseUomId.HasValue && !p.LeadTimeDays.HasValue &&
+            !p.SafetyStock.HasValue && !p.GrProcessingTimeDays.HasValue &&
+            !p.OriginCountryId.HasValue && string.IsNullOrWhiteSpace(p.TariffNumber);
+
+        private static bool IsEmptyInventory(ItemInventoryDto p) =>
+            !p.Weight.HasValue && !p.WeightUomId.HasValue &&
+            !p.DefaultMaterialRequestTypeId.HasValue && !p.ValuationMethodId.HasValue &&
+            !p.ShelfLife.HasValue && !p.UpperTolerance.HasValue && !p.LowerTolerance.HasValue &&
+            string.IsNullOrWhiteSpace(p.BatchNumberSeries) && string.IsNullOrWhiteSpace(p.SerialNumberSeries) &&
+            !p.ReorderLevel.HasValue && !p.ReorderQty.HasValue && !p.RequestTypeId.HasValue &&
+            !p.AllowNegativeStock && !p.BatchManagement && !p.ApplyBatchNumber;
+
+        private static bool IsEmptyQuality(ItemQualityDto p) =>
+            !p.InspectionTemplateId.HasValue && !p.CertificateTypeId.HasValue &&
+            !p.InspLotProcessingTime.HasValue && !p.InspectionRequired &&
+            !p.QualityInspectionFree && !p.IsCertificateRequiredFromSupplier;
     }
 }

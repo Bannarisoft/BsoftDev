@@ -8,6 +8,8 @@ namespace Core.Application.Item.ItemDetail.Queries.GetAllItems
         public bool HasVariants { get; set; }
         public bool IsStockItem { get; set; }
         public int UnitId { get; set; }
-        public int? ParentItemId { get; set; }
+        public string? ParentItemName { get; set; }
+        public string? ItemGroupName { get; set; }
+        public string? ItemCategoryName { get; set; }
     }
 }

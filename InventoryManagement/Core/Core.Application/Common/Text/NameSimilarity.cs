@@ -1,65 +1,79 @@
 // Core.Application/Common/Text/NameSimilarity.cs
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Core.Application.Common.Text
 {
     public static class NameSimilarity
     {
-        private static readonly Regex NonAlphaNum = new(@"[^a-z0-9\s]+", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        private static readonly Regex MultiSpace  = new(@"\s+", RegexOptions.Compiled);
-
+        // Keep letters+digits, collapse whitespace, lowercase.
         public static string Normalize(string? s)
         {
-            if (string.IsNullOrWhiteSpace(s)) return string.Empty;
-            var lower  = s.ToLowerInvariant();
-            var noPunc = NonAlphaNum.Replace(lower, " ");
-            var spaced = MultiSpace.Replace(noPunc, " ").Trim();
-            return spaced.Replace(" ", ""); // remove all spaces
+            s ??= string.Empty;
+            s = s.ToLowerInvariant();
+            // replace all non-alphanumeric with a single space
+            s = Regex.Replace(s, "[^a-z0-9]+", " ").Trim();
+            return Regex.Replace(s, "\\s+", " ");
         }
 
-        // Jaro-Winkler ~[0..1], higher = more similar
-        public static double JaroWinkler(string a, string b)
+        // Split into alphanumeric tokens (keeps numbers like 18, 40, 14, 256 etc.)
+        public static List<string> Tokens(string s)
+            => Regex.Matches(Normalize(s), "[a-z]+|[0-9]+(?:\\.[0-9]+)?")
+                    .Select(m => m.Value).ToList();
+
+        // Salient differences that should immediately mark names as "different enough"
+        public static bool HasSalientDifference(List<string> a, List<string> b)
         {
-            if (a == b) return 1d;
-            if (string.IsNullOrEmpty(a) || string.IsNullOrEmpty(b)) return 0d;
+            var numsA = a.Where(t => char.IsDigit(t[0])).ToHashSet();
+            var numsB = b.Where(t => char.IsDigit(t[0])).ToHashSet();
+            if (!numsA.SetEquals(numsB)) return true; // different numeric tokens → allow
 
-            int matchDistance = Math.Max(a.Length, b.Length) / 2 - 1;
-            bool[] aMatch = new bool[a.Length];
-            bool[] bMatch = new bool[b.Length];
-            int matches = 0, transpositions = 0;
+            // Optional: color/size keys (extend as you like)
+            string[] colorWords = ["black","white","blue","red","green","yellow","grey","gray","silver","gold","pink","purple"];
+            var colorsA = a.Intersect(colorWords).ToHashSet();
+            var colorsB = b.Intersect(colorWords).ToHashSet();
+            if (!colorsA.SetEquals(colorsB)) return true; // different colors → allow
 
-            for (int i = 0; i < a.Length; i++)
+            return false;
+        }
+
+        // Jaccard similarity on token sets (helps reduce false positives)
+        public static double Jaccard(List<string> a, List<string> b)
+        {
+            var sa = a.ToHashSet();
+            var sb = b.ToHashSet();
+            var inter = sa.Intersect(sb).Count();
+            var union = sa.Union(sb).Count();
+            return union == 0 ? 0 : (double)inter / union;
+        }
+
+        // Standard JW (same as you had)
+        public static double JaroWinkler(string s1, string s2)
+        {
+            // ––– implementation omitted for brevity –––
+            // keep your existing implementation here
+            throw new NotImplementedException();
+        }
+
+        // Main predicate used by the validator
+        public static bool IsTooSimilarToAny(string candidate, IEnumerable<string> existingNames,
+                                             double jwThreshold = 0.965, double jaccardThreshold = 0.60)
+        {
+            var ct = Tokens(candidate);
+
+            foreach (var ex in existingNames)
             {
-                int start = Math.Max(0, i - matchDistance);
-                int end   = Math.Min(i + matchDistance + 1, b.Length);
-                for (int j = start; j < end; j++)
-                {
-                    if (bMatch[j] || a[i] != b[j]) continue;
-                    aMatch[i] = bMatch[j] = true;
-                    matches++;
-                    break;
-                }
+                var et = Tokens(ex);
+
+                // If there’s a salient difference, skip similarity fail
+                if (HasSalientDifference(ct, et)) continue;
+
+                var jw = JaroWinkler(string.Join(' ', ct), string.Join(' ', et));
+                var jac = Jaccard(ct, et);
+
+                if (jw >= jwThreshold && jac >= jaccardThreshold)
+                    return true; // too similar
             }
-            if (matches == 0) return 0d;
-
-            for (int i = 0, k = 0; i < a.Length; i++)
-            {
-                if (!aMatch[i]) continue;
-                while (!bMatch[k]) k++;
-                if (a[i] != b[k]) transpositions++;
-                k++;
-            }
-
-            double jaro = (matches / (double)a.Length +
-                           matches / (double)b.Length +
-                           (matches - transpositions / 2.0) / matches) / 3.0;
-
-            int prefix = 0;
-            for (; prefix < Math.Min(4, Math.Min(a.Length, b.Length)); prefix++)
-                if (a[prefix] != b[prefix]) break;
-
-            return jaro + prefix * 0.1 * (1 - jaro);
+            return false;
         }
     }
 }

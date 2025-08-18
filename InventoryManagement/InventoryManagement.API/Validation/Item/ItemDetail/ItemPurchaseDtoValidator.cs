@@ -8,8 +8,7 @@ namespace InventoryManagement.API.Validation.Item.ItemDetail
     {
         public ItemPurchaseDtoValidator(IMaxLengthProvider maxLen)
         {
-            RuleFor(x => x.PurchaseUomId).GreaterThan(0).When(x => x.PurchaseUomId.HasValue);
-            RuleFor(x => x.PurchaseRate).GreaterThanOrEqualTo(0).When(x => x.PurchaseRate.HasValue);
+            RuleFor(x => x.PurchaseUomId).GreaterThan(0).When(x => x.PurchaseUomId.HasValue);            
             RuleFor(x => x.LeadTimeDays).InclusiveBetween(0, 365).When(x => x.LeadTimeDays.HasValue);
             RuleFor(x => x.SafetyStock).GreaterThanOrEqualTo(0).When(x => x.SafetyStock.HasValue);
             RuleFor(x => x.GrProcessingTimeDays).InclusiveBetween(0, 60).When(x => x.GrProcessingTimeDays.HasValue);

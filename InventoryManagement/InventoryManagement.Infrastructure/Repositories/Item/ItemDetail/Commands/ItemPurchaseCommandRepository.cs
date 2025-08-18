@@ -1,3 +1,4 @@
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.Item.ItemDetail.Commands;
 using Core.Domain.Entities.Item.ItemDetail;
 using InventoryManagement.Infrastructure.Data;
@@ -6,31 +7,45 @@ using Microsoft.EntityFrameworkCore;
 namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Commands
 {
     public class ItemPurchaseCommandRepository : ItemLogRepositoryBase,IItemPurchaseCommandRepository
-    {   
-        public ItemPurchaseCommandRepository(ApplicationDbContext db, IExecutionContext ctx) : base(db, ctx) { }
+    {           
+        public ItemPurchaseCommandRepository(ApplicationDbContext db, IIPAddressService ipAddressService)
+            : base(db, ipAddressService) { }
         public async Task CreateAsync(ItemPurchase purchase, CancellationToken ct = default)
         {
             await _db.ItemPurchase.AddAsync(purchase, ct);
         }
-
+        public async Task<ItemPurchase?> GetByItemIdAsync(int itemId, CancellationToken ct = default)
+            => await _db.ItemPurchase.FirstOrDefaultAsync(x => x.ItemId == itemId, ct);        
+            
         public async Task UpdateAsync(ItemPurchase updated, CancellationToken ct = default)
         {
             var existing = await _db.ItemPurchase.FirstOrDefaultAsync(x => x.ItemId == updated.ItemId, ct);
-            List<PropertyChange> changes; 
+
             if (existing is null)
             {
-                _db.ItemPurchase.Add(updated);
-                changes = DiffByReflection(new ItemPurchase { ItemId = updated.ItemId }, updated);
-                AddUpdateLog(nameof(ItemPurchase), updated.ItemId, changes);
+                // No row yet -> create
+                await CreateAsync(updated, ct);
                 return;
             }
 
+            // ---- DO NOT change keys. Copy only non-key fields. ----
+            existing.PurchaseUomId = updated.PurchaseUomId;
+            existing.LeadTimeDays = updated.LeadTimeDays;
+            existing.SafetyStock = updated.SafetyStock;
+            existing.GrProcessingTimeDays = updated.GrProcessingTimeDays;
+            existing.AutomaticPo = updated.AutomaticPo;
+            existing.OriginCountryId = updated.OriginCountryId;
+            existing.TariffNumber = updated.TariffNumber;
+
             var entry = _db.Entry(existing);
-            entry.CurrentValues.SetValues(updated);
+            // Explicit: ensure keys aren’t marked modified
+            entry.Property(x => x.Id).IsModified = false;
             entry.Property(x => x.ItemId).IsModified = false;
 
-            changes = GetModifiedProps(entry);
-            AddUpdateLog(nameof(ItemPurchase), existing.ItemId, changes);
+            var changes = GetModifiedProps(entry);
+            TryAddUpdateLog(nameof(ItemPurchase), existing.ItemId, changes);
         }
+
+
     }
 }

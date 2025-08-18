@@ -7,6 +7,9 @@ using Core.Application.HSNMaster.Command.UpdateHSNMaster;
 using Core.Application.Item.ItemCategory.Commands.CreateItemCategory;
 using Core.Application.Item.ItemCategory.Commands.DeleteItemCategory;
 using Core.Application.Item.ItemCategory.Commands.UpdateItemCategory;
+using Core.Application.Item.ItemDetail.Commands.CreateItem;
+using Core.Application.Item.ItemDetail.Commands.UpdateItem;
+using Core.Application.Item.ItemDetail.Queries.GetAllItems;
 using Core.Application.Item.ItemGroup.Commands.CreateItemGroup;
 using Core.Application.Item.ItemGroup.Commands.DeleteItemGroup;
 using Core.Application.Item.ItemGroup.Commands.UpdateItemGroup;
@@ -22,6 +25,7 @@ using Core.Application.UOM.Command.UpdateUOM;
 using Core.Application.UOMConversion.Command.CreateUOMConversion;
 using Core.Application.UOMConversion.Command.UpdateUOMConversion;
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using InventoryManagement.API.Validation.Budget;
 using InventoryManagement.API.Validation.HSNMaster;
 using InventoryManagement.API.Validation.Item.ItemCategory;
@@ -38,8 +42,8 @@ namespace InventoryManagement.API.Validation.Common
     {
         public void AddValidationServices(IServiceCollection services)
         {
-            //services.AddScoped<MaxLengthProvider>();
-            services.AddScoped<IMaxLengthProvider, MaxLengthProvider>(); 
+            services.AddScoped<MaxLengthProvider>();
+            services.AddScoped<IMaxLengthProvider, MaxLengthProvider>();
             services.AddScoped<IValidator<CreateItemCategoryCommand>, CreateItemCategoryCommandValidator>();
             services.AddScoped<IValidator<DeleteItemCategoryCommand>, DeleteItemCategoryCommandValidator>();
             services.AddScoped<IValidator<UpdateItemCategoryCommand>, UpdateItemCategoryCommandValidator>();
@@ -63,15 +67,18 @@ namespace InventoryManagement.API.Validation.Common
             services.AddScoped<IValidator<UpdateUOMCommand>, UpdateUOMCommandValidator>();
             services.AddScoped<IValidator<CreateUOMConversionCommand>, CreateUOMConversionCommandValidator>();
             services.AddScoped<IValidator<UpdateUOMConversionCommand>, UpdateUOMConversionCommandValidator>();
-            
-            
-            services.AddScoped<ItemPurchaseDtoValidator>();
-            services.AddScoped<ItemInventoryDtoValidator>();
-            services.AddScoped<ItemQualityDtoValidator>();
-            services.AddScoped<ItemSupplierDtoValidator>();
-            services.AddScoped<ItemManufacturingDtoValidator>();
-            services.AddScoped<ItemUomDtoValidator>(); // optional
-            services.AddValidatorsFromAssemblyContaining<CreateItemCommandValidator>();
+
+
+            services.AddScoped<IValidator<CreateItemCommand>, CreateItemCommandValidator>();
+            services.AddScoped<IValidator<UpdateItemCommand>, UpdateItemCommandValidator>();
+            services.AddScoped<IValidator<ItemPurchaseDto>, ItemPurchaseDtoValidator>();
+            services.AddScoped<IValidator<ItemInventoryDto>, ItemInventoryDtoValidator>();
+            services.AddScoped<IValidator<ItemQualityDto>, ItemQualityDtoValidator>();
+            services.AddScoped<IValidator<ItemSupplierDto>, ItemSupplierDtoValidator>();
+            services.AddScoped<IValidator<ItemManufactureDto>, ItemManufacturingDtoValidator>();
+            services.AddScoped<IValidator<ItemUomDto>, ItemUomDtoValidator>();            
+            services.AddValidatorsFromAssembly(typeof(CreateItemCommandValidator).Assembly);           
+      
         }
     }
 }

@@ -1,10 +1,8 @@
+// IItemSupplierCommandRepository.cs
 using Core.Application.Item.ItemDetail.Queries.GetAllItems;
 
-namespace Core.Application.Common.Interfaces.Item.ItemDetail.Commands
+public interface IItemSupplierCommandRepository
 {
-    public interface IItemSupplierCommandRepository
-    {
-        Task UpdateAsync(int itemId, IEnumerable<ItemSupplierDto> suppliers, CancellationToken ct = default);
-        Task<List<ItemSupplierDto>> GetByItemIdAsync(int itemId, CancellationToken ct = default);
-    }
+    Task<IReadOnlyList<Core.Domain.Entities.Item.ItemDetail.ItemSupplier>> GetByItemIdAsync(int itemId, CancellationToken ct);
+    Task UpdateAsync(int itemId, IReadOnlyCollection<ItemSupplierDto> rows, CancellationToken ct);
 }

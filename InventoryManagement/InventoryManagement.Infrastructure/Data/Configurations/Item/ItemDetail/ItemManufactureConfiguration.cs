@@ -15,16 +15,16 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
 
             // PK from BaseEntity
             b.HasKey(x => x.Id);
-
             b.Property(x => x.Id)
              .HasColumnName("Id")
              .HasColumnType("int")
-             .IsRequired();
+             .UseIdentityColumn();   
 
             b.Property(x => x.ItemId)
              .HasColumnName("ItemId")
              .HasColumnType("int")
              .IsRequired();
+            b.HasIndex(x => x.ItemId).IsUnique(); 
             b.HasOne(x => x.Item)
              .WithMany(i => i.Manufacture)
              .HasForeignKey(x => x.ItemId)
@@ -42,7 +42,7 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
             b.HasOne(x => x.MiscManufactureType)             
              .WithMany(i => i.ItemManufactureType)
              .HasForeignKey(x => x.ManufacturingTypeId)
-             .OnDelete(DeleteBehavior.Restrict);          
+             .OnDelete(DeleteBehavior.NoAction);          
         }
     }
 }

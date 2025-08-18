@@ -1,6 +1,7 @@
+// ItemManufactureCommandRepository.cs
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.Item.ItemDetail.Commands;
 using Core.Application.Item.ItemDetail.Queries.GetAllItems;
-using Core.Domain.Common;
 using Core.Domain.Entities.Item.ItemDetail;
 using InventoryManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -9,62 +10,64 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Comman
 {
     public sealed class ItemManufactureCommandRepository : ItemLogRepositoryBase, IItemManufactureCommandRepository
     {
-        public ItemManufactureCommandRepository(ApplicationDbContext db, IExecutionContext ctx) : base(db, ctx) { }
+        public ItemManufactureCommandRepository(ApplicationDbContext db, IIPAddressService ipAddressService)
+            : base(db, ipAddressService) { }
 
-        public async Task<List<ItemManufactureDto>> GetByItemIdAsync(int itemId, CancellationToken ct = default)
-            => await _db.ItemManufacture.AsNoTracking()
-                .Where(x => x.ItemId == itemId && x.IsDeleted == BaseEntity.IsDelete.NotDeleted)
-                .Select(x => new ItemManufactureDto { UnitId = x.UnitId, ManufacturingTypeId = x.ManufacturingTypeId })
-                .ToListAsync(ct);
-
-        public async Task UpdateAsync(int itemId, IEnumerable<ItemManufactureDto> rows, CancellationToken ct = default)
+        public async Task<IReadOnlyList<ItemManufacture>> GetByItemIdAsync(int itemId, CancellationToken ct)
         {
-            var existing = await _db.ItemManufacture
-                .Where(x => x.ItemId == itemId && x.IsDeleted == BaseEntity.IsDelete.NotDeleted)
-                .ToListAsync(ct);
+            return await _db.ItemManufacture.Where(x => x.ItemId == itemId).ToListAsync(ct);
+        }
 
-            var map = existing.ToDictionary(k => (k.UnitId, k.ManufacturingTypeId));
-            var seen = new HashSet<(int UnitId, int TypeId)>();
+        public async Task UpdateAsync(int itemId, IReadOnlyCollection<ItemManufactureDto> rows, CancellationToken ct)
+        {
+            var doDeleteMissing = true; // set false if you want insert/update only
 
-            foreach (var dto in rows)
+            var incoming = (rows ?? Array.Empty<ItemManufactureDto>())
+                .Where(r => r is not null && r.UnitId > 0 && r.ManufacturingTypeId > 0)
+                .Select(r => new ItemManufacture
+                {
+                    ItemId = itemId,
+                    UnitId = r.UnitId,
+                    ManufacturingTypeId = r.ManufacturingTypeId
+                })
+                .ToList();
+
+            var existing = await _db.ItemManufacture.Where(x => x.ItemId == itemId).ToListAsync(ct);
+            var existingByKey = existing.ToDictionary(e => (e.UnitId, e.ManufacturingTypeId));
+            var incomingKeys = new HashSet<(int UnitId, int TypeId)>(incoming.Select(i => (i.UnitId, i.ManufacturingTypeId)));
+
+            // INSERT (no scalars to update in your model)
+            foreach (var inc in incoming)
             {
-                var key = (dto.UnitId, dto.ManufacturingTypeId);
-                seen.Add(key);
-
-                if (map.TryGetValue(key, out var row))
+                if (!existingByKey.ContainsKey((inc.UnitId, inc.ManufacturingTypeId)))
                 {
-                    var before = new ItemManufacture { ItemId = row.ItemId, UnitId = row.UnitId, ManufacturingTypeId = row.ManufacturingTypeId, IsActive = row.IsActive };
-                    row.IsActive = BaseEntity.Status.Active;
-                    row.ModifiedDate = DateTimeOffset.UtcNow; row.ModifiedBy = _ctx.CreatedBy ?? row.ModifiedBy; row.ModifiedByName = _ctx.CreatedByName ?? row.ModifiedByName; row.ModifiedIP = _ctx.CreatedIP ?? row.ModifiedIP;
-                    AddUpdateLog(nameof(ItemManufacture), row.ItemId, DiffByReflection(before, row));
+                    await _db.ItemManufacture.AddAsync(inc, ct);
+                   // AddInsertLog(nameof(ItemManufacture), itemId);
                 }
-                else
+            }
+
+            // DELETE missing (optional)
+            if (doDeleteMissing)
+            {
+                foreach (var cur in existing)
                 {
-                    var add = new ItemManufacture
+                    var key = (cur.UnitId, cur.ManufacturingTypeId);
+                    if (!incomingKeys.Contains(key))
                     {
-                        ItemId = itemId,
-                        UnitId = dto.UnitId,
-                        ManufacturingTypeId = dto.ManufacturingTypeId,
-                        IsActive = BaseEntity.Status.Active,
-                        IsDeleted = BaseEntity.IsDelete.NotDeleted,
-                        CreatedDate = DateTimeOffset.UtcNow,
-                        CreatedBy = _ctx.CreatedBy ?? 0,
-                        CreatedByName = _ctx.CreatedByName,
-                        CreatedIP = _ctx.CreatedIP
-                    };
-                    await _db.ItemManufacture.AddAsync(add, ct);
-                    AddUpdateLog(nameof(ItemManufacture), itemId, DiffByReflection(new ItemManufacture { ItemId = itemId, UnitId = dto.UnitId, ManufacturingTypeId = dto.ManufacturingTypeId }, add));
+                        _db.ItemManufacture.Remove(cur);
+                        _db.ItemLog.Add(new Core.Domain.Entities.Item.ItemDetail.ItemLog
+                        {
+                            EntityName   = nameof(ItemManufacture),
+                            EntityId     = itemId,
+                            Action       = "Delete",
+                            PropertyName = $"Manufacture({cur.UnitId},{cur.ManufacturingTypeId})",
+                            OldValue     = null,
+                            NewValue     = null
+                        });
+                    }
                 }
             }
-
-            foreach (var row in existing)
-            {
-                if (seen.Contains((row.UnitId, row.ManufacturingTypeId))) continue;
-                var before = new ItemManufacture { ItemId = row.ItemId, UnitId = row.UnitId, ManufacturingTypeId = row.ManufacturingTypeId, IsActive = row.IsActive };
-                row.IsActive = BaseEntity.Status.Inactive;
-                row.ModifiedDate = DateTimeOffset.UtcNow; row.ModifiedBy = _ctx.CreatedBy ?? row.ModifiedBy; row.ModifiedByName = _ctx.CreatedByName ?? row.ModifiedByName; row.ModifiedIP = _ctx.CreatedIP ?? row.ModifiedIP;
-                AddUpdateLog(nameof(ItemManufacture), row.ItemId, DiffByReflection(before, row));
-            }
+            // Save is done by UoW
         }
     }
 }

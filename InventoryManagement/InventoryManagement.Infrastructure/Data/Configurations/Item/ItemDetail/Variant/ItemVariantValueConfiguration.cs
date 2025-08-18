@@ -34,7 +34,17 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
             b.HasOne(x => x.MiscVariantBasedOn)
              .WithMany(i => i.ItemAttributeBasedOn)
              .HasForeignKey(x => x.VariantBasedOn)
-             .OnDelete(DeleteBehavior.Cascade);
+             .OnDelete(DeleteBehavior.NoAction);
+            
+            
+            b.Property(x => x.AttributeGroupId)
+             .HasColumnName("AttributeGroupId")
+             .HasColumnType("int")
+             .IsRequired(false);
+            b.HasOne(x => x.MiscAttributeGroup)
+             .WithMany(i => i.ItemAttributeGroup)
+             .HasForeignKey(x => x.AttributeGroupId)
+             .OnDelete(DeleteBehavior.NoAction);
 
 
             b.Property(x => x.AttributeId)
@@ -44,12 +54,22 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
             b.HasOne(x => x.MiscAttribute)
              .WithMany(i => i.ItemAttribute)
              .HasForeignKey(x => x.AttributeId)
-             .OnDelete(DeleteBehavior.Restrict);
+             .OnDelete(DeleteBehavior.NoAction);
 
             b.Property(x => x.OptionValue)
              .HasColumnName("OptionValue")
              .HasColumnType("varchar(100)")
-             .IsRequired();
+             .IsRequired();           
+            
+            b.Property(x => x.NewItemId)
+                .HasColumnName("NewItemId")
+                .HasColumnType("int")
+                .IsRequired(false); 
+            // --- Self reference (template / variant parent) ---
+            b.HasOne(x => x.NewItem)
+                .WithMany(x => x.VariantNewItem)
+                .HasForeignKey(x => x.NewItemId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

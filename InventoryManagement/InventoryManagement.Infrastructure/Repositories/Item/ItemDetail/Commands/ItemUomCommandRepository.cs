@@ -1,72 +1,110 @@
-// Infrastructure/Repositories/Item/ItemDetail/Commands/ItemUomCommandRepository.cs
+// ItemUomCommandRepository.cs
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.Item.ItemDetail.Commands;
 using Core.Application.Item.ItemDetail.Queries.GetAllItems;
 using Core.Domain.Entities.Item.ItemDetail;
 using InventoryManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+
 namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Commands
 {
-    public sealed class ItemUomCommandRepository : IItemUomCommandRepository
-    {
-        private readonly ApplicationDbContext _db;
-        public ItemUomCommandRepository(ApplicationDbContext db) => _db = db;
-
-        public async Task<List<ItemUomDto>> GetByItemIdAsync(int itemId, CancellationToken ct = default)
+    public sealed class ItemUomCommandRepository : ItemLogRepositoryBase, IItemUomCommandRepository
+    {       
+        public ItemUomCommandRepository(ApplicationDbContext db, IIPAddressService ipAddressService)
+            : base(db, ipAddressService) { }
+        public async Task<IReadOnlyList<ItemUOM>> GetByItemIdAsync(int itemId, CancellationToken ct)
         {
-            return await _db.ItemUOMs.AsNoTracking()
+            // If your DbSet is singular, use _db.ItemUOM
+            return await _db.ItemUOMs
                 .Where(x => x.ItemId == itemId)
-                .Select(x => new ItemUomDto
-                {
-                    BaseUOMId = x.BaseUOMId,
-                    ConversionUOMId = x.ConversionUOMId,
-                    ConversionRate = x.ConversionRate
-                })
                 .ToListAsync(ct);
         }
 
-        public async Task UpdateAsync(int itemId, IEnumerable<ItemUomDto> rows, CancellationToken ct = default)
+        public async Task UpdateAsync(int itemId, IReadOnlyCollection<ItemUomDto> rows, CancellationToken ct)
         {
+            var doDeleteMissing = true; // set to false if you only want insert/update
+
+            // Normalize incoming and keep only rows with a non-null, positive ConversionUOMId
+            var incoming = (rows ?? Array.Empty<ItemUomDto>())
+                .Where(r => r is not null && r.ConversionUOMId.HasValue && r.ConversionUOMId.Value > 0)
+                .Select(r => new ItemUOM
+                {
+                    ItemId          = itemId,
+                    ConversionUOMId = r.ConversionUOMId!.Value,   // safe due to filter above
+                    ConversionRate  = r.ConversionRate
+                })
+                .ToList();
+
+            // Load existing rows for this item
             var existing = await _db.ItemUOMs
                 .Where(x => x.ItemId == itemId)
                 .ToListAsync(ct);
 
-            var map = existing.ToDictionary(k => k.ConversionUOMId!.Value);
-            var seen = new HashSet<int>();
+            // Build a dictionary keyed by non-null ConversionUOMId
+            var existingWithKey = existing
+                .Where(e => e.ConversionUOMId.HasValue)
+                .ToList();
 
-            foreach (var dto in rows)
+            var existingByKey = existingWithKey
+                .ToDictionary(e => e.ConversionUOMId!.Value);
+
+            // Build the incoming key set (non-null ints)
+            var incomingKeys = new HashSet<int>(incoming.Select(i => i.ConversionUOMId!.Value));
+
+            // INSERT or UPDATE
+            foreach (var inc in incoming)
             {
-                if (!dto.ConversionUOMId.HasValue)
-                    throw new InvalidOperationException("ConversionUOMId is required for UOM row.");
+                var key = inc.ConversionUOMId!.Value;
 
-                var key = dto.ConversionUOMId.Value;
-                seen.Add(key);
-
-                if (map.TryGetValue(key, out var row))
+                if (existingByKey.TryGetValue(key, out var cur))
                 {
-                    row.BaseUOMId = dto.BaseUOMId;
-                    row.ConversionRate = dto.ConversionRate;
-                    // EF will track modified values
+                    var changes = new List<PropertyChange>();
+
+                    // Update scalar fields if changed (keeps logs clean)
+                    if (cur.ConversionRate != inc.ConversionRate)
+                    {
+                        changes.Add(new PropertyChange(
+                            Property: $"UOM({key}).ConversionRate",
+                            OldValue: cur.ConversionRate?.ToString(),
+                            NewValue: inc.ConversionRate?.ToString()
+                        ));
+                        cur.ConversionRate = inc.ConversionRate;
+                    }
+
+                    if (changes.Count > 0)
+                        TryAddUpdateLog(nameof(ItemUOM), itemId, changes);
                 }
                 else
                 {
-                    await _db.ItemUOMs.AddAsync(new ItemUOM
-                    {
-                        ItemId = itemId,
-                        BaseUOMId = dto.BaseUOMId,
-                        ConversionUOMId = dto.ConversionUOMId,
-                        ConversionRate = dto.ConversionRate
-                    }, ct);
+                    await _db.ItemUOMs.AddAsync(inc, ct);
+                  //  AddInsertLog(nameof(ItemUOM), itemId);
                 }
             }
 
-            // Remove rows not present anymore
-            foreach (var row in existing)
+            // DELETE missing (optional)
+            if (doDeleteMissing)
             {
-                if (row.ConversionUOMId.HasValue && !seen.Contains(row.ConversionUOMId.Value))
+                foreach (var cur in existingWithKey)
                 {
-                    _db.ItemUOMs.Remove(row);
+                    var key = cur.ConversionUOMId!.Value;
+                    if (!incomingKeys.Contains(key))
+                    {
+                        _db.ItemUOMs.Remove(cur);
+
+                        // Log as a delete action
+                        _db.ItemLog.Add(new Core.Domain.Entities.Item.ItemDetail.ItemLog
+                        {
+                            EntityName   = nameof(ItemUOM),
+                            EntityId     = itemId,
+                            Action       = "Delete",
+                            PropertyName = $"UOM({key})",
+                            OldValue     = cur.ConversionRate?.ToString(),
+                            NewValue     = null
+                        });
+                    }
                 }
             }
+            // SaveChanges handled by UnitOfWork outside
         }
     }
 }

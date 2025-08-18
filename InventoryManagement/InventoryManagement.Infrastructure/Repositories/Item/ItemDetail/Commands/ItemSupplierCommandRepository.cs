@@ -1,6 +1,6 @@
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.Item.ItemDetail.Commands;
 using Core.Application.Item.ItemDetail.Queries.GetAllItems;
-using Core.Domain.Common;
 using Core.Domain.Entities.Item.ItemDetail;
 using InventoryManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -8,65 +8,104 @@ using Microsoft.EntityFrameworkCore;
 namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Commands
 {
     public sealed class ItemSupplierCommandRepository : ItemLogRepositoryBase, IItemSupplierCommandRepository
-    {
-        public ItemSupplierCommandRepository(ApplicationDbContext db, IExecutionContext ctx) : base(db, ctx) { }
-
-        public async Task<List<ItemSupplierDto>> GetByItemIdAsync(int itemId, CancellationToken ct = default)
-            => await _db.ItemSupplier.AsNoTracking()
-                .Where(x => x.ItemId == itemId && x.IsDeleted == BaseEntity.IsDelete.NotDeleted)
-                .Select(x => new ItemSupplierDto { SupplierId = x.SupplierId, UnitId = x.UnitId, SupplierPartNo = x.SupplierPartNo })
-                .ToListAsync(ct);
-
-        public async Task UpdateAsync(int itemId, IEnumerable<ItemSupplierDto> suppliers, CancellationToken ct = default)
+    {       
+        public ItemSupplierCommandRepository(ApplicationDbContext db, IIPAddressService ipAddressService)
+            : base(db, ipAddressService) { }
+        public async Task<IReadOnlyList<ItemSupplier>> GetByItemIdAsync(int itemId, CancellationToken ct)
         {
+            var list = await _db.ItemSupplier
+                .Where(x => x.ItemId == itemId)
+                .ToListAsync(ct);
+            return list;
+        }
+
+        /// <summary>
+        /// Synchronize suppliers for an item:
+        ///  - Insert new (SupplierId, UnitId) pairs
+        ///  - Update changed scalar fields (e.g., SupplierPartNo)
+        ///  - Delete rows that are not in payload  (toggle 'doDeleteMissing' if you want insert/update only)
+        /// </summary>
+        public async Task UpdateAsync(int itemId, IReadOnlyCollection<ItemSupplierDto> rows, CancellationToken ct)
+        {
+            var doDeleteMissing = true; // set false if you want insert/update only
+
+            // Normalize incoming payload
+            var incoming = (rows ?? Array.Empty<ItemSupplierDto>())
+                .Where(r => r is not null && r.SupplierId > 0 && r.UnitId > 0)
+                .Select(r => new ItemSupplier
+                {
+                    ItemId         = itemId,
+                    SupplierId     = r.SupplierId,
+                    UnitId         = r.UnitId,
+                    SupplierPartNo = string.IsNullOrWhiteSpace(r.SupplierPartNo) ? null : r.SupplierPartNo.Trim()
+                })
+                .ToList();
+
+            // Load existing tracked rows
             var existing = await _db.ItemSupplier
-                .Where(x => x.ItemId == itemId && x.IsDeleted == BaseEntity.IsDelete.NotDeleted)
+                .Where(x => x.ItemId == itemId)
                 .ToListAsync(ct);
 
-            var map = existing.ToDictionary(k => (k.SupplierId, k.UnitId));
-            var seen = new HashSet<(int SupplierId, int UnitId)>();
+            // Build key sets (SupplierId, UnitId)
+            var incomingKeys = new HashSet<(int SupplierId, int UnitId)>(
+                incoming.Select(i => (i.SupplierId, i.UnitId)));
 
-            foreach (var dto in suppliers)
+            var existingByKey = existing.ToDictionary(e => (e.SupplierId, e.UnitId));
+
+            // INSERT or UPDATE
+            foreach (var inc in incoming)
             {
-                var key = (dto.SupplierId, dto.UnitId);
-                seen.Add(key);
-
-                if (map.TryGetValue(key, out var row))
+                if (existingByKey.TryGetValue((inc.SupplierId, inc.UnitId), out var cur))
                 {
-                    var before = new ItemSupplier { ItemId = row.ItemId, SupplierId = row.SupplierId, UnitId = row.UnitId, SupplierPartNo = row.SupplierPartNo, IsActive = row.IsActive };
-                    row.SupplierPartNo = dto.SupplierPartNo;
-                    row.IsActive = BaseEntity.Status.Active;
-                    row.ModifiedDate = DateTimeOffset.UtcNow; row.ModifiedBy = _ctx.CreatedBy ?? row.ModifiedBy; row.ModifiedByName = _ctx.CreatedByName ?? row.ModifiedByName; row.ModifiedIP = _ctx.CreatedIP ?? row.ModifiedIP;
-                    AddUpdateLog(nameof(ItemSupplier), row.ItemId, DiffByReflection(before, row));
+                    // UPDATE scalar fields (compare first; only set if changed to keep logs clean)
+                    var changes = new List<PropertyChange>();
+
+                    if (!string.Equals(cur.SupplierPartNo, inc.SupplierPartNo, StringComparison.Ordinal))
+                    {
+                        changes.Add(new PropertyChange(
+                            Property: $"Supplier({cur.SupplierId},{cur.UnitId}).SupplierPartNo",
+                            OldValue: cur.SupplierPartNo,
+                            NewValue: inc.SupplierPartNo
+                        ));
+                        cur.SupplierPartNo = inc.SupplierPartNo;
+                    }
+
+                    if (changes.Count > 0)
+                        TryAddUpdateLog(nameof(ItemSupplier), itemId, changes);
                 }
                 else
                 {
-                    var add = new ItemSupplier
-                    {
-                        ItemId = itemId,
-                        SupplierId = dto.SupplierId,
-                        UnitId = dto.UnitId,
-                        SupplierPartNo = dto.SupplierPartNo,
-                        IsActive = BaseEntity.Status.Active,
-                        IsDeleted = BaseEntity.IsDelete.NotDeleted,
-                        CreatedDate = DateTimeOffset.UtcNow,
-                        CreatedBy = _ctx.CreatedBy ?? 0,
-                        CreatedByName = _ctx.CreatedByName,
-                        CreatedIP = _ctx.CreatedIP
-                    };
-                    await _db.ItemSupplier.AddAsync(add, ct);
-                    AddUpdateLog(nameof(ItemSupplier), itemId, DiffByReflection(new ItemSupplier { ItemId = itemId, SupplierId = dto.SupplierId, UnitId = dto.UnitId }, add));
+                    // INSERT
+                    await _db.ItemSupplier.AddAsync(inc, ct);
+                   // AddInsertLog(nameof(ItemSupplier), itemId);
                 }
             }
 
-            foreach (var row in existing)
+            // DELETE missing (optional)
+            if (doDeleteMissing)
             {
-                if (seen.Contains((row.SupplierId, row.UnitId))) continue;
-                var before = new ItemSupplier { ItemId = row.ItemId, SupplierId = row.SupplierId, UnitId = row.UnitId, IsActive = row.IsActive };
-                row.IsActive = BaseEntity.Status.Inactive;
-                row.ModifiedDate = DateTimeOffset.UtcNow; row.ModifiedBy = _ctx.CreatedBy ?? row.ModifiedBy; row.ModifiedByName = _ctx.CreatedByName ?? row.ModifiedByName; row.ModifiedIP = _ctx.CreatedIP ?? row.ModifiedIP;
-                AddUpdateLog(nameof(ItemSupplier), row.ItemId, DiffByReflection(before, row));
+                foreach (var cur in existing)
+                {
+                    var key = (cur.SupplierId, cur.UnitId);
+                    if (!incomingKeys.Contains(key))
+                    {
+                        _db.ItemSupplier.Remove(cur);
+
+                        // log delete as an update entry with a marker, or create a separate ItemLog Action="Delete"
+                        _db.ItemLog.Add(new Core.Domain.Entities.Item.ItemDetail.ItemLog
+                        {
+                            EntityName   = nameof(ItemSupplier),
+                            EntityId     = itemId,
+                            Action       = "Delete",
+                            PropertyName = $"Supplier({cur.SupplierId},{cur.UnitId})",
+                            OldValue     = cur.SupplierPartNo,
+                            NewValue     = null
+                        });
+                    }
+                }
             }
+
+            // Note: SaveChanges is handled by UoW outside.
         }
     }
 }

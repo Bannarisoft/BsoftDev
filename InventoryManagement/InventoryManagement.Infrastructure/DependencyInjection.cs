@@ -8,10 +8,12 @@ using Core.Application.Common.Interfaces.IMiscTypeMaster;
 using Core.Application.Common.Interfaces.Item.ItemCategory;
 using Core.Application.Common.Interfaces.Item.ItemDetail;
 using Core.Application.Common.Interfaces.Item.ItemDetail.Commands;
+using Core.Application.Common.Interfaces.Item.ItemDetail.Queries;
 using Core.Application.Common.Interfaces.Item.ItemGroup;
 using Core.Application.Common.Interfaces.IUOM;
 using Core.Application.Common.Interfaces.IUOMConversion;
 using Core.Application.Common.Mappings;
+using Core.Application.Common.Mappings.Item.ItemDetail;
 using Infrastructure.Data;
 using Infrastructure.Persistence.Repositories;
 using InventoryManagement.Infrastructure.Data;
@@ -19,6 +21,8 @@ using InventoryManagement.Infrastructure.Repositories;
 using InventoryManagement.Infrastructure.Repositories.HSNMaster;
 using InventoryManagement.Infrastructure.Repositories.Item.ItemCategory;
 using InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Commands;
+using InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Queries;
+using InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Variant;
 using InventoryManagement.Infrastructure.Repositories.Item.ItemGroup;
 using InventoryManagement.Infrastructure.Repositories.MiscMaster;
 using InventoryManagement.Infrastructure.Repositories.MiscTypeMaster;
@@ -130,11 +134,14 @@ namespace InventoryManagement.Infrastructure
             services.AddScoped<IItemCommandRepository, ItemCommandRepository>();            
             services.AddScoped<IItemPurchaseCommandRepository, ItemPurchaseCommandRepository>();
             services.AddScoped<IItemInventoryCommandRepository, ItemInventoryCommandRepository>();
-            services.AddScoped<IItemQualityCommandRepository, ItemQualityCommandRepository>();
-            services.AddScoped<IItemVariantDefCommandRepository, ItemVariantDefCommandRepository>();
+            services.AddScoped<IItemQualityCommandRepository, ItemQualityCommandRepository>();            
             services.AddScoped<IItemUomCommandRepository, ItemUomCommandRepository>();
             services.AddScoped<IItemManufactureCommandRepository, ItemManufactureCommandRepository>();
             services.AddScoped<IItemSupplierCommandRepository, ItemSupplierCommandRepository>();
+            services.AddScoped<IItemVariantValueCommandRepository, ItemVariantValueCommandRepository>();
+            services.AddScoped<IItemVariantValueQueryRepository, ItemVariantValueQueryRepository>();
+            services.AddScoped<IItemQueryRepository, ItemQueryRepository>();
+            
 
 
             // Miscellaneous services
@@ -150,7 +157,9 @@ namespace InventoryManagement.Infrastructure
                 typeof(MiscMasterProfile),               
                 typeof(HSNMasterProfile),
                 typeof(UOMProfile),
-                typeof(UOMConversionProfile)
+                typeof(UOMConversionProfile),
+                typeof(ItemProfile)
+                
                 
             );
             return services;

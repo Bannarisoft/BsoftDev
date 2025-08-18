@@ -87,9 +87,9 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
                 .HasColumnType("int")
                 .IsRequired(false);
             b.HasOne(x => x.MiscClassification)
-                .WithMany(c => c.ItemMasterClassification) 
-                .HasForeignKey(x => x.ItemClassificationId)
-                .OnDelete(DeleteBehavior.Restrict);
+                 .WithMany(c => c.ItemMasterClassification) 
+                 .HasForeignKey(x => x.ItemClassificationId)
+                 .OnDelete(DeleteBehavior.NoAction);
 
             b.Property(x => x.Description)
                 .HasColumnName("Description")
@@ -108,8 +108,7 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
             b.HasOne(x => x.MiscStatus)
                 .WithMany(c => c.ItemMasterStatus) 
                 .HasForeignKey(x => x.XPlantMaterialStatusId)
-                .OnDelete(DeleteBehavior.Restrict);
-
+                .OnDelete(DeleteBehavior.NoAction);
 
             b.Property(x => x.IsStockItem)
                 .HasColumnName("IsStockItem")

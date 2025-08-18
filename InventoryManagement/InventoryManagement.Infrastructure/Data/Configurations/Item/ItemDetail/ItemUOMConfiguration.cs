@@ -10,13 +10,17 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
         {
             b.ToTable("ItemUOM", "Inventory");
 
-            // Composite PK (requires non-nullable properties)
-            b.HasKey(x => new { x.ItemId, x.ConversionUOMId });
+            b.HasKey(x => x.Id);
+            b.Property(x => x.Id)
+             .HasColumnName("Id")
+             .HasColumnType("int")
+             .UseIdentityColumn();   
 
             b.Property(x => x.ItemId)
              .HasColumnName("ItemId")
              .HasColumnType("int")
              .IsRequired();
+             b.HasIndex(x => x.ItemId).IsUnique();
             b.HasOne(x => x.Item)
              .WithMany(i => i.ItemUOMs)
              .HasForeignKey(x => x.ItemId)
