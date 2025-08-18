@@ -11,6 +11,6 @@ namespace Contracts.Interfaces.External.IInvetoryManagement
        // Task<List<MiscMasterDto>> GetMiscMasterByIdAsync(string miscType);
 
         Task<List<MiscMasterDto>> GetMiscMasterByIdAsync(string miscType);
-        Task<(int WarehouseTypeId, int StorageTypeId, int AreaTypeId, int OperationTypeId)> GetMiscTypeIdsAsync();
+        Task<(int? WarehouseTypeId, int? StorageTypeId, int? AreaTypeId, int? OperationTypeId , int? FloorTypeId ,int? AisleTypeId, int? RackLevelTypeId )> GetMiscTypeIdsAsync();
     }
 }

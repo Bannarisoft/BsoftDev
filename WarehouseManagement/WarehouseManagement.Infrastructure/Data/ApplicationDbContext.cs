@@ -28,6 +28,7 @@ namespace WarehouseManagement.Infrastructure.Data
         {
             modelBuilder.ApplyConfiguration(new WarehouseMasterConfiguration());
             modelBuilder.ApplyConfiguration(new WarehouseItemGroupMappingConfiguration());
+            modelBuilder.ApplyConfiguration(new RackMasterConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }

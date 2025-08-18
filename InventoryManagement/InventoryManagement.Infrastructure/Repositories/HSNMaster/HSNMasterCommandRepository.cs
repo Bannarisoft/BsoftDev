@@ -43,7 +43,7 @@ namespace InventoryManagement.Infrastructure.Repositories.HSNMaster
             existingEntity.GSTPercentage = hsnMaster.GSTPercentage;
             existingEntity.IGSTPercentage = hsnMaster.IGSTPercentage;
             existingEntity.ValidFrom = hsnMaster.ValidFrom;
-
+            existingEntity.IsActive = hsnMaster.IsActive;
 
             existingEntity.ModifiedBy = hsnMaster.ModifiedBy;
             existingEntity.ModifiedByName = hsnMaster.ModifiedByName;

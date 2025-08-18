@@ -29,11 +29,75 @@ namespace WarehouseManagement.Infrastructure.Data.Configurations
             builder.ToTable("RackMaster", "Warehouse");
             builder.HasKey(x => x.Id);
 
-            builder.Property(x => x.WarehouseId).IsRequired();
-            builder.Property(x => x.RackCode).IsRequired().HasMaxLength(50);
-           
-         
+              builder.Property(x => x.WarehouseId)
+                   .IsRequired();
 
+            builder.Property(x => x.RackCode)
+                   .IsRequired()
+                   .HasMaxLength(50)
+                   .HasColumnType("nvarchar(50)");
+
+            builder.Property(x => x.RackName)
+                   .IsRequired()
+                   .HasMaxLength(100);
+
+            builder.Property(x => x.FloorId)
+                   .IsRequired()
+                   .HasColumnType("int");
+
+            builder.Property(x => x.AisleId)
+                    .HasColumnType("int")
+                    .IsRequired();
+
+            builder.Property(x => x.RackLevelId)
+                    .HasColumnType("int")
+                    .IsRequired(); 
+         
+              builder.Property(x => x.MaxCapacity)
+                   .HasPrecision(18, 2);
+
+            builder.Property(x => x.CapacityUOMId)
+                   .HasColumnType("int");
+
+            builder.Property(x => x.RackWidth)
+                   .HasPrecision(18, 2);
+
+            builder.Property(x => x.RackHeight)
+                   .HasPrecision(18, 2);
+
+            builder.Property(x => x.DimensionUOMId)
+                   .HasColumnType("int");
+
+
+              builder.Property(b => b.IsActive)
+               .HasColumnName("IsActive")
+               .HasColumnType("bit")
+               .HasConversion(statusConverter)
+               .IsRequired();
+
+            builder.Property(b => b.IsDeleted)
+                .HasColumnName("IsDeleted")
+                .HasColumnType("bit")
+                .HasConversion(isDeleteConverter)
+                .IsRequired();
+
+
+            builder.Property(b => b.CreatedByName)
+                .IsRequired()
+                .HasColumnType("varchar(50)");
+
+
+            builder.Property(b => b.CreatedIP)
+                .IsRequired()
+                .HasColumnType("varchar(255)");
+
+            builder.Property(b => b.ModifiedByName)
+                .HasColumnType("varchar(50)");
+
+            builder.Property(b => b.ModifiedIP)
+                .HasColumnType("varchar(255)");
+
+           
 
             // Rack -> Warehouse (many-to-one)
             builder.HasOne(x => x.Warehouse)

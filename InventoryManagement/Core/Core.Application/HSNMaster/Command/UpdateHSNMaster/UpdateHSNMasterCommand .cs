@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.HSNMaster.Command.UpdateHSNMaster
 {
-    public class UpdateHSNMasterCommand  : IRequest<ApiResponseDTO<int>>
+    public class UpdateHSNMasterCommand : IRequest<ApiResponseDTO<int>>
     {
         public int Id { get; set; }
         public int TypeId { get; set; }
@@ -16,7 +16,8 @@ namespace Core.Application.HSNMaster.Command.UpdateHSNMaster
         public int GSTCategoryId { get; set; }
         public decimal GSTPercentage { get; set; }
         public decimal IGSTPercentage { get; set; }
-        public DateTimeOffset ValidFrom { get; set; }
+        public DateTimeOffset ValidFrom { get; set; }        
+        public byte IsActive { get; set; }
         
     }
 }
