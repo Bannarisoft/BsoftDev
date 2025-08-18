@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Domain.Common;
+using Core.Domain.Entities.Item.ItemDetail;
 
 namespace Core.Domain.Entities
 {
@@ -18,6 +19,10 @@ namespace Core.Domain.Entities
 
         public ICollection<UOMConversion>? FromUOMConversions { get; set; }
         public ICollection<UOMConversion>? ToUOMConversions { get; set; }
+        public ICollection<ItemMaster>? ItemMasterUOM { get; set; }
+        public ICollection<ItemUOM>? ItemUOM { get; set; }
+        public ICollection<ItemPurchase>? PurchaseUOM { get; set; }
+        public ICollection<ItemInventory>? InventoryUOM { get; set; }
 
     }
 }

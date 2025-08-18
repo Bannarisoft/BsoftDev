@@ -55,6 +55,7 @@ namespace SagaOrchestrator.Infrastructure
                 x.AddSagaStateMachine<WorkOrderSchedulerStateMachine, WorkOrderSchedulerState>().InMemoryRepository();
                 x.AddSagaStateMachine<PreventiveSchedulerStateMachine, PreventiveSchedulerState>().InMemoryRepository();
                 x.AddSagaStateMachine<PreventiveSchedulerUpdateStateMachine, PreventiveUpdateState>().InMemoryRepository();
+                
 
                 // ✅ Register WorkOrderNotificationState saga and activity
                 x.AddSagaStateMachine<WorkOrderNotificationState, NotificationWorkOrder>()
