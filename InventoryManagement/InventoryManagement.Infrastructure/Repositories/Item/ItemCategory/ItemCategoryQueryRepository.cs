@@ -13,45 +13,30 @@ namespace  InventoryManagement.Infrastructure.Repositories.Item.ItemCategory
         public ItemCategoryQueryRepository(IDbConnection dbConnection)
         {
             _dbConnection = dbConnection;            
-        }       
+        }
         public async Task<ItemCategoryDto> GetByIdAsync(int Id)
         {
-            const string query = @"
-        WITH CategoryTree AS (
-            SELECT IC.Id,IC.ItemCategoryName,IG.Id AS ItemGroupId,IG.ItemGroupName,IC.IsGroup,IC.ParentCategoryId,IC1.ItemCategoryName AS ParentCategoryName,
-                IC.IsBudgetApplicable,IC.IsActive,IC.IsDeleted,IC.CreatedBy,IC.CreatedDate,IC.CreatedByName,IC.CreatedIP,IC.ModifiedBy,
-                IC.ModifiedDate,IC.ModifiedByName,IC.ModifiedIP
-            FROM Inventory.ItemCategory IC
-            INNER JOIN Inventory.ItemGroup IG ON IG.Id = IC.ItemGroupId
-            LEFT JOIN Inventory.ItemCategory IC1 ON IC.ParentCategoryId = IC1.Id -- ✅ FIXED
-            WHERE IC.Id = @Id AND IC.IsDeleted = 0
-            UNION ALL
-            SELECT IC.Id,IC.ItemCategoryName,IG.Id AS ItemGroupId,IG.ItemGroupName,IC.IsGroup,IC.ParentCategoryId,CT.ItemCategoryName AS ParentCategoryName,
-                IC.IsBudgetApplicable,IC.IsActive,IC.IsDeleted,IC.CreatedBy,IC.CreatedDate,IC.CreatedByName,IC.CreatedIP,IC.ModifiedBy,
-                IC.ModifiedDate,IC.ModifiedByName,IC.ModifiedIP
-            FROM Inventory.ItemCategory IC
-            INNER JOIN Inventory.ItemGroup IG ON IG.Id = IC.ItemGroupId
-            INNER JOIN CategoryTree CT ON IC.ParentCategoryId = CT.Id
-            WHERE IC.IsDeleted = 0)
-			  SELECT * FROM CategoryTree;
-            ";
+                const string sql = @"
+SELECT 
+    IC.Id,
+    IC.ItemCategoryName,
+    IG.Id AS ItemGroupId,
+    IG.ItemGroupName,
+    IC.IsGroup,
+    CASE WHEN IC.ParentCategoryId = IC.Id THEN NULL ELSE IC.ParentCategoryId END AS ParentCategoryId,
+    CASE WHEN IC.ParentCategoryId = IC.Id THEN NULL ELSE IC1.ItemCategoryName END AS ParentCategoryName,
+    IC.IsBudgetApplicable,
+    IC.IsActive,
+    IC.IsDeleted,
+    IC.CreatedBy, IC.CreatedDate, IC.CreatedByName, IC.CreatedIP,
+    IC.ModifiedBy, IC.ModifiedDate, IC.ModifiedByName, IC.ModifiedIP
+FROM Inventory.ItemCategory IC
+JOIN Inventory.ItemGroup IG ON IG.Id = IC.ItemGroupId
+LEFT JOIN Inventory.ItemCategory IC1 ON IC.ParentCategoryId = IC1.Id
+WHERE IC.IsDeleted = 0
+  AND IC.Id = @Id;";
 
-            var allCategories = (await _dbConnection.QueryAsync<ItemCategoryDto>(query, new { Id })).ToList();
-
-            // Create lookup dictionary
-            var lookup = allCategories.ToDictionary(x => x.Id);
-
-            // Build nested subGroups
-            foreach (var node in allCategories)
-            {
-                if (node.ParentCategoryId.HasValue && lookup.ContainsKey(node.ParentCategoryId.Value))
-                {
-                    lookup[node.ParentCategoryId.Value].SubGroups.Add(node);
-                }
-            }
-
-            // Return the requested node with its tree
-            return lookup.TryGetValue(Id, out var root) ? root : null;
+    return await _dbConnection.QueryFirstOrDefaultAsync<ItemCategoryDto>(sql, new { Id = Id });
         }
         public async Task<(IEnumerable<dynamic>, int)> GetAllItemCategoryAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
