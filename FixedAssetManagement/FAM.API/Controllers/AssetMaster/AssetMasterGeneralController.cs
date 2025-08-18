@@ -250,7 +250,7 @@ namespace FAM.API.Controllers.AssetMaster
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                message = file,
+                message = "File uploaded successfully.",
                 data = file,
                 errors = ""
             });
