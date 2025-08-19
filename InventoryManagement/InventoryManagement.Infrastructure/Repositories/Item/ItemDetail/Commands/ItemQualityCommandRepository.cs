@@ -17,7 +17,7 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Comman
         public async Task CreateAsync(ItemQuality quality, CancellationToken ct = default)
         {
             await _db.ItemQuality.AddAsync(quality, ct);
-            var changes = DiffByReflection(new ItemQuality { ItemId = quality.ItemId }, quality);            
+            var changes = DiffByReflection(new ItemQuality { ItemId = quality.ItemId }, quality);
         }
 
         public async Task UpdateAsync(ItemQuality updated, CancellationToken ct = default)
@@ -41,8 +41,8 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Comman
             entry.Property(x => x.Id).IsModified = false;
             entry.Property(x => x.ItemId).IsModified = false;
 
-            var changes = GetModifiedProps(entry);     
-            TryAddUpdateLog(nameof(ItemQuality), existing.ItemId, changes);                   
-        }
+            var changes = GetModifiedProps(entry);
+            TryAddUpdateLog(nameof(ItemQuality), existing.ItemId, changes);
+        }    
     }
 }

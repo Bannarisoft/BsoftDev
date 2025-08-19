@@ -1,3 +1,5 @@
+using Core.Domain.Entities.Item.ItemDetail.Templates;
+
 namespace Core.Domain.Entities.Item.ItemDetail
 {
     public class ItemQuality
@@ -6,6 +8,7 @@ namespace Core.Domain.Entities.Item.ItemDetail
         public int ItemId { get; set; }
         public ItemMaster Item { get; set; } = null!;
         public int? InspectionTemplateId { get; set; }
+        public InspectionTemplate? InspectionTemplate { get; set; }  
         public int? CertificateTypeId { get; set; }
         public MiscMaster MiscCertificateType { get; set; } = null!;
         public int? InspLotProcessingTime { get; set; }

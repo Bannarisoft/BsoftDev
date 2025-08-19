@@ -6,6 +6,6 @@ namespace Core.Application.Common.Interfaces.Item.ItemDetail.Commands
     {
         Task<ItemQuality?> GetByItemIdAsync(int itemId, CancellationToken ct = default);
         Task CreateAsync(ItemQuality quality, CancellationToken ct = default);
-        Task UpdateAsync(ItemQuality entity, CancellationToken ct = default);        
+        Task UpdateAsync(ItemQuality entity, CancellationToken ct = default);               
     }
 }

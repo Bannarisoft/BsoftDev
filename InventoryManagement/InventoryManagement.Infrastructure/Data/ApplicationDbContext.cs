@@ -13,6 +13,9 @@ using Core.Domain.Entities.Item.ItemDetail;
 using Core.Domain.Entities.Item.ItemDetail.Variant;
 using InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail;
 using InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail.Variant;
+using InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail.Templates;
+using Core.Domain.Entities.item.ItemDetail.Templates;
+using Core.Domain.Entities.Item.ItemDetail.Templates;
 
 namespace InventoryManagement.Infrastructure.Data
 {
@@ -50,9 +53,9 @@ namespace InventoryManagement.Infrastructure.Data
         public DbSet<ItemVariantValue> ItemVariantValue { get; set; } 
         public DbSet<ItemLog> ItemLog { get; set; } 
         public DbSet<ItemUOM> ItemUOMs { get; set; } 
-        
-
-
+        public DbSet<InspectionParameter> InspectionParameter { get; set; } 
+        public DbSet<InspectionTemplate> InspectionTemplate { get; set; } 
+        //End  Item related DbSets
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -67,7 +70,7 @@ namespace InventoryManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new HSNMasterConfiguration());
             modelBuilder.ApplyConfiguration(new UOMConfiguration());
             modelBuilder.ApplyConfiguration(new UOMConversionConfiguration());
-
+            //Item
             modelBuilder.ApplyConfiguration(new ItemMasterConfiguration());
             modelBuilder.ApplyConfiguration(new ItemSupplierConfiguration());
             modelBuilder.ApplyConfiguration(new ItemManufactureConfiguration());
@@ -77,6 +80,8 @@ namespace InventoryManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new ItemVariantValueConfiguration());
             modelBuilder.ApplyConfiguration(new ItemUOMConfiguration());
             modelBuilder.ApplyConfiguration(new ItemLogConfiguration());
+            modelBuilder.ApplyConfiguration(new InspectionParameterConfiguration());
+            modelBuilder.ApplyConfiguration(new InspectionTemplateConfiguration());
 
 
             base.OnModelCreating(modelBuilder);

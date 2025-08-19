@@ -30,6 +30,10 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
              .HasColumnName("InspectionTemplateId")
              .HasColumnType("int")
              .IsRequired(false);
+            b.HasOne(x => x.InspectionTemplate)
+             .WithMany(t => t.Items)
+             .HasForeignKey(x => x.InspectionTemplateId)
+             .OnDelete(DeleteBehavior.Restrict); 
 
             b.Property(x => x.CertificateTypeId)
              .HasColumnName("CertificateTypeId")
