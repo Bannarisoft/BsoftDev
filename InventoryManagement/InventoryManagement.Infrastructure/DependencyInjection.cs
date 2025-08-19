@@ -10,6 +10,7 @@ using Core.Application.Common.Interfaces.Item.ItemDetail;
 using Core.Application.Common.Interfaces.Item.ItemDetail.Commands;
 using Core.Application.Common.Interfaces.Item.ItemDetail.Queries;
 using Core.Application.Common.Interfaces.Item.ItemGroup;
+using Core.Application.Common.Interfaces.Item.Templates;
 using Core.Application.Common.Interfaces.IUOM;
 using Core.Application.Common.Interfaces.IUOMConversion;
 using Core.Application.Common.Mappings;
@@ -24,6 +25,7 @@ using InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Commands;
 using InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Queries;
 using InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Variant;
 using InventoryManagement.Infrastructure.Repositories.Item.ItemGroup;
+using InventoryManagement.Infrastructure.Repositories.Item.Templates;
 using InventoryManagement.Infrastructure.Repositories.MiscMaster;
 using InventoryManagement.Infrastructure.Repositories.MiscTypeMaster;
 using InventoryManagement.Infrastructure.Repositories.UOMConversion;
@@ -141,6 +143,7 @@ namespace InventoryManagement.Infrastructure
             services.AddScoped<IItemVariantValueCommandRepository, ItemVariantValueCommandRepository>();
             services.AddScoped<IItemVariantValueQueryRepository, ItemVariantValueQueryRepository>();
             services.AddScoped<IItemQueryRepository, ItemQueryRepository>();
+            services.AddScoped<ITemplateRepository,TemplateRepository>();
             
 
 
