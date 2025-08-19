@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IWarehouseMaster;
 using Core.Application.WarehouseMaster.GetAllWarehouseMaster;
+using Core.Application.WarehouseMaster.Queries.GetWareMasterAutoComplete;
 using Dapper;
 
 namespace WarehouseManagement.Infrastructure.Repositories.WarehouseMaster
@@ -37,8 +38,11 @@ namespace WarehouseManagement.Infrastructure.Repositories.WarehouseMaster
                     w.UnitId,
                     w.ParentWarehouseId,
                     w.IsGroup,
+                    w.IsVirtualWarehouse,
                     w.WarehouseTypeId,
                     w.StorageTypeId,
+                    w.AreaTypeId,
+                    w.OperationTypeId,
                     w.CapacityUOMId,
                     w.AccountId,
                     w.ContactPersonName,
@@ -86,14 +90,14 @@ namespace WarehouseManagement.Infrastructure.Repositories.WarehouseMaster
 
             return (warehouseList, totalCount);
         }
-        
-         public async Task<WarehouseMasterDto?> GetByIdAsync(int id)
-            {
-                var query = @"
+
+        public async Task<WarehouseMasterDto?> GetByIdAsync(int id)
+        {
+            var query = @"
                     SELECT 
-                        wm.Id, wm.WarehouseCode, wm.WarehouseName, wm.UnitId,
+                        wm.Id, wm.WarehouseCode, wm.WarehouseName, wm.UnitId,wm.IsVirtualWarehouse,
                         wm.ParentWarehouseId, wm.IsGroup, wm.WarehouseTypeId,
-                        wm.StorageTypeId, wm.CapacityUOMId, wm.AccountId,
+                        wm.StorageTypeId,wm.AreaTypeId, wm.OperationTypeId, wm.CapacityUOMId, wm.AccountId,
                         wm.ContactPersonName, wm.MobileNumber, wm.Email,
                         wm.AddressLine1, wm.AddressLine2, wm.CityId, wm.StateId,
                         wm.CountryId, wm.Pincode, wm.IsScrapWarehouse, wm.IsTransitWarehouse,
@@ -103,8 +107,54 @@ namespace WarehouseManagement.Infrastructure.Repositories.WarehouseMaster
                     FROM Warehouse.WarehouseMaster wm
                     WHERE wm.Id = @Id AND wm.IsDeleted = 0";
 
-                return await _dbConnection.QueryFirstOrDefaultAsync<WarehouseMasterDto>(query, new { Id = id });
+            return await _dbConnection.QueryFirstOrDefaultAsync<WarehouseMasterDto>(query, new { Id = id });
+        }
+
+
+        public async Task<bool> ExistsByNameAsync(string warehouseName, int? excludeId = null)
+        {
+            var sql = @"
+                SELECT COUNT(1)
+                FROM [Warehouse].[WarehouseMaster] WITH (NOLOCK)
+                WHERE IsDeleted = 0              
+                AND UPPER(LTRIM(RTRIM(WarehouseName))) = UPPER(LTRIM(RTRIM(@WarehouseName)))";
+
+            var p = new DynamicParameters(new { WarehouseName = warehouseName });
+
+            if (excludeId is not null)
+            {
+                // Skip the current record being updated
+                sql += " AND Id != @Id";  // change Id to your PK column if different
+                p.Add("Id", excludeId);
             }
+
+            var count = await _dbConnection.ExecuteScalarAsync<int>(sql, p);
+            return count > 0; // true = duplicate exists
+        }
         
+        public async Task<List<GetWarehouseAutoCompleteDto>> GetWarehouseMasterAutoCompletes(string searchPattern)
+            {
+                const string sql = @"
+            SELECT
+                w.Id,
+                w.WarehouseCode,
+                w.WarehouseName
+            FROM   [Warehouse].[WarehouseMaster] w
+            WHERE  w.IsDeleted = 0
+            AND (@Term = '' 
+                OR w.WarehouseCode LIKE '%' + @Term + '%'
+                OR w.WarehouseName LIKE '%' + @Term + '%')
+            ORDER BY w.WarehouseCode, w.WarehouseName;";
+
+                var rows = await _dbConnection.QueryAsync<GetWarehouseAutoCompleteDto>(sql, new
+                {
+                    Term = (searchPattern ?? string.Empty).Trim(),
+                   
+                });
+
+                return rows.ToList();
+            }
+                
+            
     }
 }

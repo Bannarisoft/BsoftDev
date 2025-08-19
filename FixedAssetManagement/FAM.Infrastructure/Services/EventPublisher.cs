@@ -17,14 +17,15 @@ namespace FAM.Infrastructure.Services
             _outboxCollection = outboxCollection;
             _publishEndpoint = publishEndpoint;
         }
-        public async Task SaveEventAsync<T>(T @event) where T : class
+         public async Task SaveEventAsync<T>(T @event) where T : class
         {
             var message = new OutboxMessage
             {
-                EventType = @event.GetType().Name,
+                EventType = @event.GetType().AssemblyQualifiedName!,
                 EventData = JsonSerializer.Serialize(@event),
                 Processed = false,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                RetryCount = 0
             };
             await _outboxCollection.InsertOneAsync(message);
         }
@@ -36,16 +37,34 @@ namespace FAM.Infrastructure.Services
             {
                 try
                 {
-                    var @event = JsonSerializer.Deserialize<AssetCreatedEvent>(message.EventData);
-                    await _publishEndpoint.Publish(@event);
+                    var eventType = Type.GetType(message.EventType);
+                    if (eventType == null)
+                    {
+                        Log.Warning($"Unknown event type: {message.EventType}");
+                        continue;
+                    }
+
+                    var @event = JsonSerializer.Deserialize(message.EventData, eventType);
+                    if (@event == null)
+                    {
+                        Log.Warning($"Deserialization failed for event type: {message.EventType}");
+                        continue;
+                    }
+
+                    await _publishEndpoint.Publish(@event, eventType);
 
                     message.Processed = true;
-                    await _outboxCollection.ReplaceOneAsync(x => x.Id == message.Id, message);
+                    message.LastPublishedAt = DateTime.UtcNow;
                 }
                 catch (Exception ex)
                 {
-                    Log.Information($"Error publishing event: {ex.Message}");
+                    message.RetryCount += 1;
+                    message.LastError = ex.Message;
+                    Log.Error(ex, "Error publishing event of type: {EventType}", message.EventType);
                 }
+
+                await _outboxCollection.ReplaceOneAsync(x => x.Id == message.Id, message);
+             
             }
         }
 

@@ -10,6 +10,7 @@
     <PackageReference Include="MassTransit" Version="8.0.0" />
     <PackageReference Include="MassTransit.MongoDb" Version="8.0.0" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.0" />
+    <PackageReference Include="MongoDB.Driver" Version="3.1.0" />
     <PackageReference Include="RabbitMQ.Client" Version="6.4.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="9.0.0" />
@@ -19,6 +20,6 @@
     <!-- <PackageReference Include="Shared.Contracts" Version="1.0.0" /> -->
   </ItemGroup>
 <ItemGroup>
-    <ProjectReference Include="..\..\Shared\Contracts\Contracts.csproj"/>
+    <ProjectReference Include="..\..\Shared\Contracts\Contracts.csproj" />
   </ItemGroup>
 </Project>

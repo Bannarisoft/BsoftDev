@@ -22,7 +22,7 @@ namespace BackgroundService.API.Controller.Notification
         public async Task<IActionResult> GetAll([FromQuery] GetAllNotificationHierarchyQuery query)
         {
             var result = await _mediator.Send(query);
-            return Ok(result);
+            return Ok(new { StatusCode=StatusCodes.Status200OK, data = result,message = result });            
         }
 
         /// ✅ Get By ID
@@ -32,8 +32,8 @@ namespace BackgroundService.API.Controller.Notification
             var result = await _mediator.Send(new GetNotificationHierarchyByIdQuery { Id = id });
             if (result == null)
                 return NotFound(new { message = "Record not found" });
-
-            return Ok(result);
+           
+            return Ok(new { StatusCode=StatusCodes.Status200OK, data = result,message = result });            
         }
 
         /// ✅ Insert
@@ -41,15 +41,20 @@ namespace BackgroundService.API.Controller.Notification
         public async Task<IActionResult> Insert([FromBody] NotificationHierarchyAndEventRuleDto dto)
         {
             var result = await _mediator.Send(new InsertNotificationHierarchyAndEventRuleCommand(dto));
-            return Ok(new { message = "Inserted successfully", success = result });
+            //return Ok(new { message = "Inserted successfully", success = result });
+            return Ok(new { StatusCode = StatusCodes.Status200OK, message = "Inserted successfully", data = result});
         }
 
         /// ✅ Update
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] UpdateNotificationHierarchyAndEventRuleCommand command)
         {
-            var result = await _mediator.Send(command);
-            return Ok(new { message = "Updated successfully", success = result });
+            var result = await _mediator.Send(command);            
+             return Ok(new
+            {
+                message = "Updated successfully.",
+                statusCode = StatusCodes.Status200OK
+            });             
         }
 
         /// ✅ Delete
@@ -57,7 +62,7 @@ namespace BackgroundService.API.Controller.Notification
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _mediator.Send(new DeleteNotificationLevelHierarchyCommand { Id = id });
-            return Ok(new { message = "Deleted successfully", success = result });
+            return Ok(new { message = "Deleted successfully", success = result ,statusCode = StatusCodes.Status200OK});
         }
         
     }

@@ -48,7 +48,7 @@ namespace Core.Application.Common.Mappings.AssetMaster
 
             CreateMap<GetAssetMasterDto, GetCategoryByDeptIdDto>(); 
 
-        
+          CreateMap<AssetTransferIssueHdrDto, AssetTransferApprovalRequestDto>();
 
             
             

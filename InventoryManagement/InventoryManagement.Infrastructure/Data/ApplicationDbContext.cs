@@ -9,6 +9,13 @@ using InventoryManagement.Infrastructure.Data.Configurations;
 using InventoryManagement.Infrastructure.Data.Configurations.Budget;
 using Core.Domain.Entities.Budget;
 using Microsoft.Identity.Client;
+using Core.Domain.Entities.Item.ItemDetail;
+using Core.Domain.Entities.Item.ItemDetail.Variant;
+using InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail;
+using InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail.Variant;
+using InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail.Templates;
+using Core.Domain.Entities.item.ItemDetail.Templates;
+using Core.Domain.Entities.Item.ItemDetail.Templates;
 
 namespace InventoryManagement.Infrastructure.Data
 {
@@ -36,6 +43,19 @@ namespace InventoryManagement.Infrastructure.Data
         public DbSet<BudgetMaster> BudgetMaster { get; set; }
         public DbSet<BudgetDetail> BudgetDetail { get; set; }
         public DbSet<BudgetLog> BudgetLog { get; set; }
+        // Item related DbSets
+        public DbSet<ItemMaster> ItemMaster { get; set; }        
+        public DbSet<ItemSupplier> ItemSupplier { get; set; } 
+        public DbSet<ItemManufacture> ItemManufacture { get; set; } 
+        public DbSet<ItemPurchase> ItemPurchase { get; set; } 
+        public DbSet<ItemInventory> ItemInventory { get; set; } 
+        public DbSet<ItemQuality> ItemQuality { get; set; }         
+        public DbSet<ItemVariantValue> ItemVariantValue { get; set; } 
+        public DbSet<ItemLog> ItemLog { get; set; } 
+        public DbSet<ItemUOM> ItemUOMs { get; set; } 
+        public DbSet<InspectionParameter> InspectionParameter { get; set; } 
+        public DbSet<InspectionTemplate> InspectionTemplate { get; set; } 
+        //End  Item related DbSets
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -50,6 +70,18 @@ namespace InventoryManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new HSNMasterConfiguration());
             modelBuilder.ApplyConfiguration(new UOMConfiguration());
             modelBuilder.ApplyConfiguration(new UOMConversionConfiguration());
+            //Item
+            modelBuilder.ApplyConfiguration(new ItemMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new ItemSupplierConfiguration());
+            modelBuilder.ApplyConfiguration(new ItemManufactureConfiguration());
+            modelBuilder.ApplyConfiguration(new ItemPurchaseConfiguration());
+            modelBuilder.ApplyConfiguration(new ItemInventoryConfiguration());
+            modelBuilder.ApplyConfiguration(new ItemQualityConfiguration());
+            modelBuilder.ApplyConfiguration(new ItemVariantValueConfiguration());
+            modelBuilder.ApplyConfiguration(new ItemUOMConfiguration());
+            modelBuilder.ApplyConfiguration(new ItemLogConfiguration());
+            modelBuilder.ApplyConfiguration(new InspectionParameterConfiguration());
+            modelBuilder.ApplyConfiguration(new InspectionTemplateConfiguration());
 
 
             base.OnModelCreating(modelBuilder);

@@ -1,8 +1,12 @@
 using System.Data;
+using Contracts.Interfaces.External.IInvetoryManagement;
+using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.AuditLog;
+using Core.Application.Common.Interfaces.IRackMaster;
 using Core.Application.Common.Interfaces.IWarehouseMaster;
 using Core.Application.Common.Mappings;
+using Core.Application.WarehouseMaster.Services;
 using Infrastructure.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +16,8 @@ using MongoDB.Driver;
 using PartyManagement.Infrastructure.Repositories;
 using Serilog;
 using WarehouseManagement.Infrastructure.Data;
+using WarehouseManagement.Infrastructure.GrpcClients;
+using WarehouseManagement.Infrastructure.Repositories.RackMaster;
 using WarehouseManagement.Infrastructure.Repositories.WarehouseMaster;
 using WarehouseManagement.Infrastructure.Services;
 
@@ -90,8 +96,14 @@ namespace WarehouseManagement.Infrastructure
 
             // Register repositories
             services.AddScoped<IAuditLogRepository, AuditLogRepository>();
-
             services.AddScoped<IWarehouseMasterQueryRepository , WarehouseMasterQueryRepository >();
+            services.AddScoped<IWarehouseMasterCommandRepository, WarehouseMasterCommandRepository>();
+            services.AddScoped<IWarehouseCodeGenerator, WarehouseCodeGenerator>();
+            services.AddScoped<IRackMasterQueryRepository, RackMasterQueryRepository>();
+            services.AddScoped<IRackMasterCommandRepository, RackMasterCommandRepository>();
+            services.AddScoped<IRackCodeGenerator, RackCodeGenerator>();
+    
+
 
 
             // Miscellaneous services
@@ -102,7 +114,8 @@ namespace WarehouseManagement.Infrastructure
             // AutoMapper profiles
            
              services.AddAutoMapper(
-                 typeof(WarehouseMasterProfile)
+                 typeof(WarehouseMasterProfile),
+                 typeof(RackMasterProfile)
 
             );
             return services;

@@ -8,11 +8,11 @@ namespace  InventoryManagement.Infrastructure.Repositories.Item.ItemGroup
 {
     public class ItemGroupQueryRepository : IItemGroupQueryRepository
     {
-        private readonly IDbConnection _dbConnection;       
+        private readonly IDbConnection _dbConnection;
 
         public ItemGroupQueryRepository(IDbConnection dbConnection)
         {
-            _dbConnection = dbConnection;            
+            _dbConnection = dbConnection;
         }
         public async Task<ItemGroupDto> GetByIdAsync(int Id)
         {
@@ -29,7 +29,7 @@ namespace  InventoryManagement.Infrastructure.Repositories.Item.ItemGroup
             SELECT @TotalCount = COUNT(*) 
             FROM Inventory.ItemGroup 
             WHERE IsDeleted = 0
-            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ModuleName LIKE @Search)")}};
+            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ItemGroupName LIKE @Search)")}};
 
             SELECT 
                 Id,ItemGroupCode, ItemGroupName,UnitId 
@@ -67,7 +67,7 @@ namespace  InventoryManagement.Infrastructure.Repositories.Item.ItemGroup
         }
         public async Task<bool> NotFoundAsync(int Id)
         {
-            var query = "SELECT COUNT(1) FROM Inventory.ItemGroup WHERE Id = @Id AND IsDeleted = 0";             
+            var query = "SELECT COUNT(1) FROM Inventory.ItemGroup WHERE Id = @Id AND IsDeleted = 0";
             var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = Id });
             return count > 0;
         }
@@ -86,5 +86,25 @@ namespace  InventoryManagement.Infrastructure.Repositories.Item.ItemGroup
             var notificationConfig = await _dbConnection.QueryAsync<ItemGroupAutoCompleteDto>(query, parameters);
             return notificationConfig.ToList();
         }
+        
+         public async Task<List<Core.Domain.Entities.Item.ItemGroup>> GetAllItemGroupsAsync()
+        {
+            const string sql = @"
+                SELECT 
+                    Id,
+                    UnitId,
+                    ItemGroupCode,
+                    ItemGroupName,
+                    IsActive
+                FROM [Inventory].[Inventory].[ItemGroup]
+                WHERE IsDeleted = 0
+                ORDER BY ItemGroupName ASC;
+            ";
+
+            var result = await _dbConnection.QueryAsync<Core.Domain.Entities.Item.ItemGroup>(sql);
+            return result.AsList();
+        }
+
+      
     }
 }

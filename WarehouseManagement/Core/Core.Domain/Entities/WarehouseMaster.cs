@@ -6,7 +6,7 @@ using Core.Domain.Common;
 
 namespace Core.Domain.Entities
 {
-    public class WarehouseMaster  : BaseEntity
+    public class WarehouseMaster : BaseEntity
     {
         public string WarehouseCode { get; set; } = null!;
         public string WarehouseName { get; set; } = null!;
@@ -14,9 +14,13 @@ namespace Core.Domain.Entities
         // Self-referencing FK for Parent Group
         public int? ParentWarehouseId { get; set; }
         public bool IsGroup { get; set; }
+
+        public bool IsVirtualWarehouse { get; set; }
         // External FK values (soft foreign keys validated via gRPC)
         public int WarehouseTypeId { get; set; }
         public int StorageTypeId { get; set; }
+        public int AreaTypeId { get; set; }
+        public int OperationTypeId { get; set; }
         public int CapacityUOMId { get; set; }
         public int? AccountId { get; set; }
         public string? ContactPersonName { get; set; }
@@ -31,7 +35,7 @@ namespace Core.Domain.Entities
         public bool IsScrapWarehouse { get; set; }
         public bool IsTransitWarehouse { get; set; }
         public decimal MaxCapacity { get; set; }
-        public bool IsDefaultStockEntry { get; set; }       
+        public bool IsDefaultStockEntry { get; set; }
 
         // Navigation properties
         public WarehouseMaster? ParentWarehouse { get; set; }
@@ -39,5 +43,7 @@ namespace Core.Domain.Entities
 
         // Allowed Item Groups mapping
         public ICollection<WarehouseItemGroupMapping> AllowedItemGroups { get; set; } = new List<WarehouseItemGroupMapping>();
+        
+        public ICollection<RackMaster> Racks { get; set; } = new List<RackMaster>();
     }
 }
