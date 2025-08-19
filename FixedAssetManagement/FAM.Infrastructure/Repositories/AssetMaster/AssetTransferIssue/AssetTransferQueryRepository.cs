@@ -476,7 +476,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
                     D.SubLocationName, 
                     B.DepartmentId, 
                     F.DeptName AS DepartmentName,
-                    NULL AS FromCustodianId,        -- placeholder, will override from location data below
+                    B.CustodianId AS FromCustodianId,        -- placeholder, will override from location data below
                     NULL AS ToCustodianId,
                     NULL AS OldUnitId
                 FROM FixedAsset.AssetMaster A
