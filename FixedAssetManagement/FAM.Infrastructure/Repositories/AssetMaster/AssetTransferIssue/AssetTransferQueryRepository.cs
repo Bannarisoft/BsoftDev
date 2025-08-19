@@ -353,10 +353,22 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
         {
             var UnitId = _iPAddressService.GetUnitId();
             const string query = @"
-                        SELECT 1 FROM FixedAsset.AssetTransferIssueHdr A
+              SELECT 1 FROM FixedAsset.AssetTransferIssueHdr A
                         INNER JOIN FixedAsset.AssetTransferIssueDtl B ON A.Id = B.AssetTransferId
-                        WHERE B.AssetId = @assetId  
-                        AND (A.Status = 'Pending' OR (A.Status = 'Approved' AND A.AckStatus <> 1))";
+						inner join FixedAsset.AssetTransferReceiptDtl C ON    B.AssetId=C.AssetId
+                        WHERE B.AssetId = 1674  
+                        AND (A.Status = 'Pending' OR (A.Status = 'Approved') AND C.AckStatus <> 1) ";
+            // const string query = @"
+            //             SELECT 1 FROM FixedAsset.AssetTransferIssueHdr A
+            //             INNER JOIN FixedAsset.AssetTransferIssueDtl B ON A.Id = B.AssetTransferId
+            //             WHERE B.AssetId = @assetId  
+            //             AND (A.Status = 'Pending' OR (A.Status = 'Approved' AND A.AckStatus <> 1))";
+
+            //   SELECT 1 FROM FixedAsset.AssetTransferIssueHdr A
+            // INNER JOIN FixedAsset.AssetTransferIssueDtl B ON A.Id = B.AssetTransferId
+            // inner join FixedAsset.AssetTransferReceiptDtl C ON    B.AssetId=C.AssetId
+            // WHERE B.AssetId = 1674  
+            // AND (A.Status = 'Pending' OR (A.Status = 'Approved') AND C.AckStatus <> 1)
 
             var result = await _dbConnection.QueryFirstOrDefaultAsync<int?>(query, new { assetId });
             return result.HasValue; // If record exists, return true (restricted)
@@ -464,7 +476,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
                     D.SubLocationName, 
                     B.DepartmentId, 
                     F.DeptName AS DepartmentName,
-                    NULL AS FromCustodianId,        -- placeholder, will override from location data below
+                    B.CustodianId AS FromCustodianId,        -- placeholder, will override from location data below
                     NULL AS ToCustodianId,
                     NULL AS OldUnitId
                 FROM FixedAsset.AssetMaster A

@@ -20,6 +20,9 @@ message GetMiscTypeIdsResponse {
   int32 storage_type_id   = 2;
   int32 area_type_id      = 3;
   int32 operation_type_id = 4;
+  int32 floor_type_id     = 5;
+  int32 warehouse_aisle_type_id     = 6;
+  int32 warehouse_rack_level_type_id = 7;
 }
 
 message MiscMasterDto {

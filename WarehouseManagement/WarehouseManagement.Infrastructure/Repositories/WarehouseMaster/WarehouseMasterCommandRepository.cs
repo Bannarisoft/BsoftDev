@@ -39,9 +39,9 @@ namespace WarehouseManagement.Infrastructure.Repositories.WarehouseMaster
         {
             return await _context.WarehouseMasters
                 .Include(w => w.AllowedItemGroups)
-                .FirstOrDefaultAsync(w => w.Id == id);
+                .FirstOrDefaultAsync(w => w.Id == id && w.IsDeleted == Core.Domain.Common.BaseEntity.IsDelete.NotDeleted);
         }
-        
+
         public async Task<bool> DeleteAsync(int id, Core.Domain.Entities.WarehouseMaster warehouseMaster)
         {
             // Load current entity (not already deleted) + mappings
@@ -60,9 +60,9 @@ namespace WarehouseManagement.Infrastructure.Repositories.WarehouseMaster
                 throw new InvalidOperationException("Cannot delete a warehouse group that has child warehouses.");
 
             // Soft delete the warehouse
-            existing.IsDeleted    = Core.Domain.Common.BaseEntity.IsDelete.Deleted;
-            existing.IsActive     = Core.Domain.Common.BaseEntity.Status.Inactive;
-           // existing.ModifiedDate = DateTimeOffset.UtcNow;
+            existing.IsDeleted = Core.Domain.Common.BaseEntity.IsDelete.Deleted;
+            existing.IsActive = Core.Domain.Common.BaseEntity.Status.Inactive;
+            // existing.ModifiedDate = DateTimeOffset.UtcNow;
 
             // Soft delete related mappings
             if (existing.AllowedItemGroups?.Count > 0)
@@ -70,9 +70,9 @@ namespace WarehouseManagement.Infrastructure.Repositories.WarehouseMaster
                 foreach (var m in existing.AllowedItemGroups
                             .Where(m => m.IsDeleted == Core.Domain.Common.BaseEntity.IsDelete.NotDeleted))
                 {
-                    m.IsDeleted    = Core.Domain.Common.BaseEntity.IsDelete.Deleted;
-                    m.IsActive     = Core.Domain.Common.BaseEntity.Status.Inactive;
-                  
+                    m.IsDeleted = Core.Domain.Common.BaseEntity.IsDelete.Deleted;
+                    m.IsActive = Core.Domain.Common.BaseEntity.Status.Inactive;
+
                 }
             }
 
@@ -80,6 +80,7 @@ namespace WarehouseManagement.Infrastructure.Repositories.WarehouseMaster
             return true;
         }
         
+       
        
 
 

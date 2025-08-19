@@ -2,16 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Core.Domain.Common;
+using MediatR;
 
-namespace Core.Domain.Entities
+namespace Core.Application.RackMaster.Command.UpdateRackMaster
 {
-    public class RackMaster : BaseEntity
+    public class UpdateRackMasterCommand  : IRequest<int>
     {
+        public int Id { get; set; }
         public int WarehouseId { get; set; }
-
-        public WarehouseMaster? Warehouse { get; set; }
-        public string RackCode { get; set; } = default!;
         public string? RackName { get; set; }
         public int? FloorId { get; set; }
         public int? AisleId { get; set; }
@@ -20,8 +18,8 @@ namespace Core.Domain.Entities
         public int? CapacityUOMId { get; set; }
         public decimal? RackWidth { get; set; }
         public decimal? RackHeight { get; set; }
-        public int? DimensionUOMId { get; set; }
+        public int? DimensionUOMId { get; set; }        
+        public byte IsActive { get; set; }
         
-
     }
 }

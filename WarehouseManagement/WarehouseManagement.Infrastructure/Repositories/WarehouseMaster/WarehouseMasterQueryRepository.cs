@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IWarehouseMaster;
 using Core.Application.WarehouseMaster.GetAllWarehouseMaster;
+using Core.Application.WarehouseMaster.Queries.GetWareMasterAutoComplete;
 using Dapper;
 
 namespace WarehouseManagement.Infrastructure.Repositories.WarehouseMaster
@@ -109,7 +110,7 @@ namespace WarehouseManagement.Infrastructure.Repositories.WarehouseMaster
             return await _dbConnection.QueryFirstOrDefaultAsync<WarehouseMasterDto>(query, new { Id = id });
         }
 
-     
+
         public async Task<bool> ExistsByNameAsync(string warehouseName, int? excludeId = null)
         {
             var sql = @"
@@ -130,34 +131,30 @@ namespace WarehouseManagement.Infrastructure.Repositories.WarehouseMaster
             var count = await _dbConnection.ExecuteScalarAsync<int>(sql, p);
             return count > 0; // true = duplicate exists
         }
+        
+        public async Task<List<GetWarehouseAutoCompleteDto>> GetWarehouseMasterAutoCompletes(string searchPattern)
+            {
+                const string sql = @"
+            SELECT
+                w.Id,
+                w.WarehouseCode,
+                w.WarehouseName
+            FROM   [Warehouse].[WarehouseMaster] w
+            WHERE  w.IsDeleted = 0
+            AND (@Term = '' 
+                OR w.WarehouseCode LIKE '%' + @Term + '%'
+                OR w.WarehouseName LIKE '%' + @Term + '%')
+            ORDER BY w.WarehouseCode, w.WarehouseName;";
 
-        // public async Task<bool> ExistsByNameAsync(string warehouseName, int? excludeId = null)
-        //     {
-        //                 var sql = @"
-        //         SELECT COUNT(1)
-        //         FROM [Warehouse].[WarehouseMaster] WITH (NOLOCK)
-        //         WHERE IsDeleted = 0              
-        //         AND UPPER(LTRIM(RTRIM(WarehouseName))) = UPPER(LTRIM(RTRIM(@WarehouseName)))";
+                var rows = await _dbConnection.QueryAsync<GetWarehouseAutoCompleteDto>(sql, new
+                {
+                    Term = (searchPattern ?? string.Empty).Trim(),
+                   
+                });
 
-        //             // If uniqueness is per Unit, add:  AND UnitId = @UnitId
-
-        //             var p = new DynamicParameters(new { WarehouseName = warehouseName });
-
-        //             // if (excludeId is not null)
-        //             // {
-        //             //     // IMPORTANT: use your real PK column here if it's not 'Id'
-        //             //     sql += " AND Id <> @Id";
-        //             //     p.Add("Id", excludeId);
-        //             // }
-        //              if (excludeId is not null)
-        //             {
-        //                 sql += " AND Id != @Id";
-        //                 p.Add("Id", excludeId);
-        //             }
-
-        //             var count = await _dbConnection.ExecuteScalarAsync<int>(sql, p);
-        //             return count > 0; // true = another row with same name exists
-        //     }
+                return rows.ToList();
+            }
+                
             
     }
 }
