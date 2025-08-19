@@ -52,7 +52,7 @@ namespace PartyManagement.Infrastructure.Data.Configurations
             builder.Property(m => m.PartyZoneId)  // Foreign Key column
                .HasColumnName("PartyZoneId")
                .HasColumnType("int");  // Set as int
-       
+
 
             // Foreign Key Relationship
             builder.HasOne(m => m.ZoneType)
@@ -85,33 +85,33 @@ namespace PartyManagement.Infrastructure.Data.Configurations
             builder.Property(m => m.PAN)
               .HasColumnName("PAN")
               .HasColumnType("nvarchar(20)");
-            
+
 
             builder.Property(m => m.Website)
                .HasColumnName("Website")
                .HasColumnType("nvarchar(50)");
 
-             builder.Property(m => m.TAN)
-               .HasColumnName("TAN")
-               .HasColumnType("nvarchar(50)");
+            builder.Property(m => m.TAN)
+              .HasColumnName("TAN")
+              .HasColumnType("nvarchar(50)");
 
-            builder.Property(m => m.TDSCategoryId)  
+            builder.Property(m => m.TDSCategoryId)
               .HasColumnName("TDSCategoryId")
               .HasColumnType("int");
 
             builder.Property(m => m.MSMETypeId)  // Foreign Key column
               .HasColumnName("MSMETypeId")
               .HasColumnType("int");  // Set as int
-          
+
             // Foreign Key Relationship
             builder.HasOne(m => m.MSMETypeMisc)
                 .WithMany(t => t.PartyMSMEType)
                 .HasForeignKey(m => m.MSMETypeId) // Foreign Key property in Misc
                 .OnDelete(DeleteBehavior.Restrict); // Use .Cascade if needed
 
-             builder.Property(m => m.MSMENO)
-               .HasColumnName("MSMENO")
-               .HasColumnType("nvarchar(50)");
+            builder.Property(m => m.MSMENO)
+              .HasColumnName("MSMENO")
+              .HasColumnType("nvarchar(50)");
 
             builder.Property(x => x.MSMEValidUpto)
                      .HasColumnName("MSMEValidUpto")
@@ -128,16 +128,16 @@ namespace PartyManagement.Infrastructure.Data.Configurations
                 .HasColumnType("bit")
                 .IsRequired();
 
-             builder.Property(t => t.IsTCSApplicable)
-                .HasColumnName("IsTCSApplicable")
-                .HasColumnType("bit")
-                .IsRequired();
+            builder.Property(t => t.IsTCSApplicable)
+               .HasColumnName("IsTCSApplicable")
+               .HasColumnType("bit")
+               .IsRequired();
 
             builder.Property(t => t.IsGstReverseCharge)
                 .HasColumnName("IsGstReverseCharge")
                 .HasColumnType("bit")
                 .IsRequired();
-            
+
             builder.Property(t => t.Is206AB206CCAApplicable)
                 .HasColumnName("Is206AB206CCAApplicable")
                 .HasColumnType("bit")
@@ -146,7 +146,7 @@ namespace PartyManagement.Infrastructure.Data.Configurations
             builder.Property(m => m.PayementModeId)  // Foreign Key column
               .HasColumnName("PayementModeId")
               .HasColumnType("int");  // Set as int
-          
+
             // Foreign Key Relationship
             builder.HasOne(m => m.PaymentModeTypeMisc)
                 .WithMany(t => t.PartyPaymentModeType)
@@ -157,28 +157,28 @@ namespace PartyManagement.Infrastructure.Data.Configurations
                .HasColumnName("FavourOf")
                .HasColumnType("nvarchar(250)");
 
-            
-             builder.Property(m => m.PreferredCurrencyPurchase)
-               .HasColumnName("PreferredCurrencyPurchase")
-                .HasColumnType("int");
 
-             builder.Property(m => m.CreditDays)  // Foreign Key column
-              .HasColumnName("CreditDays")
-              .HasColumnType("int");  
+            builder.Property(m => m.PreferredCurrencyPurchase)
+              .HasColumnName("PreferredCurrencyPurchase")
+               .HasColumnType("int");
 
-             builder.Property(m => m.DueDateTypeId)  // Foreign Key column
-              .HasColumnName("DueDateTypeId")
-              .HasColumnType("int");  // Set as int
-          
+            builder.Property(m => m.CreditDays)  // Foreign Key column
+             .HasColumnName("CreditDays")
+             .HasColumnType("int");
+
+            builder.Property(m => m.DueDateTypeId)  // Foreign Key column
+             .HasColumnName("DueDateTypeId")
+             .HasColumnType("int");  // Set as int
+
             // Foreign Key Relationship
             builder.HasOne(m => m.DueDateTypeMisc)
                 .WithMany(t => t.PartyDueDateType)
                 .HasForeignKey(m => m.DueDateTypeId) // Foreign Key property in Misc
-                .OnDelete(DeleteBehavior.Restrict); 
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(m => m.LeadTime)  // Foreign Key column
               .HasColumnName("LeadTime")
-              .HasColumnType("int");  
+              .HasColumnType("int");
 
 
             builder.Property(m => m.PreferredCurrencySale)
@@ -192,34 +192,34 @@ namespace PartyManagement.Infrastructure.Data.Configurations
 
             builder.Property(m => m.SellingPriceListId)  // Foreign Key column
               .HasColumnName("SellingPriceListId")
-              .HasColumnType("int");  
+              .HasColumnType("int");
 
 
-             builder.Property(m => m.CustomerTypeId)  // Foreign Key column
-              .HasColumnName("CustomerTypeId")
-              .HasColumnType("int");  // Set as int
-          
+            builder.Property(m => m.CustomerTypeId)  // Foreign Key column
+             .HasColumnName("CustomerTypeId")
+             .HasColumnType("int");  // Set as int
+
             // Foreign Key Relationship
             builder.HasOne(m => m.CustomerTypeMisc)
                 .WithMany(t => t.PartyCustomerType)
                 .HasForeignKey(m => m.CustomerTypeId) // Foreign Key property in Misc
-                .OnDelete(DeleteBehavior.Restrict); 
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(t => t.IsInternalSupplier)
                 .HasColumnName("IsInternalSupplier")
                 .HasColumnType("bit")
                 .IsRequired();
 
-             builder.Property(t => t.IsInternalCustomer)
-                .HasColumnName("IsInternalCustomer")
-                .HasColumnType("bit")
-                .IsRequired();
+            builder.Property(t => t.IsInternalCustomer)
+               .HasColumnName("IsInternalCustomer")
+               .HasColumnType("bit")
+               .IsRequired();
 
-             builder.Property(t => t.IsStopPayment)
-                .HasColumnName("IsStopPayment")
-                .HasColumnType("bit")
-                .IsRequired();
-              
+            builder.Property(t => t.IsStopPayment)
+               .HasColumnName("IsStopPayment")
+               .HasColumnType("bit")
+               .IsRequired();
+
             builder.Property(b => b.IsActive)
                 .HasColumnName("IsActive")
                 .HasColumnType("bit")
@@ -236,7 +236,7 @@ namespace PartyManagement.Infrastructure.Data.Configurations
                 .IsRequired()
                 .HasColumnType("varchar(50)");
 
-    
+
             builder.Property(b => b.CreatedIP)
                 .IsRequired()
                 .HasColumnType("varchar(255)");
@@ -246,6 +246,11 @@ namespace PartyManagement.Infrastructure.Data.Configurations
 
             builder.Property(b => b.ModifiedIP)
                 .HasColumnType("varchar(255)");
+
+            builder.Property(m => m.PartyStatus)
+              .HasColumnName("PartyStatus")
+              .HasColumnType("nvarchar(20)");
+               
                                                 
         }
     }

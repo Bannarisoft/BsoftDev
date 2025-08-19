@@ -10,5 +10,6 @@ namespace Core.Application.Common.Interfaces.IPartyGroup
         Task<(List<PartyGroupDto>, int)> GetAllPartyGroupAsync(int PageNumber, int PageSize, string? SearchTerm);
         Task<List<PartyGroupAutoCompleteDto>> GetMainPartyGroups(string searchPattern);
         Task<List<PartyGroupAutoCompleteDto>> GetParentPartyGroups(string searchPattern);
+     
     }
 }
