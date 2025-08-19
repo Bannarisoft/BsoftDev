@@ -9,6 +9,7 @@ using Core.Application.WarehouseMaster.Command.CreateWarehouseMaster;
 using Core.Application.WarehouseMaster.Command.DeleteWarehouseMaster;
 using Core.Application.WarehouseMaster.Command.UpdateWarehouseMaster;
 using Core.Application.WarehouseMaster.GetWarehouseMasterById;
+using Core.Application.WarehouseMaster.Queries.GetWareMasterAutoComplete;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -98,8 +99,8 @@ namespace WarehouseManagement.API.Controllers
                 errors = ""
             });
         }
-        
-          [HttpDelete]
+
+        [HttpDelete]
         public async Task<IActionResult> DeleteWarehouseAsync(int id, CancellationToken ct)
         {
             await Mediator.Send(new DeleteWarehouseMasterCommand { Id = id }, ct);
@@ -108,6 +109,25 @@ namespace WarehouseManagement.API.Controllers
             {
                 message = "Deleted successfully.",
                 statusCode = StatusCodes.Status200OK
+            });
+        }
+        
+         [HttpGet("by-name")]
+        public async Task<IActionResult> GetRackMaster([FromQuery] string? name)
+        {
+            var result = await Mediator.Send(new GetWarehouseMasterAutoCompleteQuery { SearchPattern = name });
+            if (result == null)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = "  Warehouse Not Found",
+                });
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,                
+                data = result
             });
         }
 

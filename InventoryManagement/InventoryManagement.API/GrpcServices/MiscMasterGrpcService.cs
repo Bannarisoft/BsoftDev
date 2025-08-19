@@ -26,10 +26,13 @@ namespace InventoryManagement.API.GrpcServices
                 var key = request.Misctype.Trim().ToLowerInvariant();
                 var typeKey = key switch
                 {
-                    "warehouse" or "warehousetype" => Core.Domain.Common.MiscEnumEntity.WarehouseType, // "WarehouseType"
-                    "storage"   or "storagetype"   => Core.Domain.Common.MiscEnumEntity.StorageType,
-                    "area"      or "areatype"      => Core.Domain.Common.MiscEnumEntity.AreaType,
-                    "operation" or "operationtype" => Core.Domain.Common.MiscEnumEntity.OperationType,
+                    "warehouse" or "warehousetype"              => Core.Domain.Common.MiscEnumEntity.WarehouseType, // "WarehouseType"
+                    "storage"   or "storagetype"                => Core.Domain.Common.MiscEnumEntity.StorageType,
+                    "area"      or "areatype"                   => Core.Domain.Common.MiscEnumEntity.AreaType,
+                    "operation" or "operationtype"              => Core.Domain.Common.MiscEnumEntity.OperationType,
+                    "floor"  or "Floor"                         => Core.Domain.Common.MiscEnumEntity.Floor,
+                    "warehouseaisle" or "aisle"                 => Core.Domain.Common.MiscEnumEntity.WarehouseAisle,
+                    "warehouseracklevel" or "racklevel"         => Core.Domain.Common.MiscEnumEntity.WarehouseRackLevel,
                     _ => throw new RpcException(new Status(StatusCode.InvalidArgument, $"Unsupported misctype: {request.Misctype}"))
                 };
 

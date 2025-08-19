@@ -243,6 +243,7 @@ namespace FAM.API.Controllers.AssetMaster
 
             var response = await Mediator.Send(query);
 
+            
             return Ok(new 
             {
                 StatusCode = StatusCodes.Status200OK,

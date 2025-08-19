@@ -101,66 +101,7 @@ namespace Core.Application.WarehouseMaster.GetAllWarehouseMaster
                 if (countryDict.TryGetValue(d.CountryId, out var countryName) && countryName != null)
                     d.CountryName = countryName;
             }
-            // var miscMasters = await _miscMasterGrpcClient.GetMiscMasterByIdAsync("WarehouseType");          
-            // var stTask   = _miscMasterGrpcClient.GetMiscMasterByIdAsync("StorageType");
-            // var areaTask = _miscMasterGrpcClient.GetMiscMasterByIdAsync("AreaType");
-            // var opTask   = _miscMasterGrpcClient.GetMiscMasterByIdAsync("OperationType");
-
-            // var dict = miscMasters.ToDictionary(x => x.Id, x => x.Description);
-            
-            // var uOMs = await _uOMGrpcClient.GetUOMAsync();
-            // var uOMDict = uOMs.ToDictionary(x => x.Id, x => x.UOMName);
-
-            // var city = await _cityGrpcClient.GetAllCityAsync();
-            // var cityDict = city.ToDictionary(x => x.CityId, x => x.CityName);
-            // var state = await _stateGrpcClient.GetAllStateAsync();
-            // var stateDict = state.ToDictionary(x => x.StateId, x => x.StateName);
-            // var country = await _countryGrpcClient.GetAllCountryAsync();
-            // var countryDict = country.ToDictionary(x => x.CountryId, x => x.CountryName);
-
-            // foreach (var data in warehouseListdto)
-            // {
-            //     if (dict.TryGetValue(data.WarehouseTypeId, out var warehouseTypeName) && warehouseTypeName != null)
-            //     {
-            //         data.WarehouseTypeName = warehouseTypeName;
-            //     }
-
-            //     if (dict.TryGetValue(data.StorageTypeId, out var storageTypeName) && storageTypeName != null)
-            //     {
-            //         data.StorageTypeName = storageTypeName;
-            //         //data.WarehouseTypeName = dict.GetValueOrDefault(data.WarehouseTypeId,))
-            //     }
-
-            //     if(dict.TryGetValue(data.AreaTypeId, out var areaTypeName) && areaTypeName != null) //data.WarehouseTypeName = dict.GetValueOrDefault(data.WarehouseTypeId  ,))
-            //     {
-            //         data.AreaTypeName = areaTypeName;
-            //     }
-            //     if(dict.TryGetValue(data.OperationTypeId , out var operationTypeName) && operationTypeName != null) //data.WarehouseTypeName = dict.GetValueOrDefault(data.WarehouseTypeId  ,))
-            //     {
-            //         data.OperationTypeName = operationTypeName;
-            //     }
-
-            //     if (uOMDict.TryGetValue(data.CapacityUOMId, out var uOMName) && uOMName != null)
-            //     {
-            //         data.CapacityUOMName = uOMName;
-            //     }              
-            //     if (cityDict.TryGetValue(data.CityId, out var cityName) && cityName != null)
-            //     {
-            //         data.CityName = cityName;
-            //     }
-            //     if (stateDict.TryGetValue(data.StateId, out var stateName) && stateName != null)
-            //     {
-            //         data.StateName = stateName;
-            //     }
-            //     if (countryDict.TryGetValue(data.CountryId, out var countryName) && countryName != null)
-            //     {
-            //         data.CountryName = countryName;
-            //     }
-
-
-            
-            // Map to DTO
-                //  var warehouseList = _mapper.Map<List<WarehouseMasterDto>>(warehouseEntities);
+           
 
                 // Domain Event for auditing
                 var auditEvent = new AuditLogsDomainEvent(
