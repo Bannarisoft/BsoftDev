@@ -30,6 +30,18 @@ namespace InventoryManagement.Infrastructure
 
             services.AddScoped<IUserSessionGrpcClient, GrpcUserSessionClient>();
 
+            services.AddGrpcClient<UnitService.UnitServiceClient>(options =>
+            {
+                options.Address = new Uri(userManagementUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            })
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+
+            services.AddScoped<IUnitGrpcClient, UnitGrpcClient>();
 
             return services;
         }

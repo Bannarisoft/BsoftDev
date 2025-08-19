@@ -40,10 +40,12 @@ namespace Core.Application.Item.ItemDetail.Queries.GetAllItems
         public string? ItemClassification { get; set; }
         public string? XPlantMaterialStatus { get; set; }
         public string? ParentItemName { get; set; }
+        public string? UnitName { get; set; }
         public new ItemPurchaseDetailDto? Purchase { get; set; }
         public new ItemInventoryDetailDto? Inventory { get; set; }
         public new ItemQualityDetailDto? Quality { get; set; }
         public new List<ItemManufactureDetailDto>? Manufacture { get; set; }
+        public new List<ItemSupplierDetailDto>? Supplier { get; set; }
         public new List<VariantDetailDto>? VariantValues { get; set; }
         public new List<ItemDetailUomDto> Uoms  { get; set; }
         
@@ -107,11 +109,16 @@ namespace Core.Application.Item.ItemDetail.Queries.GetAllItems
         public string? CertificateType { get; set; }
     }
 
-    public sealed class ItemSupplierDto
+    public class ItemSupplierDto
     {
         public int SupplierId { get; set; }
         public int UnitId { get; set; }
         public string? SupplierPartNo { get; set; }
+    }
+    public class ItemSupplierDetailDto : ItemSupplierDto
+    {
+        public string? UnitName { get; set; }
+        public string? SupplierName { get; set; }
     }
 
     public class ItemManufactureDto
@@ -122,6 +129,7 @@ namespace Core.Application.Item.ItemDetail.Queries.GetAllItems
     public class ItemManufactureDetailDto : ItemManufactureDto
     {
         public string? ManufacturingType { get; set; }
+        public string? UnitName { get; set; }
     }
 
     public class VariantValueDto
