@@ -36,6 +36,15 @@ namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
            .HasColumnType("int")
            .IsRequired();
 
+              builder.Property(t => t.ApproverBinding)
+           .HasColumnName("ApproverBinding")
+           .HasColumnType("nvarchar(10)")
+           .IsRequired();
+
+               builder.Property(t => t.ApproverValue)
+           .HasColumnName("ApproverValue")
+           .HasColumnType("nvarchar(200)")
+           .IsRequired();
 
            builder.Property(t => t.Remark)
            .HasColumnName("Remark")

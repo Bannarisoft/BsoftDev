@@ -67,9 +67,9 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequest
                 UnitId = _ipaddressService.GetUnitId()
             };
 
-            var ApprovalRequest = await _dbConnection.QueryAsync<ApprovalRequest, ApprovalStepDetail, Domain.Entities.Notification.MiscMaster, WorkflowType, ApprovalRequest>(
+            var ApprovalRequest = await _dbConnection.QueryAsync<ApprovalRequest, ApprovalStepDetail, Domain.Entities.Notification.MiscMaster, ApprovalRequest>(
                 dataQuery,
-                (approvalReq, detail, status, workFlow) =>
+                (approvalReq, detail, status) =>
                 {
                     // approvalReq.ApprovalStepDetail = new ApprovalStepDetail
                     // {
@@ -79,14 +79,14 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequest
                     {
                         Code = status.Code
                     };
-                    approvalReq.WorkflowType = new WorkflowType
-                    {
-                        ModuleTypeName = workFlow.ModuleTypeName
-                    };
+                    // approvalReq.WorkflowType = new WorkflowType
+                    // {
+                    //     ModuleTypeName = workFlow.ModuleTypeName
+                    // };
                     return approvalReq;
                 },
                 parameters,
-                splitOn: "TargetTypeId,Code,ModuleTypeName"
+                splitOn: "TargetTypeId,Code"
                 );
 
             var totalCount = await _dbConnection.ExecuteScalarAsync<int>(countQuery, parameters);
@@ -184,7 +184,7 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequest
             return result.ToList();
         }
 
-        public async Task<List<int>> GetApprovalStepDetailByIdAsync(int WorkFlowTypeId, int ModuleTransactionId, int UnitId, int DepartmentId)
+        public async Task<List<int>> GetApprovalStepDetailByIdAsync(string WorkFlowType, int ModuleTransactionId, int UnitId, int DepartmentId)
         {
             const string query = @"
                 SELECT ASD.Id
@@ -195,14 +195,14 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequest
                 ON ApprovalDept.ApprovalStepDetailId = ASD.Id
             LEFT JOIN [AppData].[ApprovalRequest] AR 
                 ON AR.ApprovalStepDetailId = ASD.Id 
-                AND AR.WorkflowTypeId = @WorkFlowTypeId 
+                AND AR.WorkflowType = @WorkFlowType 
                 AND AR.ModuleTransactionId = @ModuleTransactionId
             WHERE ASD.IsDeleted = 0 
               AND ASD.IsActive = 1 
               AND AR.Id IS NULL AND ASM.UnitId = @UnitId AND ApprovalDept.DepartmentId = @DepartmentId
             ORDER BY ASD.StepOrder ASC;";
 
-            var WorkflowType = await _dbConnection.QueryAsync<int>(query, new { WorkFlowTypeId, ModuleTransactionId, UnitId, DepartmentId });
+            var WorkflowType = await _dbConnection.QueryAsync<int>(query, new { WorkFlowType, ModuleTransactionId, UnitId, DepartmentId });
             return WorkflowType.ToList();
         }
         public async Task<List<int>> StartApprovalProcessAsync(List<int> Id, Dictionary<string, object> requestData)

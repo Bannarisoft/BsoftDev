@@ -14,8 +14,8 @@ namespace BackgroundService.Application.Workflow.Common.Mappings
         {
             CreateMap<ApprovalRequest, ApprovalRequestDto>()
             // .ForMember(dest => dest.TargetTypeId, opt => opt.MapFrom(src => src.ApprovalStepDetail.TargetTypeId))
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.Code))
-            .ForMember(dest => dest.ModuleTypeName, opt => opt.MapFrom(src => src.WorkflowType.ModuleTypeName));
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.Code));
+            // .ForMember(dest => dest.ModuleTypeName, opt => opt.MapFrom(src => src.WorkflowType.ModuleTypeName));
         }
     }
 }

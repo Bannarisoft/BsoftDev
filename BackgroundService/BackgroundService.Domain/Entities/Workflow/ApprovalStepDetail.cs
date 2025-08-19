@@ -16,8 +16,12 @@ namespace BackgroundService.Domain.Entities.Workflow
         public WorkflowType WorkflowType { get; set; }
         public MiscMaster ApprovalStep { get; set; }
         public ICollection<ApprovalStepUnitMapping> ApprovalStepUnitMappings { get; set; }
-        
+
         public ICollection<ApprovalRequest> ApprovalRequest { get; set; }
+        public ICollection<ApprovalRule> ApprovalRules { get; set; }
+        
+        public ICollection<ApprovalTarget> ApprovalTargets { get; set; }
+        
         
     }
 }

@@ -12,5 +12,6 @@ namespace Core.Domain.Common
         public const string Approved = "Approved";
         public const string Rejected = "Rejected";
         public const string Deleted = "Deleted";
+        public const string PurchaseIndent = "Purchase Indent";
     }
 }

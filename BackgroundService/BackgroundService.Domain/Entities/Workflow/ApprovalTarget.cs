@@ -9,9 +9,9 @@ namespace BackgroundService.Domain.Entities.Workflow
 {
     public class ApprovalTarget : BaseEntity
     {
-        public int ApprovalStepId { get; set; }
+        public int ApprovalStepDetailId { get; set; }
         public required string Binding { get; set; }
         public required string Value { get; set; }
-        public MiscMaster ApprovalStep { get; set; }
+        public ApprovalStepDetail ApprovalStepDetail { get; set; }
     }
 }

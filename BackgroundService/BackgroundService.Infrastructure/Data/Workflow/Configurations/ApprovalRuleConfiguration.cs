@@ -34,8 +34,8 @@ namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
                 .HasColumnType("int")
                 .IsRequired();
 
-            builder.Property(t => t.ApprovalStepId)
-            .HasColumnName("ApprovalStepId")
+            builder.Property(t => t.ApprovalStepDetailId)
+            .HasColumnName("ApprovalStepDetailId")
             .HasColumnType("int")
             .IsRequired();
 
@@ -101,9 +101,9 @@ namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
       .HasForeignKey(ac => ac.WorkflowTypeId)
       .OnDelete(DeleteBehavior.NoAction);
           
-           builder.HasOne(ac => ac.ApprovalStep)
+           builder.HasOne(ac => ac.ApprovalStepDetail)
           .WithMany(am => am.ApprovalRules)
-          .HasForeignKey(ac => ac.ApprovalStepId)
+          .HasForeignKey(ac => ac.ApprovalStepDetailId)
           .OnDelete(DeleteBehavior.NoAction);
         }
     }

@@ -52,9 +52,16 @@ namespace Core.Application.Common.Mappings
               .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == Status.Active ? 1 : 0))
               .ForMember(dest => dest.IndentDetails, opt => opt.MapFrom(src => src.IndentDetails))
                .ForMember(dest => dest.IndentDepartments, opt => opt.MapFrom(src => src.IndentDepartmentMappings));
-               
-                CreateMap<IndentDetail, IndentDetailUpdateDto>();
+
+            CreateMap<IndentDetail, IndentDetailUpdateDto>();
             CreateMap<IndentDepartmentMapping, IndentDepartmentUpdateDto>();
+
+            CreateMap<IndentHeader, IndentReverseMapDto>()
+                 .ForMember(dest => dest.Header, opt => opt.MapFrom(src => src))
+                 .ForMember(dest => dest.Lines, opt => opt.MapFrom(src => src.IndentDetails));
+
+            CreateMap<IndentHeader, CreateIndentHeaderDto>();
+            CreateMap<IndentDetail, CreateIndentDetailDto>();
         }
         
     }

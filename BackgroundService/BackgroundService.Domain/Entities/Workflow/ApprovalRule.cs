@@ -11,7 +11,7 @@ namespace BackgroundService.Domain.Entities.Workflow
     {
 
         public int WorkflowTypeId { get; set; }
-        public int ApprovalStepId { get; set; }
+        public int ApprovalStepDetailId { get; set; }
         public int Priority { get; set; }
         public string? Action { get; set; }
         public int UnitId { get; set; }
@@ -19,7 +19,7 @@ namespace BackgroundService.Domain.Entities.Workflow
         public DateOnly EffectiveTo { get; set; }
         public WorkflowType WorkflowType { get; set; }
         public ICollection<ApprovalRequest> ApprovalRequest { get; set; }
-        public MiscMaster ApprovalStep { get; set; }
+        public ApprovalStepDetail ApprovalStepDetail { get; set; }
         public ICollection<ApprovalRuleCondition> Conditions { get; set; }
         public ICollection<RuleTargetOverride> RuleTargetOverride { get; set; }
     }

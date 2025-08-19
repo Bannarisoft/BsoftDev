@@ -4,6 +4,7 @@ using BackgroundService.Infrastructure.Data.Notification;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackgroundService.Infrastructure.Migrations
 {
     [DbContext(typeof(NotificationDbContext))]
-    partial class NotificationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250819052740_approvalRequestColumnAdd")]
+    partial class approvalRequestColumnAdd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -919,9 +922,9 @@ namespace BackgroundService.Infrastructure.Migrations
                         .HasColumnType("varchar(50)")
                         .HasColumnName("Action");
 
-                    b.Property<int>("ApprovalStepDetailId")
+                    b.Property<int>("ApprovalStepId")
                         .HasColumnType("int")
-                        .HasColumnName("ApprovalStepDetailId");
+                        .HasColumnName("ApprovalStepId");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
@@ -979,7 +982,7 @@ namespace BackgroundService.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApprovalStepDetailId");
+                    b.HasIndex("ApprovalStepId");
 
                     b.HasIndex("WorkflowTypeId");
 
@@ -1175,9 +1178,9 @@ namespace BackgroundService.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ApprovalStepDetailId")
+                    b.Property<int>("ApprovalStepId")
                         .HasColumnType("int")
-                        .HasColumnName("ApprovalStepDetailId");
+                        .HasColumnName("ApprovalStepId");
 
                     b.Property<string>("Binding")
                         .IsRequired()
@@ -1225,7 +1228,7 @@ namespace BackgroundService.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApprovalStepDetailId");
+                    b.HasIndex("ApprovalStepId");
 
                     b.ToTable("ApprovalTarget", "AppData");
                 });
@@ -1550,9 +1553,9 @@ namespace BackgroundService.Infrastructure.Migrations
 
             modelBuilder.Entity("BackgroundService.Domain.Entities.Workflow.ApprovalRule", b =>
                 {
-                    b.HasOne("BackgroundService.Domain.Entities.Workflow.ApprovalStepDetail", "ApprovalStepDetail")
+                    b.HasOne("BackgroundService.Domain.Entities.Notification.MiscMaster", "ApprovalStep")
                         .WithMany("ApprovalRules")
-                        .HasForeignKey("ApprovalStepDetailId")
+                        .HasForeignKey("ApprovalStepId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
@@ -1562,7 +1565,7 @@ namespace BackgroundService.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("ApprovalStepDetail");
+                    b.Navigation("ApprovalStep");
 
                     b.Navigation("WorkflowType");
                 });
@@ -1622,13 +1625,13 @@ namespace BackgroundService.Infrastructure.Migrations
 
             modelBuilder.Entity("BackgroundService.Domain.Entities.Workflow.ApprovalTarget", b =>
                 {
-                    b.HasOne("BackgroundService.Domain.Entities.Workflow.ApprovalStepDetail", "ApprovalStepDetail")
+                    b.HasOne("BackgroundService.Domain.Entities.Notification.MiscMaster", "ApprovalStep")
                         .WithMany("ApprovalTargets")
-                        .HasForeignKey("ApprovalStepDetailId")
+                        .HasForeignKey("ApprovalStepId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("ApprovalStepDetail");
+                    b.Navigation("ApprovalStep");
                 });
 
             modelBuilder.Entity("BackgroundService.Domain.Entities.Workflow.RuleTargetOverride", b =>
@@ -1648,7 +1651,11 @@ namespace BackgroundService.Infrastructure.Migrations
 
                     b.Navigation("ApprovalRequestStatus");
 
+                    b.Navigation("ApprovalRules");
+
                     b.Navigation("ApprovalStep");
+
+                    b.Navigation("ApprovalTargets");
 
                     b.Navigation("ApprovalType");
 
@@ -1726,11 +1733,7 @@ namespace BackgroundService.Infrastructure.Migrations
                 {
                     b.Navigation("ApprovalRequest");
 
-                    b.Navigation("ApprovalRules");
-
                     b.Navigation("ApprovalStepUnitMappings");
-
-                    b.Navigation("ApprovalTargets");
                 });
 
             modelBuilder.Entity("BackgroundService.Domain.Entities.Workflow.WorkflowType", b =>
