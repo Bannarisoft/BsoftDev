@@ -4,6 +4,7 @@ using InventoryManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InventoryManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250820093436_ItemMaster_deletion_behaviour")]
+    partial class ItemMaster_deletion_behaviour
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1473,7 +1476,7 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.MiscMaster", "MiscClassification")
                         .WithMany("ItemMasterClassification")
                         .HasForeignKey("ItemClassificationId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Core.Domain.Entities.Item.ItemGroup", "ItemGroup")
                         .WithMany("ItemMasterGroup")
@@ -1493,7 +1496,7 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.MiscMaster", "MiscStatus")
                         .WithMany("ItemMasterStatus")
                         .HasForeignKey("XPlantMaterialStatusId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("HSNMaster");
 
@@ -1588,18 +1591,18 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.MiscTypeMaster", "MiscAttributeGroup")
                         .WithMany("ItemAttributeGroup")
                         .HasForeignKey("AttributeGroupId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Core.Domain.Entities.MiscMaster", "MiscAttribute")
                         .WithMany("ItemAttribute")
                         .HasForeignKey("AttributeId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.Item.ItemDetail.ItemMaster", "ItemMaster")
                         .WithMany("VariantValues")
                         .HasForeignKey("ItemId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.Item.ItemDetail.ItemMaster", "NewItem")
@@ -1610,7 +1613,7 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.MiscMaster", "MiscVariantBasedOn")
                         .WithMany("ItemAttributeBasedOn")
                         .HasForeignKey("VariantBasedOn")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("ItemMaster");

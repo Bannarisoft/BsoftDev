@@ -36,7 +36,7 @@ namespace InventoryManagement.API.GrpcServices
                     _ => throw new RpcException(new Status(StatusCode.InvalidArgument, $"Unsupported misctype: {request.Misctype}"))
                 };
 
-                var list = await _miscMasterQueryRepository.GetMiscMaster("", typeKey);
+                var list = await _miscMasterQueryRepository.GetMiscMaster("", typeKey,"");
 
                 var resp = new MiscMastersListResponse();
                 resp.Items.AddRange(list.Select(d => new MiscMasterDto {

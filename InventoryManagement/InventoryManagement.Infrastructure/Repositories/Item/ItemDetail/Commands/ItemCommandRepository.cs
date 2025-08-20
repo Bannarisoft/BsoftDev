@@ -49,7 +49,7 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Comman
             _db.ItemMaster.FirstOrDefaultAsync(x => x.Id == id, ct);
 
         public Task<bool> ExistsByCodeForUpdateAsync(string itemCode, int excludeId, CancellationToken ct = default) =>
-            _db.ItemMaster.AnyAsync(x => x.ItemCode == itemCode && x.Id != excludeId, ct);
+            _db.ItemMaster.AnyAsync(x => x.ItemCode == itemCode && x.Id != excludeId && x.IsActive == BaseEntity.Status.Active, ct);
 
         public Task<bool> ExistsByCodeForCreateAsync(string itemCode, CancellationToken ct = default) =>
             _db.ItemMaster.AnyAsync(x => x.ItemCode == itemCode && x.IsDeleted == BaseEntity.IsDelete.NotDeleted, ct);

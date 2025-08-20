@@ -77,7 +77,7 @@ namespace InventoryManagement.Infrastructure.Repositories.MiscTypeMaster
         {
 
 
-            const string query = @"SELECT Id, MiscTypeCode   FROM Inventory.MiscTypeMaster
+            const string query = @"SELECT Id, MiscTypeCode,Description   FROM Inventory.MiscTypeMaster
                 WHERE IsDeleted = 0 AND MiscTypeCode LIKE @SearchPattern ";
 
 
