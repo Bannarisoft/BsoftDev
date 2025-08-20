@@ -1,0 +1,68 @@
+
+SELECT  
+--*
+
+trnhd.po_type AS BudgetType,
+        trnhd.DIVCODE AS OldUnitId,
+        trnhd.SLCODE AS VendorCode,
+        sl.slname AS VendorName
+  
+        
+        ,
+        
+        trnDL.PORDDT AS PoDate,
+        trnDL.pordno AS PoNo,
+        trnDL.Pordsno AS PoSno,
+        trnDL.itemcode AS ItemCode,
+        itm.itemname AS ItemName,
+        trnDL.docno AS GrnNo,
+        trnDL.Docsno AS GrnSno,
+        trnDL.docdt AS GrnDate,
+        'Y' AS QcCompleted,
+        
+        B.bquantity AS AcceptedQty,
+        B.bVALUE AS PurchaseValue,             
+        (B.bQUANTITY * B.bRATE) AS GrnValue,
+        
+        a.billNo AS BillNo,
+        A.billDt AS BillDate,
+        itm.uom AS Uom,
+        ISNULL(B1.lnname, 'NA') AS BinLocation, 
+    --    YEAR(trnDL.PjvocDt) AS PjYear,
+        'PJ' AS PjDocId,
+        'PJ-' + A.DIVCODE AS PjDocSr
+        ,trnDL.PJNO AS PjDocNo
+      
+    
+FROM IN_TRNHEAD trnhd
+INNER JOIN IN_TRNTAIL trnDL ON trnhd.DIVCODE=trnDL.DIVCODE AND trnhd.TC=trnDL.TC AND trnhd.DOCDT=trnDL.DOCDT AND trnhd.DOCNO=trnDL.DOCNO
+INNER JOIN FA_SLMAS SL ON trnhd.SLCODE=SL.slcode
+LEFT JOIN IN_PJH A ON trnhd.DIVCODE=trnDL.DIVCODE AND trnhd.SLCODE=A.SLCODE AND trnDL.PJDT=A.PJVOCDT AND trnDL.PJNO=A.PJVOCNO 
+LEFT JOIN IN_PJL B ON A.DIVCODE=B.DIVCODE AND A.PJVOCDT=B.PJVOCDT AND A.PJVOCNO=B.PJVOCNO 
+INNER JOIN[in_item] itm 
+        ON itm.itemcode = trnDL.itemcode   
+                 
+    LEFT OUTER JOIN[po_ordh] o 
+        ON trnDL.DIVCODE = o.DIVCODE 
+        AND o.PORDNO = trnDL.PORDNO          
+        AND o.PORDDT = trnDL.PORDDT          
+    LEFT OUTER JOIN[IG_Tax] I 
+        ON trnDL.Tax_Code = I.Tax_Code          
+        
+    LEFT OUTER JOIN[IG_TAX] Ad 
+        ON B.Btax2_Code = Ad.Tax_Code           
+        
+    LEFT OUTER JOIN[pp_divmas] d 
+        ON A.DIVCODE = d.DIVCODE          
+    LEFT OUTER JOIN[po_type] p 
+        ON trnDL.POGRP = P.TYPE_CODE            
+    LEFT OUTER JOIN[iN_ITEMSUB] A1  
+        ON A1.DIVCODE ='01'
+        AND trnDL.ITEMCODE = A1.ITEMCODE 
+    LEFT OUTER JOIN[in_itmln] B1  
+        ON B1.DIVCODE ='01'
+        AND A1.LnCode = B1.lncode  
+
+WHERE TRNHD.DOCDT>='2025-04-01'AND TRNHD.DIVCODE='01' AND TRNHD.TC=1 
+AND TRNDL.pogrp='CA' 
+--AND TRNHD.DOCNO IN(29,30)

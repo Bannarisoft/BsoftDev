@@ -48,15 +48,15 @@ namespace PartyManagement.Infrastructure.Data.Configurations
                .HasColumnType("nvarchar(50)");
 
             builder.Property(m => m.State)
-               .HasColumnName("AddressLine4")
+               .HasColumnName("State")
                .HasColumnType("nvarchar(50)");
 
             builder.Property(m => m.PostalCode)
-               .HasColumnName("AddressLine5")
+               .HasColumnName("PostalCode")
                .HasColumnType("nvarchar(10)");
 
             builder.Property(m => m.Country)
-               .HasColumnName("AddressLine6")
+               .HasColumnName("Country")
                .HasColumnType("nvarchar(50)");  
         }
     }

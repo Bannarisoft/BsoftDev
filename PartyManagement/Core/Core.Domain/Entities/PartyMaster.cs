@@ -45,12 +45,14 @@ namespace Core.Domain.Entities
         public bool IsInternalSupplier { get; set; }
         public bool IsInternalCustomer { get; set; }
         public bool IsStopPayment { get; set; }
+        public string? PartyStatus { get; set; }
         public MiscMaster? CustomerTypeMisc { get; set; } = null!;
         public ICollection<PartyContact>? PartyContactTypes { get; set; }
         public ICollection<PartyAddress>? PartyAddressTypes { get; set; }
         public ICollection<PartyType>? PartyTypes { get; set; }
         public ICollection<PartyDocument>? PartyDocumentTypes { get; set; }
         public ICollection<PartyBank>? PartyBankTypes { get; set; }
+        public ICollection<PartyActivityLog>? PartyActivityLogTypes { get; set; }
         
     }
 }

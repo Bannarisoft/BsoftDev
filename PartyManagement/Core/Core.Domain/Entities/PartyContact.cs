@@ -20,7 +20,8 @@ namespace Core.Domain.Entities
         public string? Phone { get; set; }
         public int? PreferredChannelId { get; set; }
         public MiscMaster? PreferredChannel { get; set; } = null!;
-        public int? ContactTypeId { get; set; }    
+        public int? ContactTypeId { get; set; }
         public MiscMaster? ContactType { get; set; } = null!;
+        public string? ContactBy { get; set; }
     }
 }
