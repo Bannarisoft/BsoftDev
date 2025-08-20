@@ -9,6 +9,7 @@ using Core.Application.WarehouseMaster.Command.CreateWarehouseMaster;
 using Core.Application.WarehouseMaster.Command.DeleteWarehouseMaster;
 using Core.Application.WarehouseMaster.Command.UpdateWarehouseMaster;
 using Core.Application.WarehouseMaster.GetWarehouseMasterById;
+using Core.Application.WarehouseMaster.Queries.GetParentWarehouseMaster;
 using Core.Application.WarehouseMaster.Queries.GetWareMasterAutoComplete;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -111,8 +112,8 @@ namespace WarehouseManagement.API.Controllers
                 statusCode = StatusCodes.Status200OK
             });
         }
-        
-         [HttpGet("by-name")]
+
+        [HttpGet("by-name")]
         public async Task<IActionResult> GetRackMaster([FromQuery] string? name)
         {
             var result = await Mediator.Send(new GetWarehouseMasterAutoCompleteQuery { SearchPattern = name });
@@ -122,6 +123,26 @@ namespace WarehouseManagement.API.Controllers
                 {
                     StatusCode = StatusCodes.Status404NotFound,
                     message = "  Warehouse Not Found",
+                });
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data = result
+            });
+        }
+        
+
+         [HttpGet("Get Parent Warehouse")]
+        public async Task<IActionResult> GetParentWarehouse([FromQuery] string? name)
+        {
+            var result = await Mediator.Send(new GetParentWarehouseMasterQuery {} );
+            if (result == null)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = "  Parent Warehouse Not Found",
                 });
             }
             return Ok(new
