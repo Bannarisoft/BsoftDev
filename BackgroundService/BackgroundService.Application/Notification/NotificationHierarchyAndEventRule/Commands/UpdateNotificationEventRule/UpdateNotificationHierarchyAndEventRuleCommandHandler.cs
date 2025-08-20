@@ -4,6 +4,7 @@ using BackgroundService.Application.Notification.Exceptions;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationLevelHierarchy;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationEventRule;
 using BackgroundService.Domain.Entities.Notification;
+using BackgroundService.Domain.Common;
 
 namespace BackgroundService.Application.Notification.NotificationHierarchyAndEventRule.Commands.UpdateNotificationEventRule
 {
@@ -45,6 +46,9 @@ namespace BackgroundService.Application.Notification.NotificationHierarchyAndEve
             existing.TargetId = request.TargetId;
             existing.ApprovalModeId = request.ApprovalModeId;
             existing.Description = request.Description;
+            existing.IsActive = request.IsActive == 1
+                    ? BaseEntity.Status.Active
+                    : BaseEntity.Status.Inactive;
 
             // 🔹 Step 3: Map and assign new event rules
             existing.NotificationEventRules = request.NotificationEventRules

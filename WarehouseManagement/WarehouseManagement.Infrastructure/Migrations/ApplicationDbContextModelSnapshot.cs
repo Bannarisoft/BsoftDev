@@ -22,6 +22,97 @@ namespace WarehouseManagement.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Core.Domain.Entities.RackMaster", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AisleId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CapacityUOMId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int?>("DimensionUOMId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FloorId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsActive");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<decimal?>("MaxCapacity")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("RackCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal?>("RackHeight")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("RackLevelId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RackName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal?>("RackWidth")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WarehouseId", "RackCode")
+                        .IsUnique()
+                        .HasDatabaseName("UX_Rack_Warehouse_RackCode");
+
+                    b.ToTable("RackMaster", "Warehouse");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.WarehouseItemGroupMapping", b =>
                 {
                     b.Property<int>("Id")
@@ -218,6 +309,17 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.ToTable("WarehouseMaster", "Warehouse");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.RackMaster", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.WarehouseMaster", "Warehouse")
+                        .WithMany("Racks")
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Warehouse");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.WarehouseItemGroupMapping", b =>
                 {
                     b.HasOne("Core.Domain.Entities.WarehouseMaster", "Warehouse")
@@ -244,6 +346,8 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Navigation("AllowedItemGroups");
 
                     b.Navigation("ChildWarehouses");
+
+                    b.Navigation("Racks");
                 });
 #pragma warning restore 612, 618
         }

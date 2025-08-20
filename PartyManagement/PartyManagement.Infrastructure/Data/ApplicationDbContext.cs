@@ -29,6 +29,8 @@ namespace PartyManagement.Infrastructure.Data
         public DbSet<PartyAddress> PartyAddress { get; set; }
         public DbSet<PartyBank> PartyBank { get; set; }
         public DbSet<PartyDocument> PartyDocument { get; set; }
+        public DbSet<PartyActivityLog> PartyActivityLog { get; set; }
+
 
 
 
@@ -44,6 +46,7 @@ namespace PartyManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new PartyAddressConfiguration());
             modelBuilder.ApplyConfiguration(new PartyBankConfiguration());
             modelBuilder.ApplyConfiguration(new PartyDocumentConfiguration());
+            modelBuilder.ApplyConfiguration(new PartyActivityLogConfiguration());
 
 
 

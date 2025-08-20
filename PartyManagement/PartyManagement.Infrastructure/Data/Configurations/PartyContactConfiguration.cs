@@ -32,7 +32,7 @@ namespace PartyManagement.Infrastructure.Data.Configurations
                 .OnDelete(DeleteBehavior.Restrict); // Use .Cascade if needed
 
             builder.Property(m => m.FirstName)
-               .HasColumnName("GSTNumber")
+               .HasColumnName("FirstName")
                .HasColumnType("nvarchar(25)")
                 .IsRequired();
 
@@ -77,9 +77,9 @@ namespace PartyManagement.Infrastructure.Data.Configurations
                 .HasForeignKey(m => m.PreferredChannelId) // Foreign Key property in MiscMaster
                 .OnDelete(DeleteBehavior.Restrict); // Use .Cascade if needed
 
-              builder.Property(m => m.ContactTypeId)  // Foreign Key column
-               .HasColumnName("ContactTypeId")
-               .HasColumnType("int");  // Set as int
+            builder.Property(m => m.ContactTypeId)  // Foreign Key column
+             .HasColumnName("ContactTypeId")
+             .HasColumnType("int");  // Set as int
 
             // Foreign Key Relationship
             builder.HasOne(m => m.ContactType)
@@ -87,6 +87,9 @@ namespace PartyManagement.Infrastructure.Data.Configurations
                 .HasForeignKey(m => m.ContactTypeId) // Foreign Key property in MiscMaster
                 .OnDelete(DeleteBehavior.Restrict); // Use .Cascade if needed
             
+            builder.Property(m => m.ContactBy)
+                .HasColumnName("ContactBy")
+                .HasColumnType("nvarchar(50)");
   
         }
     }

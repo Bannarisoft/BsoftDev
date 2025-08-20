@@ -56,7 +56,7 @@ namespace WarehouseManagement.Infrastructure.GrpcClients
                 }).ToList();
             }
 
-        public async Task<(int WarehouseTypeId, int StorageTypeId, int AreaTypeId, int OperationTypeId)>
+        public async Task<(int? WarehouseTypeId, int? StorageTypeId, int? AreaTypeId, int? OperationTypeId , int? FloorTypeId , int? AisleTypeId, int? RackLevelTypeId )>
             GetMiscTypeIdsAsync()
         {
             var headers = BuildAuthHeadersOrNull();
@@ -66,7 +66,7 @@ namespace WarehouseManagement.Infrastructure.GrpcClients
                 headers: headers
              );
 
-            return (resp.WarehouseTypeId, resp.StorageTypeId, resp.AreaTypeId, resp.OperationTypeId);
+            return (resp.WarehouseTypeId, resp.StorageTypeId, resp.AreaTypeId, resp.OperationTypeId ,resp.FloorTypeId,resp.WarehouseAisleTypeId,resp.WarehouseRackLevelTypeId);
         }
         // public async Task<(int WarehouseTypeId, int StorageTypeId, int AreaTypeId, int OperationTypeId)> GetMiscTypeIdsAsync()
         //     {

@@ -364,6 +364,593 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.ToTable("ItemCategory", "Inventory");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemDetail.ItemInventory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("AllowNegativeStock")
+                        .HasColumnType("bit")
+                        .HasColumnName("AllowNegativeStock");
+
+                    b.Property<bool>("ApplyBatchNumber")
+                        .HasColumnType("bit")
+                        .HasColumnName("ApplyBatchNumber");
+
+                    b.Property<bool>("BatchManagement")
+                        .HasColumnType("bit")
+                        .HasColumnName("BatchManagement");
+
+                    b.Property<string>("BatchNumberSeries")
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("BatchNumberSeries");
+
+                    b.Property<int?>("DefaultMaterialRequestTypeId")
+                        .HasColumnType("int")
+                        .HasColumnName("DefaultMaterialRequestTypeId");
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int")
+                        .HasColumnName("ItemId");
+
+                    b.Property<decimal?>("LowerTolerance")
+                        .HasColumnType("decimal(18,4)")
+                        .HasColumnName("LowerTolerance");
+
+                    b.Property<int?>("ReorderLevel")
+                        .HasColumnType("int")
+                        .HasColumnName("ReorderLevel");
+
+                    b.Property<int?>("ReorderQty")
+                        .HasColumnType("int")
+                        .HasColumnName("ReorderQty");
+
+                    b.Property<int?>("RequestTypeId")
+                        .HasColumnType("int")
+                        .HasColumnName("RequestTypeId");
+
+                    b.Property<string>("SerialNumberSeries")
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("SerialNumberSeries");
+
+                    b.Property<int?>("ShelfLife")
+                        .HasColumnType("int")
+                        .HasColumnName("ShelfLife");
+
+                    b.Property<decimal?>("UpperTolerance")
+                        .HasColumnType("decimal(18,4)")
+                        .HasColumnName("UpperTolerance");
+
+                    b.Property<int?>("ValuationMethodId")
+                        .HasColumnType("int")
+                        .HasColumnName("ValuationMethodId");
+
+                    b.Property<decimal?>("Weight")
+                        .HasColumnType("decimal(18,4)")
+                        .HasColumnName("Weight");
+
+                    b.Property<int?>("WeightUomId")
+                        .HasColumnType("int")
+                        .HasColumnName("WeightUomId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DefaultMaterialRequestTypeId");
+
+                    b.HasIndex("ItemId")
+                        .IsUnique();
+
+                    b.HasIndex("RequestTypeId");
+
+                    b.HasIndex("ValuationMethodId");
+
+                    b.HasIndex("WeightUomId");
+
+                    b.ToTable("ItemInventory", "Inventory");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemDetail.ItemLog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("varchar(32)")
+                        .HasDefaultValue("Update")
+                        .HasColumnName("Action");
+
+                    b.Property<string>("CorrelationId")
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("CorrelationId");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("CreatedBy");
+
+                    b.Property<string>("CreatedByName")
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("CreatedByName");
+
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("CreatedDate")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<string>("CreatedIP")
+                        .HasColumnType("varchar(45)")
+                        .HasColumnName("CreatedIP");
+
+                    b.Property<int>("EntityId")
+                        .HasColumnType("int")
+                        .HasColumnName("EntityId");
+
+                    b.Property<string>("EntityName")
+                        .IsRequired()
+                        .HasColumnType("varchar(128)")
+                        .HasColumnName("EntityName");
+
+                    b.Property<string>("NewValue")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("NewValue");
+
+                    b.Property<string>("OldValue")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("OldValue");
+
+                    b.Property<string>("PropertyName")
+                        .IsRequired()
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("PropertyName");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CorrelationId")
+                        .HasDatabaseName("IX_ItemLogs_CorrelationId");
+
+                    b.HasIndex("EntityName", "EntityId", "CreatedDate")
+                        .HasDatabaseName("IX_ItemLogs_Entity_ThenDate");
+
+                    b.ToTable("ItemLogs", "Inventory");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemDetail.ItemManufacture", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int")
+                        .HasColumnName("ItemId");
+
+                    b.Property<int>("ManufacturingTypeId")
+                        .HasColumnType("int")
+                        .HasColumnName("ManufacturingTypeId");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("UnitId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemId")
+                        .IsUnique();
+
+                    b.HasIndex("ManufacturingTypeId");
+
+                    b.ToTable("ItemManufacture", "Inventory");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemDetail.ItemMaster", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("CreatedBy");
+
+                    b.Property<string>("CreatedByName")
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("CreatedByName");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("CreatedDate");
+
+                    b.Property<string>("CreatedIP")
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("CreatedIP");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("Description");
+
+                    b.Property<int?>("HSNId")
+                        .HasColumnType("int")
+                        .HasColumnName("HSNId");
+
+                    b.Property<bool>("HasVariants")
+                        .HasColumnType("bit")
+                        .HasColumnName("HasVariants");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsActive");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<bool>("IsStockItem")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsStockItem");
+
+                    b.Property<int?>("ItemCategoryId")
+                        .HasColumnType("int")
+                        .HasColumnName("ItemCategoryId");
+
+                    b.Property<int?>("ItemClassificationId")
+                        .HasColumnType("int")
+                        .HasColumnName("ItemClassificationId");
+
+                    b.Property<string>("ItemCode")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("ItemCode");
+
+                    b.Property<int?>("ItemGroupId")
+                        .HasColumnType("int")
+                        .HasColumnName("ItemGroupId");
+
+                    b.Property<string>("ItemImage")
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("ItemImage");
+
+                    b.Property<string>("ItemName")
+                        .IsRequired()
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("ItemName");
+
+                    b.Property<bool>("MaintainStock")
+                        .HasColumnType("bit")
+                        .HasColumnName("MaintainStock");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("ModifiedBy");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("ModifiedByName");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("ModifiedDate");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("ModifiedIP");
+
+                    b.Property<int?>("ParentItemId")
+                        .HasColumnType("int")
+                        .HasColumnName("ParentItemId");
+
+                    b.Property<int?>("StockUomId")
+                        .HasColumnType("int")
+                        .HasColumnName("StockUomId");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("UnitId");
+
+                    b.Property<DateOnly?>("ValidFrom")
+                        .HasColumnType("date")
+                        .HasColumnName("ValidFrom");
+
+                    b.Property<int?>("XPlantMaterialStatusId")
+                        .HasColumnType("int")
+                        .HasColumnName("XPlantMaterialStatusId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HSNId");
+
+                    b.HasIndex("ItemCategoryId");
+
+                    b.HasIndex("ItemClassificationId");
+
+                    b.HasIndex("ItemGroupId");
+
+                    b.HasIndex("ParentItemId");
+
+                    b.HasIndex("StockUomId");
+
+                    b.HasIndex("XPlantMaterialStatusId");
+
+                    b.ToTable("ItemMaster", "Inventory");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemDetail.ItemPurchase", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("AutomaticPo")
+                        .HasColumnType("bit")
+                        .HasColumnName("AutomaticPo");
+
+                    b.Property<int?>("GrProcessingTimeDays")
+                        .HasColumnType("int")
+                        .HasColumnName("GrProcessingTimeDays");
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int")
+                        .HasColumnName("ItemId");
+
+                    b.Property<int?>("LeadTimeDays")
+                        .HasColumnType("int")
+                        .HasColumnName("LeadTimeDays");
+
+                    b.Property<int?>("OriginCountryId")
+                        .HasColumnType("int")
+                        .HasColumnName("OriginCountryId");
+
+                    b.Property<int?>("PurchaseUomId")
+                        .HasColumnType("int")
+                        .HasColumnName("PurchaseUomId");
+
+                    b.Property<int?>("SafetyStock")
+                        .HasColumnType("int")
+                        .HasColumnName("SafetyStock");
+
+                    b.Property<string>("TariffNumber")
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("TariffNumber");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemId")
+                        .IsUnique();
+
+                    b.HasIndex("PurchaseUomId");
+
+                    b.ToTable("ItemPurchase", "Inventory");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemDetail.ItemQuality", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CertificateTypeId")
+                        .HasColumnType("int")
+                        .HasColumnName("CertificateTypeId");
+
+                    b.Property<int?>("InspLotProcessingTime")
+                        .HasColumnType("int")
+                        .HasColumnName("InspLotProcessingTime");
+
+                    b.Property<bool>("InspectionRequired")
+                        .HasColumnType("bit")
+                        .HasColumnName("InspectionRequired");
+
+                    b.Property<int?>("InspectionTemplateId")
+                        .HasColumnType("int")
+                        .HasColumnName("InspectionTemplateId");
+
+                    b.Property<bool>("IsCertificateRequiredFromSupplier")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsCertificateRequiredFromSupplier");
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int")
+                        .HasColumnName("ItemId");
+
+                    b.Property<bool>("QualityInspectionFree")
+                        .HasColumnType("bit")
+                        .HasColumnName("QualityInspectionFree");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CertificateTypeId");
+
+                    b.HasIndex("InspectionTemplateId");
+
+                    b.HasIndex("ItemId")
+                        .IsUnique();
+
+                    b.ToTable("ItemQuality", "Inventory");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemDetail.ItemSupplier", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int")
+                        .HasColumnName("ItemId");
+
+                    b.Property<int>("SupplierId")
+                        .HasColumnType("int")
+                        .HasColumnName("SupplierId");
+
+                    b.Property<string>("SupplierPartNo")
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("SupplierPartNo");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("UnitId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemId")
+                        .IsUnique();
+
+                    b.ToTable("ItemSupplier", "Inventory");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemDetail.ItemUOM", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal?>("ConversionRate")
+                        .HasColumnType("decimal(18,6)")
+                        .HasColumnName("ConversionRate");
+
+                    b.Property<int>("ConversionUOMId")
+                        .HasColumnType("int")
+                        .HasColumnName("ConversionUOMId");
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int")
+                        .HasColumnName("ItemId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConversionUOMId");
+
+                    b.HasIndex("ItemId")
+                        .IsUnique();
+
+                    b.ToTable("ItemUOM", "Inventory");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemDetail.Templates.InspectionTemplate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("IsActive")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IsDeleted")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TemplateName")
+                        .IsRequired()
+                        .HasColumnType("varchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TemplateName");
+
+                    b.ToTable("InspectionTemplate", "Inventory");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemDetail.Variant.ItemVariantValue", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AttributeGroupId")
+                        .HasColumnType("int")
+                        .HasColumnName("AttributeGroupId");
+
+                    b.Property<int>("AttributeId")
+                        .HasColumnType("int")
+                        .HasColumnName("AttributeId");
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int")
+                        .HasColumnName("ItemId");
+
+                    b.Property<int?>("NewItemId")
+                        .HasColumnType("int")
+                        .HasColumnName("NewItemId");
+
+                    b.Property<string>("OptionValue")
+                        .IsRequired()
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("OptionValue");
+
+                    b.Property<int>("VariantBasedOn")
+                        .HasColumnType("int")
+                        .HasColumnName("VariantBasedOn");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AttributeGroupId");
+
+                    b.HasIndex("AttributeId");
+
+                    b.HasIndex("ItemId");
+
+                    b.HasIndex("NewItemId");
+
+                    b.HasIndex("VariantBasedOn");
+
+                    b.ToTable("ItemVariantValue", "Inventory");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.Item.ItemGroup", b =>
                 {
                     b.Property<int>("Id")
@@ -678,6 +1265,70 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.ToTable("UOMConversion", "Inventory");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.item.ItemDetail.Templates.InspectionParameter", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AcceptanceCriteriaValue")
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("IsActive")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IsDeleted")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("MaximumValue")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal?>("MinimumValue")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Numeric")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Parameter")
+                        .IsRequired()
+                        .HasColumnType("varchar(150)");
+
+                    b.Property<int>("TemplateId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TemplateId");
+
+                    b.ToTable("InspectionParameter", "Inventory");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.Budget.BudgetDetail", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Budget.BudgetMaster", "BudgetMaster")
@@ -752,6 +1403,230 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.Navigation("RootCategory");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemDetail.ItemInventory", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscDefaultMaterialRequestType")
+                        .WithMany("ItemInventoryDefaultMaterialRequestType")
+                        .HasForeignKey("DefaultMaterialRequestTypeId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Core.Domain.Entities.Item.ItemDetail.ItemMaster", "Item")
+                        .WithOne("Inventory")
+                        .HasForeignKey("Core.Domain.Entities.Item.ItemDetail.ItemInventory", "ItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscRequestType")
+                        .WithMany("ItemInventoryRequestType")
+                        .HasForeignKey("RequestTypeId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscValuationMethod")
+                        .WithMany("ItemInventoryValuationMethod")
+                        .HasForeignKey("ValuationMethodId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Core.Domain.Entities.UOM", "WeightUOM")
+                        .WithMany("InventoryUOM")
+                        .HasForeignKey("WeightUomId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Item");
+
+                    b.Navigation("MiscDefaultMaterialRequestType");
+
+                    b.Navigation("MiscRequestType");
+
+                    b.Navigation("MiscValuationMethod");
+
+                    b.Navigation("WeightUOM");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemDetail.ItemManufacture", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Item.ItemDetail.ItemMaster", "Item")
+                        .WithMany("Manufacture")
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscManufactureType")
+                        .WithMany("ItemManufactureType")
+                        .HasForeignKey("ManufacturingTypeId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Item");
+
+                    b.Navigation("MiscManufactureType");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemDetail.ItemMaster", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.HSNMaster", "HSNMaster")
+                        .WithMany("ItemMasterHSN")
+                        .HasForeignKey("HSNId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Core.Domain.Entities.Item.ItemCategory", "ItemCategory")
+                        .WithMany("ItemMasterCategory")
+                        .HasForeignKey("ItemCategoryId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscClassification")
+                        .WithMany("ItemMasterClassification")
+                        .HasForeignKey("ItemClassificationId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Core.Domain.Entities.Item.ItemGroup", "ItemGroup")
+                        .WithMany("ItemMasterGroup")
+                        .HasForeignKey("ItemGroupId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Core.Domain.Entities.Item.ItemDetail.ItemMaster", "ParentItem")
+                        .WithMany("ChildItems")
+                        .HasForeignKey("ParentItemId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Core.Domain.Entities.UOM", "UOM")
+                        .WithMany("ItemMasterUOM")
+                        .HasForeignKey("StockUomId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscStatus")
+                        .WithMany("ItemMasterStatus")
+                        .HasForeignKey("XPlantMaterialStatusId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("HSNMaster");
+
+                    b.Navigation("ItemCategory");
+
+                    b.Navigation("ItemGroup");
+
+                    b.Navigation("MiscClassification");
+
+                    b.Navigation("MiscStatus");
+
+                    b.Navigation("ParentItem");
+
+                    b.Navigation("UOM");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemDetail.ItemPurchase", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Item.ItemDetail.ItemMaster", "Item")
+                        .WithOne("Purchase")
+                        .HasForeignKey("Core.Domain.Entities.Item.ItemDetail.ItemPurchase", "ItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.UOM", "PurchaseUOM")
+                        .WithMany("PurchaseUOM")
+                        .HasForeignKey("PurchaseUomId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Item");
+
+                    b.Navigation("PurchaseUOM");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemDetail.ItemQuality", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscCertificateType")
+                        .WithMany("ItemQualityCertificateType")
+                        .HasForeignKey("CertificateTypeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Core.Domain.Entities.Item.ItemDetail.Templates.InspectionTemplate", "InspectionTemplate")
+                        .WithMany("Items")
+                        .HasForeignKey("InspectionTemplateId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Core.Domain.Entities.Item.ItemDetail.ItemMaster", "Item")
+                        .WithOne("Quality")
+                        .HasForeignKey("Core.Domain.Entities.Item.ItemDetail.ItemQuality", "ItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("InspectionTemplate");
+
+                    b.Navigation("Item");
+
+                    b.Navigation("MiscCertificateType");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemDetail.ItemSupplier", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Item.ItemDetail.ItemMaster", "Item")
+                        .WithMany("Suppliers")
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Item");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemDetail.ItemUOM", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.UOM", "ConversionUOM")
+                        .WithMany("ItemUOM")
+                        .HasForeignKey("ConversionUOMId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.Item.ItemDetail.ItemMaster", "Item")
+                        .WithMany("ItemUOMs")
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ConversionUOM");
+
+                    b.Navigation("Item");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemDetail.Variant.ItemVariantValue", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.MiscTypeMaster", "MiscAttributeGroup")
+                        .WithMany("ItemAttributeGroup")
+                        .HasForeignKey("AttributeGroupId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscAttribute")
+                        .WithMany("ItemAttribute")
+                        .HasForeignKey("AttributeId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.Item.ItemDetail.ItemMaster", "ItemMaster")
+                        .WithMany("VariantValues")
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.Item.ItemDetail.ItemMaster", "NewItem")
+                        .WithMany("VariantNewItem")
+                        .HasForeignKey("NewItemId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscVariantBasedOn")
+                        .WithMany("ItemAttributeBasedOn")
+                        .HasForeignKey("VariantBasedOn")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("ItemMaster");
+
+                    b.Navigation("MiscAttribute");
+
+                    b.Navigation("MiscAttributeGroup");
+
+                    b.Navigation("MiscVariantBasedOn");
+
+                    b.Navigation("NewItem");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
                 {
                     b.HasOne("Core.Domain.Entities.MiscTypeMaster", "MiscTypeMaster")
@@ -793,6 +1668,17 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.Navigation("ToUOM");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.item.ItemDetail.Templates.InspectionParameter", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Item.ItemDetail.Templates.InspectionTemplate", "Template")
+                        .WithMany("Parameters")
+                        .HasForeignKey("TemplateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Template");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.Budget.BudgetDetail", b =>
                 {
                     b.Navigation("BudgetLog");
@@ -803,14 +1689,51 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.Navigation("BudgetDetail");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.HSNMaster", b =>
+                {
+                    b.Navigation("ItemMasterHSN");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.Item.ItemCategory", b =>
                 {
                     b.Navigation("ChildCategories");
+
+                    b.Navigation("ItemMasterCategory");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemDetail.ItemMaster", b =>
+                {
+                    b.Navigation("ChildItems");
+
+                    b.Navigation("Inventory");
+
+                    b.Navigation("ItemUOMs");
+
+                    b.Navigation("Manufacture");
+
+                    b.Navigation("Purchase");
+
+                    b.Navigation("Quality");
+
+                    b.Navigation("Suppliers");
+
+                    b.Navigation("VariantNewItem");
+
+                    b.Navigation("VariantValues");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemDetail.Templates.InspectionTemplate", b =>
+                {
+                    b.Navigation("Items");
+
+                    b.Navigation("Parameters");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Item.ItemGroup", b =>
                 {
                     b.Navigation("ItemCategory");
+
+                    b.Navigation("ItemMasterGroup");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
@@ -819,6 +1742,24 @@ namespace InventoryManagement.Infrastructure.Migrations
 
                     b.Navigation("HSNMasters");
 
+                    b.Navigation("ItemAttribute");
+
+                    b.Navigation("ItemAttributeBasedOn");
+
+                    b.Navigation("ItemInventoryDefaultMaterialRequestType");
+
+                    b.Navigation("ItemInventoryRequestType");
+
+                    b.Navigation("ItemInventoryValuationMethod");
+
+                    b.Navigation("ItemManufactureType");
+
+                    b.Navigation("ItemMasterClassification");
+
+                    b.Navigation("ItemMasterStatus");
+
+                    b.Navigation("ItemQualityCertificateType");
+
                     b.Navigation("TypeHSNs");
 
                     b.Navigation("UOMs");
@@ -826,12 +1767,22 @@ namespace InventoryManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>
                 {
+                    b.Navigation("ItemAttributeGroup");
+
                     b.Navigation("MiscMaster");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.UOM", b =>
                 {
                     b.Navigation("FromUOMConversions");
+
+                    b.Navigation("InventoryUOM");
+
+                    b.Navigation("ItemMasterUOM");
+
+                    b.Navigation("ItemUOM");
+
+                    b.Navigation("PurchaseUOM");
 
                     b.Navigation("ToUOMConversions");
                 });
