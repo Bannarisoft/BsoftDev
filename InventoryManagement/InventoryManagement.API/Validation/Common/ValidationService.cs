@@ -13,6 +13,8 @@ using Core.Application.Item.ItemDetail.Queries.GetAllItems;
 using Core.Application.Item.ItemGroup.Commands.CreateItemGroup;
 using Core.Application.Item.ItemGroup.Commands.DeleteItemGroup;
 using Core.Application.Item.ItemGroup.Commands.UpdateItemGroup;
+using Core.Application.Item.Templates.CreateTemplate;
+using Core.Application.Item.Templates.SearchTemplates;
 using Core.Application.MiscMaster;
 using Core.Application.MiscMaster.Command.CreateMiscMaster;
 using Core.Application.MiscMaster.Command.DeleteMiscMaster;
@@ -76,8 +78,10 @@ namespace InventoryManagement.API.Validation.Common
             services.AddScoped<IValidator<ItemQualityDto>, ItemQualityDtoValidator>();
             services.AddScoped<IValidator<ItemSupplierDto>, ItemSupplierDtoValidator>();
             services.AddScoped<IValidator<ItemManufactureDto>, ItemManufacturingDtoValidator>();
-            services.AddScoped<IValidator<ItemUomDto>, ItemUomDtoValidator>();            
-            services.AddValidatorsFromAssembly(typeof(CreateItemCommandValidator).Assembly);           
+            services.AddScoped<IValidator<ItemUomDto>, ItemUomDtoValidator>();
+            services.AddValidatorsFromAssembly(typeof(CreateItemCommandValidator).Assembly);       
+            services.AddScoped<IValidator<CreateTemplateCommand>, CreateTemplateCommandValidator>();
+            services.AddScoped<IValidator<TemplateParamDto>, TemplateParamDtoValidator>();
       
         }
     }

@@ -149,6 +149,68 @@ namespace PartyManagement.Infrastructure.Migrations
                     b.ToTable("MiscTypeMaster", "Party");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.PartyActivityLog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ActionType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(20)")
+                        .HasColumnName("ActionType");
+
+                    b.Property<int>("ChangedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("ChangedBy");
+
+                    b.Property<string>("ChangedByName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("ChangedByName");
+
+                    b.Property<string>("ChangedIp")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("ChangedIp");
+
+                    b.Property<DateTimeOffset>("ChangedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("ChangedOn")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<string>("ColumnName")
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("ColumnName");
+
+                    b.Property<string>("NewValue")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("NewValue");
+
+                    b.Property<string>("OldValue")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("OldValue");
+
+                    b.Property<int>("PartyId")
+                        .HasColumnType("int")
+                        .HasColumnName("PartyId");
+
+                    b.Property<string>("TableName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("TableName");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PartyId");
+
+                    b.ToTable("PartyActivityLog", "Party");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.PartyAddress", b =>
                 {
                     b.Property<int>("Id")
@@ -176,7 +238,7 @@ namespace PartyManagement.Infrastructure.Migrations
 
                     b.Property<string>("Country")
                         .HasColumnType("nvarchar(50)")
-                        .HasColumnName("AddressLine6");
+                        .HasColumnName("Country");
 
                     b.Property<int>("PartyId")
                         .HasColumnType("int")
@@ -184,11 +246,11 @@ namespace PartyManagement.Infrastructure.Migrations
 
                     b.Property<string>("PostalCode")
                         .HasColumnType("nvarchar(10)")
-                        .HasColumnName("AddressLine5");
+                        .HasColumnName("PostalCode");
 
                     b.Property<string>("State")
                         .HasColumnType("nvarchar(50)")
-                        .HasColumnName("AddressLine4");
+                        .HasColumnName("State");
 
                     b.HasKey("Id");
 
@@ -260,6 +322,10 @@ namespace PartyManagement.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ContactBy")
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("ContactBy");
+
                     b.Property<int?>("ContactTypeId")
                         .HasColumnType("int")
                         .HasColumnName("ContactTypeId");
@@ -275,7 +341,7 @@ namespace PartyManagement.Infrastructure.Migrations
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(25)")
-                        .HasColumnName("GSTNumber");
+                        .HasColumnName("FirstName");
 
                     b.Property<int?>("GenderId")
                         .HasColumnType("int")
@@ -570,6 +636,10 @@ namespace PartyManagement.Infrastructure.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("PartyName");
 
+                    b.Property<string>("PartyStatus")
+                        .HasColumnType("nvarchar(20)")
+                        .HasColumnName("PartyStatus");
+
                     b.Property<int?>("PartyZoneId")
                         .HasColumnType("int")
                         .HasColumnName("PartyZoneId");
@@ -664,6 +734,17 @@ namespace PartyManagement.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("MiscTypeMaster");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.PartyActivityLog", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.PartyMaster", "PartyLogActivity")
+                        .WithMany("PartyActivityLogTypes")
+                        .HasForeignKey("PartyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("PartyLogActivity");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.PartyAddress", b =>
@@ -890,6 +971,8 @@ namespace PartyManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.PartyMaster", b =>
                 {
+                    b.Navigation("PartyActivityLogTypes");
+
                     b.Navigation("PartyAddressTypes");
 
                     b.Navigation("PartyBankTypes");

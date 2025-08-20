@@ -781,6 +781,8 @@ namespace InventoryManagement.Infrastructure.Migrations
 
                     b.HasIndex("CertificateTypeId");
 
+                    b.HasIndex("InspectionTemplateId");
+
                     b.HasIndex("ItemId")
                         .IsUnique();
 
@@ -849,6 +851,55 @@ namespace InventoryManagement.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("ItemUOM", "Inventory");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemDetail.Templates.InspectionTemplate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("IsActive")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IsDeleted")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TemplateName")
+                        .IsRequired()
+                        .HasColumnType("varchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TemplateName");
+
+                    b.ToTable("InspectionTemplate", "Inventory");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Item.ItemDetail.Variant.ItemVariantValue", b =>
@@ -1214,6 +1265,70 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.ToTable("UOMConversion", "Inventory");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.item.ItemDetail.Templates.InspectionParameter", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AcceptanceCriteriaValue")
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("IsActive")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IsDeleted")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("MaximumValue")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal?>("MinimumValue")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Numeric")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Parameter")
+                        .IsRequired()
+                        .HasColumnType("varchar(150)");
+
+                    b.Property<int>("TemplateId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TemplateId");
+
+                    b.ToTable("InspectionParameter", "Inventory");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.Budget.BudgetDetail", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Budget.BudgetMaster", "BudgetMaster")
@@ -1423,11 +1538,18 @@ namespace InventoryManagement.Infrastructure.Migrations
                         .HasForeignKey("CertificateTypeId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Core.Domain.Entities.Item.ItemDetail.Templates.InspectionTemplate", "InspectionTemplate")
+                        .WithMany("Items")
+                        .HasForeignKey("InspectionTemplateId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Core.Domain.Entities.Item.ItemDetail.ItemMaster", "Item")
                         .WithOne("Quality")
                         .HasForeignKey("Core.Domain.Entities.Item.ItemDetail.ItemQuality", "ItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("InspectionTemplate");
 
                     b.Navigation("Item");
 
@@ -1546,6 +1668,17 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.Navigation("ToUOM");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.item.ItemDetail.Templates.InspectionParameter", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Item.ItemDetail.Templates.InspectionTemplate", "Template")
+                        .WithMany("Parameters")
+                        .HasForeignKey("TemplateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Template");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.Budget.BudgetDetail", b =>
                 {
                     b.Navigation("BudgetLog");
@@ -1587,6 +1720,13 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.Navigation("VariantNewItem");
 
                     b.Navigation("VariantValues");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemDetail.Templates.InspectionTemplate", b =>
+                {
+                    b.Navigation("Items");
+
+                    b.Navigation("Parameters");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Item.ItemGroup", b =>

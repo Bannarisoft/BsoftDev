@@ -10,11 +10,11 @@ using Microsoft.AspNetCore.Mvc;
 namespace InventoryManagement.API.Controllers.Item
 {
     [ApiController]
-    [Route("api/items")]
-    public sealed class ItemsController : ControllerBase
+     [Route("api/[controller]")]
+    public sealed class ItemMasterController : ControllerBase
     {
         private readonly IMediator _mediator;
-        public ItemsController(IMediator mediator) => _mediator = mediator;
+        public ItemMasterController(IMediator mediator) => _mediator = mediator;
 
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? search = null, [FromQuery] bool onlyActive = true)
