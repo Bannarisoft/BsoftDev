@@ -45,7 +45,7 @@ namespace Core.Application.Item.ItemDetail.Queries.GetAllItems
         public new ItemInventoryDetailDto? Inventory { get; set; }
         public new ItemQualityDetailDto? Quality { get; set; }
         public new List<ItemManufactureDetailDto>? Manufacture { get; set; }
-        public new List<ItemSupplierDetailDto>? Supplier { get; set; }
+        public new List<ItemSupplierDetailDto>? Suppliers  { get; set; }
         public new List<VariantDetailDto>? VariantValues { get; set; }
         public new List<ItemDetailUomDto> Uoms  { get; set; }
         

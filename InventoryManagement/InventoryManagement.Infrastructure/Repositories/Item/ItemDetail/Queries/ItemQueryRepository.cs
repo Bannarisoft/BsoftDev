@@ -1,4 +1,5 @@
 using System.Data;
+using Contracts.Interfaces.External.IParty;
 using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.Item.ItemDetail.Queries;
@@ -15,11 +16,13 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Querie
         private readonly ApplicationDbContext _db;
         private readonly IDbConnection _dbConnection;
         private readonly IUnitGrpcClient _unitGrpcClient;
-        public ItemQueryRepository(IDbConnection dbConnection, ApplicationDbContext db, IUnitGrpcClient unitGrpcClient)
+        private readonly IPartyGrpcClient _partyGrpcClient;
+        public ItemQueryRepository(IDbConnection dbConnection, ApplicationDbContext db, IUnitGrpcClient unitGrpcClient, IPartyGrpcClient partyGrpcClient)
         {
             _db = db;
             _dbConnection = dbConnection;
             _unitGrpcClient = unitGrpcClient;
+            _partyGrpcClient = partyGrpcClient;
         }
 
         public async Task<(List<ItemListDto> Items, int TotalCount)> GetAllAsync(int page, int size, string? search, bool onlyActive, CancellationToken ct = default)
@@ -134,12 +137,13 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Querie
                 // collections
                 Suppliers = i.Suppliers
                     .OrderBy(s => s.SupplierId)
-                    .Select(s => new ItemSupplierDto
+                    .Select(s => new ItemSupplierDetailDto
                     {
-                        SupplierId = s.SupplierId,
-                        UnitId = s.UnitId,
+                        SupplierId     = s.SupplierId,
+                        UnitId         = s.UnitId,
                         SupplierPartNo = s.SupplierPartNo
-                    }).ToList(),
+                    })
+                    .ToList(),
 
                 Manufacture = i.Manufacture
                     .OrderBy(m => m.UnitId)
@@ -198,12 +202,37 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Querie
             dto.UnitName = unitMap.TryGetValue(dto.UnitId, out var nm) ? nm : null;
 
             if (dto.Suppliers != null)
-                foreach (var s in dto.Supplier)
+                foreach (var s in dto.Suppliers)
                     s.UnitName = unitMap.TryGetValue(s.UnitId, out var n) ? n : null;
 
             if (dto.Manufacture != null)
                 foreach (var m in dto.Manufacture)
                     m.UnitName = unitMap.TryGetValue(m.UnitId, out var n) ? n : null;
+
+            
+            // 🔹 Party gRPC — get supplier names
+           if (dto.Suppliers != null && dto.Suppliers.Count > 0)
+            {
+                var supplierIds = dto.Suppliers
+                    .Select(s => s.SupplierId)
+                    .Where(id => id > 0)
+                    .Distinct()
+                    .ToHashSet();
+
+                if (supplierIds.Count > 0)
+                {
+                    // 4) Parties (no-arg call). Then filter to only the suppliers you need.
+                    var parties = await _partyGrpcClient.GetAllPartyAsync();
+                    // Adjust property names below to match your Party DTO (Id/Name OR PartyId/PartyName).                    
+                    var partyMap = parties
+                        .Where(p => supplierIds.Contains(p.PartyId))
+                        .GroupBy(p => p.PartyId)
+                        .ToDictionary(g => g.Key, g => g.First().PartyName);
+
+                    foreach (var s in dto.Suppliers)
+                        s.SupplierName = partyMap.TryGetValue(s.SupplierId, out var name) ? name : null;
+                }
+            }
             
             return dto;
         }
