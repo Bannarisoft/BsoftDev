@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IWarehouseMaster;
 using Core.Application.WarehouseMaster.GetAllWarehouseMaster;
+using Core.Application.WarehouseMaster.Queries.GetParentWarehouseMaster;
 using Core.Application.WarehouseMaster.Queries.GetWareMasterAutoComplete;
 using Dapper;
 
@@ -131,10 +132,10 @@ namespace WarehouseManagement.Infrastructure.Repositories.WarehouseMaster
             var count = await _dbConnection.ExecuteScalarAsync<int>(sql, p);
             return count > 0; // true = duplicate exists
         }
-        
+
         public async Task<List<GetWarehouseAutoCompleteDto>> GetWarehouseMasterAutoCompletes(string searchPattern)
-            {
-                const string sql = @"
+        {
+            const string sql = @"
             SELECT
                 w.Id,
                 w.WarehouseCode,
@@ -146,15 +147,36 @@ namespace WarehouseManagement.Infrastructure.Repositories.WarehouseMaster
                 OR w.WarehouseName LIKE '%' + @Term + '%')
             ORDER BY w.WarehouseCode, w.WarehouseName;";
 
-                var rows = await _dbConnection.QueryAsync<GetWarehouseAutoCompleteDto>(sql, new
-                {
-                    Term = (searchPattern ?? string.Empty).Trim(),
-                   
-                });
+            var rows = await _dbConnection.QueryAsync<GetWarehouseAutoCompleteDto>(sql, new
+            {
+                Term = (searchPattern ?? string.Empty).Trim(),
 
-                return rows.ToList();
-            }
+            });
+
+            return rows.ToList();
+        }
+
+        public async Task<List<GetParentWarehouseDto>> GetParentWarehouseMaster()
+        {
+                      const string sql = @"
+                                            SELECT
+                                                w.Id   AS Id,
+                                                w.WarehouseCode AS ParentWarehouseCode,
+                                                w.WarehouseName   AS ParentWarehouseName
+                                            FROM [Warehouse].[WarehouseMaster] AS w
+                                            WHERE w.IsDeleted = 0
+                                            AND w.IsActive  = 1
+                                            AND w.ParentWarehouseId IS NULL  
+                                            ORDER BY w.WarehouseName, w.WarehouseCode;";
+
+            var rows = await _dbConnection.QueryAsync<GetParentWarehouseDto>(
+                new CommandDefinition(sql));
+            return rows.AsList();
+
+        }
                 
+                
+            
             
     }
 }
