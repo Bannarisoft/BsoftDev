@@ -19,12 +19,11 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
             b.Property(x => x.ItemId)
              .HasColumnName("ItemId")
              .HasColumnType("int")
-             .IsRequired();
-            b.HasIndex(x => x.ItemId).IsUnique(); 
+             .IsRequired();            
             b.HasOne(x => x.Item)
              .WithOne(i => i.Quality)
              .HasForeignKey<ItemQuality>(x => x.ItemId)
-             .OnDelete(DeleteBehavior.Cascade);
+             .OnDelete(DeleteBehavior.Restrict);
 
             b.Property(x => x.InspectionTemplateId)
              .HasColumnName("InspectionTemplateId")

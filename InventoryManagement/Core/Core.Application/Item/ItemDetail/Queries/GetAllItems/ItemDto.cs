@@ -20,6 +20,7 @@ namespace Core.Application.Item.ItemDetail.Queries.GetAllItems
         public bool HasVariants { get; set; }
         public int? ParentItemId { get; set; }
         public string? ItemImage { get; set; }
+        public byte IsActive { get; set; }
         // Tabs
         public ItemPurchaseDto? Purchase { get; set; }
         public ItemInventoryDto? Inventory { get; set; }
@@ -65,6 +66,7 @@ namespace Core.Application.Item.ItemDetail.Queries.GetAllItems
     {
         public int Id { get; set; }
         public string? PurchaseUOM { get; set; }
+        public string? CountryName { get; set; }
     }
 
     public class ItemInventoryDto

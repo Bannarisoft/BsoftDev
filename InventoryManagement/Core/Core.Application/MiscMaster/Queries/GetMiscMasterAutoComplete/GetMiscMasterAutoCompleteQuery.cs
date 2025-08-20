@@ -7,11 +7,12 @@ using MediatR;
 
 namespace Core.Application.MiscMaster.Queries.GetMiscMasterAutoComplete
 {
-    public class GetMiscMasterAutoCompleteQuery  :  IRequest<List<GetMiscMasterAutoCompleteDto>>
+    public class GetMiscMasterAutoCompleteQuery : IRequest<List<GetMiscMasterAutoCompleteDto>>
     {
 
-          public string? SearchPattern { get; set; }
-          public string? MiscTypeCode { get; set; }
+        public string? SearchPattern { get; set; }
+        public string? MiscTypeCode { get; set; }
+        public string? MiscTypeDesc { get; set; }
         
     }
 }

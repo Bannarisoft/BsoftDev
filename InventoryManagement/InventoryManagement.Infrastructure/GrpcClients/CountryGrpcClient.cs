@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Contracts.Interfaces.External.IUser;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -21,7 +17,7 @@ namespace InventoryManagement.Infrastructure.GrpcClients
             _httpContextAccessor = httpContextAccessor; // ✅ fixed
         }
 
-        public async Task<List<Contracts.Dtos.Users.CountryDto>> GetAllCountriesAsync()
+        public async Task<List<Contracts.Dtos.Users.CountryDto>> GetAllCountryAsync()
         {
             var token = _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].ToString();
 
@@ -45,6 +41,6 @@ namespace InventoryManagement.Infrastructure.GrpcClients
                 CountryCode = u.CountryCode
             }).ToList();
         }
-        
+      
     }
 }

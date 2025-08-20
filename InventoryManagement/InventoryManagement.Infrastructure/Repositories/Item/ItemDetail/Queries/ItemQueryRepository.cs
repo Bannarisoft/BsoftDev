@@ -17,15 +17,18 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Querie
         private readonly IDbConnection _dbConnection;
         private readonly IUnitGrpcClient _unitGrpcClient;
         private readonly IPartyGrpcClient _partyGrpcClient;
-        public ItemQueryRepository(IDbConnection dbConnection, ApplicationDbContext db, IUnitGrpcClient unitGrpcClient, IPartyGrpcClient partyGrpcClient)
+        private readonly ICountryGrpcClient _countryGrpcClient;
+
+        public ItemQueryRepository(IDbConnection dbConnection, ApplicationDbContext db, IUnitGrpcClient unitGrpcClient, IPartyGrpcClient partyGrpcClient, ICountryGrpcClient countryGrpcClient)
         {
             _db = db;
             _dbConnection = dbConnection;
             _unitGrpcClient = unitGrpcClient;
             _partyGrpcClient = partyGrpcClient;
+            _countryGrpcClient = countryGrpcClient;
         }
 
-        public async Task<(List<ItemListDto> Items, int TotalCount)> GetAllAsync(int page, int size, string? search, bool onlyActive, CancellationToken ct = default)
+        public async Task<(List<ItemListDto> Items, int TotalCount)> GetAllAsync(int page, int size, string? search, bool onlyActive,int? itemGroupId,int? itemCategoryId, CancellationToken ct = default)
         {
             var q = _db.ItemMaster.AsNoTracking()
                 .Where(x => x.IsDeleted == BaseEntity.IsDelete.NotDeleted);
@@ -36,6 +39,11 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Querie
                 var term = search.Trim();
                 q = q.Where(x => x.ItemCode.Contains(term) || x.ItemName.Contains(term));
             }
+            if (itemGroupId.HasValue && itemGroupId.Value > 0)
+                 q = q.Where(x => x.ItemGroupId == itemGroupId.Value);
+
+            if (itemCategoryId.HasValue && itemCategoryId.Value > 0)
+                q = q.Where(x => x.ItemCategoryId == itemCategoryId.Value);
             var total = await q.CountAsync(ct);
             var list = await q.OrderBy(x => x.ItemName)
                 .Skip((page - 1) * size).Take(size)
@@ -197,7 +205,6 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Querie
            
             var units = await _unitGrpcClient.GetAllUnitAsync(); 
             var unitMap = units.ToDictionary(u => u.UnitId, u => u.UnitName);
-
             // 4) Fill names
             dto.UnitName = unitMap.TryGetValue(dto.UnitId, out var nm) ? nm : null;
 
@@ -209,8 +216,17 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Querie
                 foreach (var m in dto.Manufacture)
                     m.UnitName = unitMap.TryGetValue(m.UnitId, out var n) ? n : null;
 
+            //Country grpc
+            var countries = _countryGrpcClient.GetAllCountryAsync();
+            var countryMap= countries.Result.ToDictionary(x => x.CountryId,x => x.CountryName);
+            if (dto.Purchase?.OriginCountryId is int cid)
+            {
+                dto.Purchase.CountryName =
+                    countryMap.TryGetValue(cid, out var name) ? name : null;
+            }
+
             
-            // 🔹 Party gRPC — get supplier names
+            /* // 🔹 Party gRPC — get supplier names
            if (dto.Suppliers != null && dto.Suppliers.Count > 0)
             {
                 var supplierIds = dto.Suppliers
@@ -232,8 +248,8 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Querie
                     foreach (var s in dto.Suppliers)
                         s.SupplierName = partyMap.TryGetValue(s.SupplierId, out var name) ? name : null;
                 }
-            }
-            
+            } */
+
             return dto;
         }
         public async Task<string> GetBaseDirectoryAsync(CancellationToken ct = default)
@@ -287,16 +303,16 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Querie
        /*      if (string.IsNullOrWhiteSpace(normalizedPrefix)) return new();
             var p = normalizedPrefix.Length >= 3 ? normalizedPrefix[..3] : normalizedPrefix; */
 
-var hint = normalizedPrefix?.Replace("%", "").Replace("_", "") ?? "";
-return await _db.ItemMaster
-    .AsNoTracking()
-    .Where(i => i.IsDeleted == BaseEntity.IsDelete.NotDeleted && i.ItemName != null)
-    .Where(i => EF.Functions.Like(
-        EF.Functions.Collate(i.ItemName!, "Latin1_General_CI_AI"), $"%{hint}%"))
-    .OrderByDescending(i => i.Id)
-    .Select(i => i.ItemName!)
-    .Take(take <= 0 ? 100 : take)
-    .ToListAsync(ct);
+            var hint = normalizedPrefix?.Replace("%", "").Replace("_", "") ?? "";
+            return await _db.ItemMaster
+                .AsNoTracking()
+                .Where(i => i.IsDeleted == BaseEntity.IsDelete.NotDeleted && i.ItemName != null)
+                .Where(i => EF.Functions.Like(
+                    EF.Functions.Collate(i.ItemName!, "Latin1_General_CI_AI"), $"%{hint}%"))
+                .OrderByDescending(i => i.Id)
+                .Select(i => i.ItemName!)
+                .Take(take <= 0 ? 100 : take)
+                .ToListAsync(ct);
 
        /*      return await _db.ItemMaster
                 .Where(x => x.IsDeleted == BaseEntity.IsDelete.NotDeleted &&

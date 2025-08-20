@@ -67,19 +67,29 @@ namespace InventoryManagement.Infrastructure.Repositories.MiscMaster
         } 
 
 
-        public async Task<List<Core.Domain.Entities.MiscMaster>>  GetMiscMaster(string searchPattern,string miscTypeCode)
+        public async Task<List<Core.Domain.Entities.MiscMaster>>  GetMiscMaster(string searchPattern,string? miscTypeCode,string? miscTypeDesc)
         {
             
 
-            const string query = @"SELECT M.Id,M.Code ,M.Description  FROM Inventory.MiscMaster M
-            INNER JOIN [Inventory].[MiscTypeMaster] MT ON MT.Id = M.MiscTypeId
-                WHERE M.IsDeleted = 0 AND MT.IsDeleted = 0 AND M.IsActive = 1  AND MT.MiscTypeCode= @MiscTypeCode AND M.Code LIKE @SearchPattern  ";
+            const string query = @"SELECT M.Id, M.Code, M.Description
+                        FROM Inventory.MiscMaster AS M
+                        INNER JOIN Inventory.MiscTypeMaster AS MT ON MT.Id = M.MiscTypeId
+                        WHERE M.IsDeleted = 0
+                        AND MT.IsDeleted = 0
+                        AND M.IsActive  = 1
+                        AND (@MiscTypeCode IS NULL OR MT.MiscTypeCode LIKE @MiscTypeCode)
+                        AND (
+                            @SearchPattern IS NULL
+                            OR M.Code LIKE @SearchPattern
+                            OR M.Description LIKE @SearchPattern
+                            )    AND (@MiscTypeDesc IS NULL OR MT.Description LIKE @MiscTypeDesc);";
                 
             
-            var parameters = new 
-              { 
-                  SearchPattern = $"%{searchPattern ?? string.Empty}%",
-                  MiscTypeCode = miscTypeCode 
+            var parameters = new
+            {
+                SearchPattern = string.IsNullOrWhiteSpace(searchPattern) ? null : $"%{searchPattern}%",
+                MiscTypeCode  = string.IsNullOrWhiteSpace(miscTypeCode)  ? null : $"%{miscTypeCode}%",
+                MiscTypeDesc  = string.IsNullOrWhiteSpace(miscTypeDesc)  ? null : $"%{miscTypeDesc}%"
              
               };
 
