@@ -36,30 +36,35 @@ namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
            .HasColumnType("int")
            .IsRequired();
 
-              builder.Property(t => t.ApproverBinding)
-           .HasColumnName("ApproverBinding")
-           .HasColumnType("nvarchar(10)")
-           .IsRequired();
+            builder.Property(t => t.ApproverBinding)
+         .HasColumnName("ApproverBinding")
+         .HasColumnType("nvarchar(10)")
+         .IsRequired();
 
-               builder.Property(t => t.ApproverValue)
-           .HasColumnName("ApproverValue")
-           .HasColumnType("nvarchar(200)")
-           .IsRequired();
+            builder.Property(t => t.ApproverValue)
+        .HasColumnName("ApproverValue")
+        .HasColumnType("nvarchar(200)")
+        .IsRequired();
 
-           builder.Property(t => t.Remark)
-           .HasColumnName("Remark")
-           .HasColumnType("Varchar(max)")
-           .IsRequired(false);
+            builder.Property(t => t.Remark)
+            .HasColumnName("Remark")
+            .HasColumnType("Varchar(max)")
+            .IsRequired(false);
 
-             builder.Property(cf => cf.ModifiedByName)
-                 .HasColumnType("varchar(50)");
+            builder.Property(cf => cf.ModifiedByName)
+                .HasColumnType("varchar(50)");
 
             builder.Property(cf => cf.ModifiedIP)
                 .HasColumnType("varchar(255)");
 
-                 builder.HasOne(ac => ac.ApprovalRequest)
-           .WithMany(am => am.ApprovalRequestLines)
-           .HasForeignKey(ac => ac.ApprovalRequestId)
+            builder.HasOne(ac => ac.ApprovalRequest)
+      .WithMany(am => am.ApprovalRequestLines)
+      .HasForeignKey(ac => ac.ApprovalRequestId)
+      .OnDelete(DeleteBehavior.NoAction);
+           
+           builder.HasOne(ac => ac.Status)
+           .WithMany(am => am.ApprovalRequestLineStatus)
+           .HasForeignKey(ac => ac.StatusId)
            .OnDelete(DeleteBehavior.NoAction);
         }
     }

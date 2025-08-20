@@ -7,6 +7,8 @@ using Core.Application.PurchaseIndents.Command.CreatePurchaseIndent;
 using Core.Application.PurchaseIndents.Command.DeletePurchaseIndent;
 using Core.Application.PurchaseIndents.Command.UpdatePurchaseIndent;
 using Core.Application.PurchaseIndents.Queries.GetAllPurchaseIndent;
+using Core.Application.PurchaseIndents.Queries.GetPendingIndent;
+using Core.Application.PurchaseIndents.Queries.GetPendingIndentById;
 using Core.Application.PurchaseIndents.Queries.GetPurchaseIndentById;
 using Core.Domain.Entities;
 using static Core.Domain.Common.BaseEntity;
@@ -15,53 +17,62 @@ namespace Core.Application.Common.Mappings
 {
     public class PurchaseIndentProfile : Profile
     {
-        public PurchaseIndentProfile()
-        {
-            CreateMap<CreatePurchaseIndentCommand, IndentHeader>()
-             .ForMember(dest => dest.Id, opt => opt.Ignore())
-                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
-                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted))
-                 .ForMember(dest => dest.IndentDetails, opt => opt.MapFrom(src => src.IndentDetails))
-                .ForMember(dest => dest.IndentDepartmentMappings, opt => opt.MapFrom(src => src.IndentDepartments));
+    public PurchaseIndentProfile()
+    {
+      CreateMap<CreatePurchaseIndentCommand, IndentHeader>()
+       .ForMember(dest => dest.Id, opt => opt.Ignore())
+           .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
+           .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted))
+           .ForMember(dest => dest.IndentDetails, opt => opt.MapFrom(src => src.IndentDetails))
+          .ForMember(dest => dest.IndentDepartmentMappings, opt => opt.MapFrom(src => src.IndentDepartments));
 
-            CreateMap<IndentDetailDto, IndentDetail>();
-            CreateMap<IndentDepartmentDto, IndentDepartmentMapping>();
+      CreateMap<IndentDetailDto, IndentDetail>();
+      CreateMap<IndentDepartmentDto, IndentDepartmentMapping>();
 
-            CreateMap<DeletePurchaseIndentCommand, IndentHeader>()
-              .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-              .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));
+      CreateMap<DeletePurchaseIndentCommand, IndentHeader>()
+        .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+        .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));
 
-            CreateMap<UpdatePurchaseIndentCommand, IndentHeader>()
-              .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == 1 ? Status.Active : Status.Inactive))
-              .ForMember(dest => dest.IndentDetails, opt => opt.MapFrom(src => src.IndentDetails))
-               .ForMember(dest => dest.IndentDepartmentMappings, opt => opt.MapFrom(src => src.IndentDepartments));
+      CreateMap<UpdatePurchaseIndentCommand, IndentHeader>()
+        .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == 1 ? Status.Active : Status.Inactive))
+        .ForMember(dest => dest.IndentDetails, opt => opt.MapFrom(src => src.IndentDetails))
+         .ForMember(dest => dest.IndentDepartmentMappings, opt => opt.MapFrom(src => src.IndentDepartments));
 
-            CreateMap<IndentDetailUpdateDto, IndentDetail>();
-            CreateMap<IndentDepartmentUpdateDto, IndentDepartmentMapping>();
+      CreateMap<IndentDetailUpdateDto, IndentDetail>();
+      CreateMap<IndentDepartmentUpdateDto, IndentDepartmentMapping>();
 
-            CreateMap<IndentHeader, IndentDto>()
-            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == Status.Active ? 1 : 0))
-            .ForMember(dest => dest.IndentType, opt => opt.MapFrom(src => src.IndentType.Code));
+      CreateMap<IndentHeader, IndentDto>()
+      .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == Status.Active ? 1 : 0))
+      .ForMember(dest => dest.IndentType, opt => opt.MapFrom(src => src.IndentType.Code));
 
-            CreateMap<IndentHeader, IndentByIdDto>()
-            .ForMember(dest => dest.IndentDepartments, opt => opt.MapFrom(src => src.IndentDepartmentMappings));
-            CreateMap<IndentDepartmentMapping, IndentDepartmentByIdDto>();
-            CreateMap<IndentDetail, IndentDetailByIdDto>();
+      CreateMap<IndentHeader, IndentByIdDto>()
+      .ForMember(dest => dest.IndentDepartments, opt => opt.MapFrom(src => src.IndentDepartmentMappings));
+      CreateMap<IndentDepartmentMapping, IndentDepartmentByIdDto>();
+      CreateMap<IndentDetail, IndentDetailByIdDto>();
 
-            CreateMap<IndentHeader, UpdatePurchaseIndentCommand>()
-              .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == Status.Active ? 1 : 0))
-              .ForMember(dest => dest.IndentDetails, opt => opt.MapFrom(src => src.IndentDetails))
-               .ForMember(dest => dest.IndentDepartments, opt => opt.MapFrom(src => src.IndentDepartmentMappings));
+      CreateMap<IndentHeader, UpdatePurchaseIndentCommand>()
+        .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == Status.Active ? 1 : 0))
+        .ForMember(dest => dest.IndentDetails, opt => opt.MapFrom(src => src.IndentDetails))
+         .ForMember(dest => dest.IndentDepartments, opt => opt.MapFrom(src => src.IndentDepartmentMappings));
 
-            CreateMap<IndentDetail, IndentDetailUpdateDto>();
-            CreateMap<IndentDepartmentMapping, IndentDepartmentUpdateDto>();
+      CreateMap<IndentDetail, IndentDetailUpdateDto>();
+      CreateMap<IndentDepartmentMapping, IndentDepartmentUpdateDto>();
 
-            CreateMap<IndentHeader, IndentReverseMapDto>()
-                 .ForMember(dest => dest.Header, opt => opt.MapFrom(src => src))
-                 .ForMember(dest => dest.Lines, opt => opt.MapFrom(src => src.IndentDetails));
+      CreateMap<IndentHeader, IndentReverseMapDto>()
+           .ForMember(dest => dest.Header, opt => opt.MapFrom(src => src))
+           .ForMember(dest => dest.Lines, opt => opt.MapFrom(src => src.IndentDetails));
 
-            CreateMap<IndentHeader, CreateIndentHeaderDto>();
-            CreateMap<IndentDetail, CreateIndentDetailDto>();
+      CreateMap<IndentHeader, CreateIndentHeaderDto>();
+      CreateMap<IndentDetail, CreateIndentDetailDto>();
+
+      CreateMap<IndentHeader, PendingIndentDto>()
+      .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == Status.Active ? 1 : 0))
+      .ForMember(dest => dest.IndentType, opt => opt.MapFrom(src => src.IndentType.Code));
+            
+              CreateMap<IndentHeader, PendingIndentByIdDto>()
+      .ForMember(dest => dest.IndentDepartments, opt => opt.MapFrom(src => src.IndentDepartmentMappings));
+      CreateMap<IndentDepartmentMapping, PendingIndentDepartmentByIdDto>();
+      CreateMap<IndentDetail, PendingIndentDetailByIdDto>();
         }
         
     }

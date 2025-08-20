@@ -12,7 +12,7 @@ using Dapper;
 
 namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequests
 {
-    public class ApprovalRequestQueryRepository : IApprovalRequestQuery
+    public class ApprovalRequestQueryRepository : IApprovalRequestQuery,IApprovalRequestGrpcQuery
     {
         private readonly IDbConnection _dbConnection;
         private readonly IIPAddressService _ipaddressService;
@@ -182,6 +182,73 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequest
             };
             var result = await _dbConnection.QueryAsync(dataQuery, parameters);
             return result.ToList();
+        }
+
+        public async Task<List<ApprovalRequest>> GetApprovalRequestByWorkFlowTypeAsync(string WorkFlowType)
+        {
+            const string query = @"
+            SELECT AR.Id,AR.ModuleTransactionId,AR.ApprovalStepDetailId,AR.ApprovalRuleId,MM.Id,MM.Code FROM [AppData].[ApprovalRequest] AR
+            INNER JOIN [AppData].[MiscMaster] MM ON MM.Id = AR.StatusId
+            WHERE MM.Code=@Status AND AR.WorkflowType=@WorkflowType";
+
+               var parameters = new
+            {
+                Status = MiscEnumEntity.Pending,
+                WorkflowType = WorkFlowType
+            };
+
+            var ApprovalRequest = await _dbConnection.QueryAsync<ApprovalRequest, Domain.Entities.Notification.MiscMaster, ApprovalRequest>(
+                query,
+                (approvalReq, status) =>
+                {
+                    approvalReq.Status = new Domain.Entities.Notification.MiscMaster
+                    {
+                        Code = status.Code
+                    };
+
+                    return approvalReq;
+                },
+                parameters,
+                splitOn: "Id"
+                );
+
+            
+
+            return ApprovalRequest.ToList();
+        }
+
+        public async Task<List<ApprovalRequestLine>> GetApprovalRequestLineByWorkFlowTypeAsync(string WorkFlowType)
+        {
+             const string query = @"
+            SELECT ARL.Id,ARL.ModuleLineTransactionId,ARL.ApproverBinding,ARL.ApproverValue,MM.Id,MM.Code FROM [AppData].[ApprovalRequest] AR
+            INNER JOIN [AppData].[ApprovalRequestLine] ARL ON AR.Id =ARL.ApprovalRequestId
+            INNER JOIN [AppData].[MiscMaster] MM ON MM.Id = ARL.StatusId
+            WHERE MM.Code=@Status AND AR.WorkflowType=@WorkflowType";
+
+               var parameters = new
+            {
+                Status = MiscEnumEntity.Pending,
+                WorkflowType = WorkFlowType
+            };
+
+            var ApprovalRequest = await _dbConnection.QueryAsync<ApprovalRequestLine, Domain.Entities.Notification.MiscMaster, ApprovalRequestLine>(
+                query,
+                (approvalReq, status) =>
+                {
+                    approvalReq.Status = new Domain.Entities.Notification.MiscMaster
+                    {
+                        Code = status.Code
+                    };
+
+                    return approvalReq;
+                },
+                parameters,
+                splitOn: "Id"
+                );
+
+            
+
+            return ApprovalRequest.ToList();
         }
 
         public async Task<List<int>> GetApprovalStepDetailByIdAsync(string WorkFlowType, int ModuleTransactionId, int UnitId, int DepartmentId)

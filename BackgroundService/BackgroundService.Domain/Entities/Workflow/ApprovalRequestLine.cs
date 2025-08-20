@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BackgroundService.Domain.Entities.Notification;
 
 namespace BackgroundService.Domain.Entities.Workflow
 {
@@ -19,5 +20,6 @@ namespace BackgroundService.Domain.Entities.Workflow
         public string? ModifiedByName { get; set; }
         public string? ModifiedIP { get; set; }
         public ApprovalRequest ApprovalRequest { get; set; }
+        public MiscMaster Status { get; set; }
     }
 }

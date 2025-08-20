@@ -232,6 +232,8 @@ namespace PurchaseManagement.Infrastructure.Repositories.PurchaseIndents
             return IndentResponse.FirstOrDefault()!;
         }
 
+     
+
         public async Task<bool> NotFoundAsync(int id)
         {
              var query = "SELECT COUNT(1) FROM [Purchase].[IndentHeader]  WHERE Id = @Id AND IsDeleted = 0";
