@@ -34,6 +34,7 @@ namespace Core.Application.WarehouseMaster.Command.UpdateWarehouseMaster
     public bool IsTransitWarehouse { get; set; }
     public double MaxCapacity { get; set; }
     public bool IsDefaultStockEntry { get; set; }
+    public byte IsActive { get; set; }
     public List<int>? AllowedItemGroupIds { get; set; }
 
         

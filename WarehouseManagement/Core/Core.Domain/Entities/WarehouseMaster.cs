@@ -11,12 +11,12 @@ namespace Core.Domain.Entities
         public string WarehouseCode { get; set; } = null!;
         public string WarehouseName { get; set; } = null!;
         public int UnitId { get; set; }
-        // Self-referencing FK for Parent Group
+
         public int? ParentWarehouseId { get; set; }
         public bool IsGroup { get; set; }
 
         public bool IsVirtualWarehouse { get; set; }
-        // External FK values (soft foreign keys validated via gRPC)
+
         public int WarehouseTypeId { get; set; }
         public int StorageTypeId { get; set; }
         public int AreaTypeId { get; set; }
@@ -43,7 +43,9 @@ namespace Core.Domain.Entities
 
         // Allowed Item Groups mapping
         public ICollection<WarehouseItemGroupMapping> AllowedItemGroups { get; set; } = new List<WarehouseItemGroupMapping>();
-        
+
         public ICollection<RackMaster> Racks { get; set; } = new List<RackMaster>();
+        
+        public ICollection<BinMaster> Bins { get; set; } = new List<BinMaster>();
     }
 }
