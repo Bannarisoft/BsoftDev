@@ -171,8 +171,8 @@ namespace InventoryManagement.API.Controllers
             }
             return Ok(new
             {
-                StatusCode = StatusCodes.Status200OK,
-                data = $"UOM ID {id} Deleted"
+                StatusCode = StatusCodes.Status200OK,                
+                message = deleteduom.Message
             });
 
         }
