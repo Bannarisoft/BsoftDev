@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
+using Core.Domain.Common;
 using Core.Domain.Entities;
 using Dapper;
 using MaintenanceManagement.Infrastructure.Migrations;
@@ -319,7 +320,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                             )
                             OR
                             -- Inactive: include ONLY if WO exists AND status is allowed
-                            (PS.IsActive = 0 AND PSD.IsActive = 0
+                            (PS.IsActive = 0 OR PSD.IsActive = 0
                                 AND WO.Id IS NOT NULL
                                 AND MISC.Code IN @StatusCodes
                             )
@@ -370,7 +371,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                             )
                             OR
                             -- Inactive schedules: must have WO and allowed status
-                            (PS.IsActive = 0 AND PSD.IsActive = 0
+                            (PS.IsActive = 0 OR PSD.IsActive = 0
                                 AND WO.Id IS NOT NULL
                                 AND MISC.Code IN @StatusCodes
                             )
@@ -723,8 +724,10 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             )
             SELECT MachineId, IsActive
             INTO #notActiveMachine
-            FROM LatestMachineStatus
-            WHERE rn = 1 AND IsActive = 0 or IsDeleted=1;
+            FROM LatestMachineStatus L
+            LEFT JOIN Maintenance.WorkOrder WO ON WO.PreventiveScheduleId = L.Id
+			LEFT JOIN [Maintenance].[MiscMaster] MM ON MM.Id = WO.StatusId
+            WHERE rn = 1 AND L.IsActive = 0 or L.IsDeleted=1 or MM.Code=@Status;
 
             -- Step 2: Get machines not in PreventiveSchedulerDetail (unmapped)
             SELECT M.Id, M.MachineCode, M.MachineName  
@@ -746,8 +749,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
             var parameters = new
             {
-                Id
-                // StatusCodes = statusCodes,
+                Id,
+                Status = MaintenanceStatusCancelled.Code,
               //  DoneStatus = MaintenanceStatusUpdate.Code
             };
             var machines = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineMaster>(query, parameters);
