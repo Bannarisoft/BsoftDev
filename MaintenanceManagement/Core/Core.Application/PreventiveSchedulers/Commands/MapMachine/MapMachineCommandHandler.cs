@@ -68,9 +68,11 @@ namespace Core.Application.PreventiveSchedulers.Commands.MapMachine
 
             // Preventiveresult.Id
             int jobDelayMin = 0;
-            var startDateTime = Preventiveresult.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue);
+            // var startDateTime = Preventiveresult.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue);
+            var targetDateTime = Preventiveresult.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue);
 
-            var delay = startDateTime - DateTime.Today;
+            // var delay = startDateTime - DateTime.Today;
+            var delay = targetDateTime - DateTime.Now;
             string newJobId;
             var delayInMinutes = (int)delay.TotalMinutes;
             var token = _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].ToString();
