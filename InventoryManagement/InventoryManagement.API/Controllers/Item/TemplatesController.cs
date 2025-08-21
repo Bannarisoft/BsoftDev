@@ -16,7 +16,8 @@ public sealed class TemplatesController : ControllerBase
     public async Task<IActionResult> Create([FromBody] CreateTemplateCommand cmd, CancellationToken ct)
     {
         var id = await _mediator.Send(cmd, ct);
-        return CreatedAtAction(nameof(Get), new { id }, new { id });
+        return CreatedAtAction(nameof(Get), new { StatusCode = StatusCodes.Status200OK,id }, new { id });
+        
     }
 
     [HttpGet("{id:int}")]
@@ -25,16 +26,16 @@ public sealed class TemplatesController : ControllerBase
     {
         var list = await _mediator.Send(new SearchTemplatesQuery { Term = null, Take = 1 }, ct);
         var tpl = list.FirstOrDefault(x => x.Id == id);
-        if (tpl is null) return NotFound();
-        return Ok(tpl);
+        if (tpl is null) return NotFound();        
+        return Ok(new { StatusCode = StatusCodes.Status200OK, data = tpl });
     }
 
-    
+
     [HttpGet("search")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Search([FromQuery] string? q, [FromQuery] int take = 20, CancellationToken ct = default)
     {
-        var res = await _mediator.Send(new SearchTemplatesQuery { Term = q, Take = take }, ct);
-        return Ok(res);
+        var res = await _mediator.Send(new SearchTemplatesQuery { Term = q, Take = take }, ct);        
+        return Ok(new { StatusCode = StatusCodes.Status200OK, data = res });
     }
 }
