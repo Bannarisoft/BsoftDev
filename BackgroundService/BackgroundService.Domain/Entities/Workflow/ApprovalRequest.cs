@@ -9,7 +9,7 @@ namespace BackgroundService.Domain.Entities.Workflow
     public class ApprovalRequest
     {
         public int Id { get; set; }
-        public int WorkflowTypeId { get; set; }
+        public string WorkflowType { get; set; }
         public int ModuleTransactionId { get; set; }
         public int ApprovalStepDetailId { get; set; }
         public int? ApprovalRuleId { get; set; }
@@ -22,10 +22,11 @@ namespace BackgroundService.Domain.Entities.Workflow
         public DateTimeOffset? ModifiedDate { get; set; }
         public string? ModifiedByName { get; set; }
         public string? ModifiedIP { get; set; }
-        public WorkflowType WorkflowType { get; set; }
+        public required string Action { get; set; }
         public ApprovalStepDetail ApprovalStepDetail { get; set; }
         public ApprovalRule ApprovalRule { get; set; }
         public MiscMaster Status { get; set; }
         public ICollection<ApprovalDocument> ApprovalDocuments { get; set; }
+        public ICollection<ApprovalRequestLine> ApprovalRequestLines { get; set; }
     }
 }

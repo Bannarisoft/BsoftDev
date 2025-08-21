@@ -34,19 +34,14 @@ namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
                 .HasColumnType("int")
                 .IsRequired();
 
-            builder.Property(t => t.ConditionKey)
-            .HasColumnName("ConditionKey")
-            .HasColumnType("varchar(255)")
+            builder.Property(t => t.ApprovalStepDetailId)
+            .HasColumnName("ApprovalStepDetailId")
+            .HasColumnType("int")
             .IsRequired();
 
-            builder.Property(t => t.Operator)
-            .HasColumnName("Operator")
-            .HasColumnType("varchar(50)")
-            .IsRequired();
-
-            builder.Property(t => t.Value)
-            .HasColumnName("Value")
-            .HasColumnType("varchar(50)")
+            builder.Property(t => t.Priority)
+            .HasColumnName("Priority")
+            .HasColumnType("int")
             .IsRequired();
 
             builder.Property(t => t.Action)
@@ -63,6 +58,17 @@ namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
             .HasColumnName("WorkflowTypeId")
             .HasColumnType("int")
             .IsRequired();
+
+
+            builder.Property(t => t.EffectiveFrom)
+            .HasColumnName("EffectiveFrom")
+            .HasColumnType("date")
+            .IsRequired(true);
+
+            builder.Property(t => t.EffectiveTo)
+           .HasColumnName("EffectiveTo")
+           .HasColumnType("date")
+           .IsRequired(true);
 
             builder.Property(cf => cf.IsActive)
             .HasColumnName("IsActive")
@@ -89,10 +95,15 @@ namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
 
             builder.Property(cf => cf.ModifiedIP)
                 .HasColumnType("varchar(255)");
-                
-                builder.HasOne(ac => ac.WorkflowType)
+
+            builder.HasOne(ac => ac.WorkflowType)
+      .WithMany(am => am.ApprovalRules)
+      .HasForeignKey(ac => ac.WorkflowTypeId)
+      .OnDelete(DeleteBehavior.NoAction);
+          
+           builder.HasOne(ac => ac.ApprovalStepDetail)
           .WithMany(am => am.ApprovalRules)
-          .HasForeignKey(ac => ac.WorkflowTypeId)
+          .HasForeignKey(ac => ac.ApprovalStepDetailId)
           .OnDelete(DeleteBehavior.NoAction);
         }
     }

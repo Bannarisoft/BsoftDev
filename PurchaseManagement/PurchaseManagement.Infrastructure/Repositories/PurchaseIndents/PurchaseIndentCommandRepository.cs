@@ -29,13 +29,13 @@ namespace PurchaseManagement.Infrastructure.Repositories.PurchaseIndents
             _miscMasterQueryRepository = miscMasterQueryRepository;
             _imapper = imapper;
         }
-        public async Task<int> CreateAsync(IndentHeader indentHeader)
+        public async Task<IndentHeader> CreateAsync(IndentHeader indentHeader)
         {
             _dbContext.Entry(indentHeader);
             await _dbContext.IndentHeader.AddAsync(indentHeader);
             await _dbContext.SaveChangesAsync();
 
-            return indentHeader.Id;
+            return indentHeader;
         }
 
         public async Task<bool> DeleteAsync(int id, IndentHeader indentHeader)

@@ -1,5 +1,8 @@
 
 using Contracts.Interfaces.External.IUser;
+using Contracts.Interfaces.External.IWorkflow;
+using GrpcServices.BackgroundService;
+using GrpcServices.BackgroundService.Line;
 using GrpcServices.UserManagement;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +20,7 @@ namespace PurchaseManagement.Infrastructure
         public static IServiceCollection AddHttpClients(this IServiceCollection services, IConfiguration configuration)
         {
             var userManagementUrl = configuration["GrpcSettings:UserManagementUrl"];
+            var backGroundServiceUrl = configuration["GrpcSettings:BackGroundUrl"];
 
             
             // ✅ Register Session gRPC Client
@@ -42,6 +46,43 @@ namespace PurchaseManagement.Infrastructure
             .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
 
             services.AddScoped<IUnitGrpcClient, UnitGrpcClient>();
+
+             services.AddGrpcClient<ApprovalRequestStatusAllService.ApprovalRequestStatusAllServiceClient>(options =>
+            {
+                options.Address = new Uri(backGroundServiceUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            })
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+
+             services.AddGrpcClient<ApprovalRequestLineStatusService.ApprovalRequestLineStatusServiceClient>(options =>
+            {
+                options.Address = new Uri(backGroundServiceUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            })
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+
+            services.AddScoped<IWorkflowGrpcClient, WorkflowGrpcClient>();
+
+            services.AddGrpcClient<GetAllUsersJobService.GetAllUsersJobServiceClient>(options =>
+            {
+                options.Address = new Uri(userManagementUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            })
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+
+            services.AddScoped<IUsersAllGrpcClient, UsersGrpcClient>();
 
 
             return services;
