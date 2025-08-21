@@ -21,8 +21,8 @@ namespace BackgroundService.Application.Workflow.Common.Mappings
             CreateMap<ApprovalStepDetail, ApprovalStepDetailDto>()
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == Status.Active ? 1 : 0))
             .ForMember(dest => dest.ModuleTypeName, opt => opt.MapFrom(src => src.WorkflowType.ModuleTypeName))
-            .ForMember(dest => dest.ApprovalStepName, opt => opt.MapFrom(src => src.ApprovalStep.Code))
-            .ForMember(dest => dest.ApprovalTypeName, opt => opt.MapFrom(src => src.ApprovalType.Code));
+            .ForMember(dest => dest.ApprovalStepName, opt => opt.MapFrom(src => src.ApprovalStep.Code));
+            // .ForMember(dest => dest.ApprovalTypeName, opt => opt.MapFrom(src => src.ApprovalType.Code));
 
             CreateMap<WorkflowType, WorkflowTypeApprovalStepDto>();
             CreateMap<Domain.Entities.Notification.MiscMaster, ApprovalStepDto>()
@@ -34,19 +34,19 @@ namespace BackgroundService.Application.Workflow.Common.Mappings
                  .ForMember(dest => dest.Id, opt => opt.Ignore())
                  .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
                  .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted))
-                 .ForMember(dest => dest.ApprovalStepUnitMappings, opt => opt.MapFrom(src => src.ApprovalStepUnitMappings))
-                 .ForMember(dest => dest.RuleSkipApproverMappings, opt => opt.MapFrom(src => src.RuleSkipApproverMappings))
-                 .ForMember(dest => dest.ApprovalStepDepartmentMappings, opt => opt.MapFrom(src => src.ApprovalStepDepartmentMappings));
+                  .ForMember(dest => dest.ApprovalStepUnitMappings, opt => opt.MapFrom(src => src.ApprovalStepUnitMappings));
+                //  .ForMember(dest => dest.RuleSkipApproverMappings, opt => opt.MapFrom(src => src.RuleSkipApproverMappings))
+                //  .ForMember(dest => dest.ApprovalStepDepartmentMappings, opt => opt.MapFrom(src => src.ApprovalStepDepartmentMappings));
 
             CreateMap<ApprovalStepUnitMappingDto, ApprovalStepUnitMapping>();
-            CreateMap<RuleSkipApproverMappingDto, RuleSkipApproverMapping>();
-            CreateMap<ApprovalStepDepartmentMappingDto, ApprovalStepDepartmentMapping>();
+            // CreateMap<RuleSkipApproverMappingDto, RuleSkipApproverMapping>();
+            // CreateMap<ApprovalStepDepartmentMappingDto, ApprovalStepDepartmentMapping>();
 
             CreateMap<UpdateApprovalStepDetailCommand, ApprovalStepDetail>()
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == 1 ? Status.Active : Status.Inactive))
-                .ForMember(dest => dest.ApprovalStepUnitMappings, opt => opt.MapFrom(src => src.ApprovalStepUnitMappings))
-                 .ForMember(dest => dest.RuleSkipApproverMappings, opt => opt.MapFrom(src => src.RuleSkipApproverMappings))
-                 .ForMember(dest => dest.ApprovalStepDepartmentMappings, opt => opt.MapFrom(src => src.ApprovalStepDepartmentMappings));
+                .ForMember(dest => dest.ApprovalStepUnitMappings, opt => opt.MapFrom(src => src.ApprovalStepUnitMappings));
+                //  .ForMember(dest => dest.RuleSkipApproverMappings, opt => opt.MapFrom(src => src.RuleSkipApproverMappings))
+                //  .ForMember(dest => dest.ApprovalStepDepartmentMappings, opt => opt.MapFrom(src => src.ApprovalStepDepartmentMappings));
 
 
             CreateMap<DeleteApprovalStepDetailCommand, ApprovalStepDetail>()
@@ -57,8 +57,8 @@ namespace BackgroundService.Application.Workflow.Common.Mappings
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == Status.Active ? 1 : 0));
 
             CreateMap<ApprovalStepUnitMapping,ApprovalStepUnitMappingByIdDto>();
-            CreateMap<ApprovalStepDepartmentMapping,ApprovalStepDepartmentMappingByIdDto>();
-            CreateMap<RuleSkipApproverMapping, RuleSkipApproverMappingByIdDto>();
+            // CreateMap<ApprovalStepDepartmentMapping,ApprovalStepDepartmentMappingByIdDto>();
+            // CreateMap<RuleSkipApproverMapping, RuleSkipApproverMappingByIdDto>();
         }
     }
 }

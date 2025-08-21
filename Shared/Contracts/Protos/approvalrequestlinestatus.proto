@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option csharp_namespace = "GrpcServices.BackgroundService.Line";
+
+service ApprovalRequestLineStatusService {
+    rpc GetApprovalRequestLineStatus (ApprovalStatusRequest) returns (ApprovalLineStatusListResponse);
+}
+message ApprovalStatusRequest {
+    string ModuleTypeName = 1;
+}
+message ApprovalRequestLineStatusDto {
+    int32 Id = 1;
+    int32 ModuleLineTransactionId = 2;
+    string Status = 3;
+    string ApproverBinding = 4;
+    string ApproverValue = 5;
+}
+
+message ApprovalLineStatusListResponse {
+    repeated ApprovalRequestLineStatusDto approvalstatus = 1;
+}

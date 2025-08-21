@@ -65,6 +65,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapGrpcService<ApprovalRequestStatusAllGrpcService>().EnableGrpcWeb();
     endpoints.MapGrpcService<ApprovalRequestByApproverGrpcService>().EnableGrpcWeb();
     endpoints.MapGrpcService<ApprovedApprovalRequestGrpcService>().EnableGrpcWeb();
+    endpoints.MapGrpcService<ApprovalLineRequestStatusGrpcService>().EnableGrpcWeb();
     endpoints.MapControllers();
     endpoints.MapHub<NotificationHub>("/notificationHub");    
 });

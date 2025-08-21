@@ -25,7 +25,7 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
             b.HasOne(x => x.ItemMaster)
              .WithMany(i => i.VariantValues)
              .HasForeignKey(x => x.ItemId)
-             .OnDelete(DeleteBehavior.Cascade);
+             .OnDelete(DeleteBehavior.Restrict);
 
             b.Property(x => x.VariantBasedOn)
              .HasColumnName("VariantBasedOn")
@@ -34,7 +34,7 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
             b.HasOne(x => x.MiscVariantBasedOn)
              .WithMany(i => i.ItemAttributeBasedOn)
              .HasForeignKey(x => x.VariantBasedOn)
-             .OnDelete(DeleteBehavior.NoAction);
+             .OnDelete(DeleteBehavior.Restrict);
             
             
             b.Property(x => x.AttributeGroupId)
@@ -44,7 +44,7 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
             b.HasOne(x => x.MiscAttributeGroup)
              .WithMany(i => i.ItemAttributeGroup)
              .HasForeignKey(x => x.AttributeGroupId)
-             .OnDelete(DeleteBehavior.NoAction);
+             .OnDelete(DeleteBehavior.Restrict);
 
 
             b.Property(x => x.AttributeId)
@@ -54,7 +54,7 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
             b.HasOne(x => x.MiscAttribute)
              .WithMany(i => i.ItemAttribute)
              .HasForeignKey(x => x.AttributeId)
-             .OnDelete(DeleteBehavior.NoAction);
+             .OnDelete(DeleteBehavior.Restrict);
 
             b.Property(x => x.OptionValue)
              .HasColumnName("OptionValue")

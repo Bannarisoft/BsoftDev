@@ -183,7 +183,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
                     await _applicationDbContext.PreventiveSchedulerDtl.AddAsync(existingPreventiveScheduler);
                     await _applicationDbContext.SaveChangesAsync();
-                    var delay = existingPreventiveScheduler.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today;
+                    // var delay = existingPreventiveScheduler.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today;
+                    var targetDateTime = existingPreventiveScheduler.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue);
+                    var delay = targetDateTime - DateTime.Now;
                     string newJobId;
                     var delayInMinutes = (int)delay.TotalMinutes;
 
@@ -249,8 +251,10 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 existingPreventiveScheduler.WorkOrderCreationStartDate = RescheduleDate;
                 
                 _backgroundServiceClient.RemoveHangFireJob(existingPreventiveScheduler.HangfireJobId,token);
-                
-                var delay = existingPreventiveScheduler.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today;
+
+                // var delay = existingPreventiveScheduler.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today;
+                var targetDateTime = existingPreventiveScheduler.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue);
+                var delay = targetDateTime - DateTime.Now;
                 string newJobId;
                 var delayInMinutes = (int)delay.TotalMinutes;
 

@@ -43,9 +43,9 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRules
             
             if (existingApprovalRule != null)
             {
-                existingApprovalRule.ConditionKey = approvalRule.ConditionKey;
-                existingApprovalRule.Operator = approvalRule.Operator;
-                existingApprovalRule.Value = approvalRule.Value;
+                // existingApprovalRule.ConditionKey = approvalRule.ConditionKey;
+                // existingApprovalRule.Operator = approvalRule.Operator;
+                // existingApprovalRule.Value = approvalRule.Value;
                 existingApprovalRule.IsActive = approvalRule.IsActive;
                 _notificationDbContext.ApprovalRule.Update(existingApprovalRule);
 

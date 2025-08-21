@@ -26,10 +26,11 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
         private readonly IUnitGrpcClient _unitGrpcClient; 
         private readonly ICompanyGrpcClient _companyGrpcClient; 
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ITimeZoneService _timeZoneService;
 
         public UpdateWorkOrderCommandHandler(IWorkOrderCommandRepository workOrderRepository, IMapper mapper, IWorkOrderQueryRepository workOrderQueryRepository,
         IMediator mediator, IEventPublisher eventPublisher, ILogger<UpdateWorkOrderCommandHandler> logger, ILogQueryService logQueryService,
-        IUnitGrpcClient unitGrpcClient, ICompanyGrpcClient companyGrpcClient, IHttpContextAccessor httpContextAccessor)
+        IUnitGrpcClient unitGrpcClient, ICompanyGrpcClient companyGrpcClient, IHttpContextAccessor httpContextAccessor, ITimeZoneService timeZoneService)
         {
             _workOrderRepository = workOrderRepository;
             _mapper = mapper;
@@ -41,11 +42,22 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
             _unitGrpcClient = unitGrpcClient;
             _companyGrpcClient = companyGrpcClient;
             _httpContextAccessor = httpContextAccessor;
+            _timeZoneService = timeZoneService;
         }
 
         public async Task<ApiResponseDTO<bool>> Handle(UpdateWorkOrderCommand request, CancellationToken cancellationToken)
-        {            
+        {
             var token = _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].ToString();
+            var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
+            var systemTimeZone = TimeZoneInfo.FindSystemTimeZoneById(systemTimeZoneId);
+
+            request.WorkOrder.DownTimeStart= TimeZoneInfo.ConvertTime(request.WorkOrder.DownTimeStart.Value, systemTimeZone);
+            //request.WOSchedule.StartTime =request.WOSchedule.StartTime;
+            if (request.WorkOrder.DownTimeEnd != null)
+            {
+                request.WorkOrder.DownTimeEnd = TimeZoneInfo.ConvertTime(request.WorkOrder.DownTimeEnd.Value, systemTimeZone);
+                //request.WOSchedule.EndTime =request.WOSchedule.EndTime.Value;
+            }          
             var updatedEntity = _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(request.WorkOrder);
             var updateResult = await _workOrderRepository.UpdateAsync(updatedEntity.Id, updatedEntity);
 

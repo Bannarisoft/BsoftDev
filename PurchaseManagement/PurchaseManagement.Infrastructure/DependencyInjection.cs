@@ -106,6 +106,7 @@ namespace PurchaseManagement.Infrastructure
             services.AddScoped<ILogServiceCommand, LogServiceCommandRepository>();
             services.AddScoped<IPurchaseIndentQuery, PurchaseIndentQueryRepository>();
             services.AddScoped<IPartyMasterQueryRepository, PartyMasterQueryRepository>();
+            services.AddScoped<IPurchaseIndentGrpcQuery, PurchaseIndentQueryRepository>();
             
 
 
