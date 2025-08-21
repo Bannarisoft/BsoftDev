@@ -81,7 +81,9 @@ namespace PurchaseManagement.Infrastructure.GrpcClients
                 ModuleLineTransactionId = u.ModuleLineTransactionId,
                 Status = u.Status,
                 ApproverBinding = u.ApproverBinding,
-                ApproverValue = u.ApproverValue
+                ApproverValue = u.ApproverValue,
+                ApprovalRequestId = u.ApprovalRequestId,
+                ApprovalRequestLineId = u.ApprovalRequestLineId
             }).ToList();
         }
     }

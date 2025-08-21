@@ -153,7 +153,7 @@ namespace BackgroundService.Infrastructure.Repositories.MiscMaster
             
 
             const string query = @"SELECT M.Id,M.Code ,M.Description  FROM appdata.MiscMaster AS M
-                                INNER JOIN appdata.MiscMaster.MiscTypeMaster AS MT 
+                                INNER JOIN appdata.MiscTypeMaster AS MT 
                                 ON MT.Id = M.MiscTypeId
                                 WHERE M.IsDeleted = 0 AND MT.IsDeleted = 0 AND M.IsActive = 1 AND MT.MiscTypeCode= @MiscTypeCode AND M.Code=@MiscTypeName  ";
                 

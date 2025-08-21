@@ -11,10 +11,11 @@ message ApprovalStatusRequest {
     string ModuleTypeName = 1;
 }
 message ApprovalRequestStatusDto {
-    int32 ModuleTransactionId = 1;
-    int32 ApprovalRequestId = 2;
-    string CurrentStatus = 3;
-    string ModuleTypeName = 4;
+    int32 Id = 1;
+    int32 ModuleTransactionId = 2;
+    int32 ApprovalRequestId = 3;
+    string CurrentStatus = 4;
+    string ModuleTypeName = 5;
 }
 
 message ApprovalStatusAllListResponse {
