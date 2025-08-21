@@ -18,6 +18,7 @@ namespace Core.Application.PurchaseIndents.Queries.GetPendingIndentById
         public string Status { get; set; }
         public int ApproverId { get; set; }
         public string ApproverName { get; set; }
+        public string ViewOnly { get; set; }
         
     }
 }

@@ -9,5 +9,7 @@ namespace BackgroundService.Application.Dto
     {
         public int ModuleLineTransactionId { get; set; }
         public string Status { get; set; }
+        public string ApproverBinding { get; set; }
+        public string ApproverValue { get; set; }
     }
 }

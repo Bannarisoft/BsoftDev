@@ -36,7 +36,7 @@ namespace Core.Application.PurchaseIndents.Queries.GetPendingIndentById
             var workflowResponse = await _workflowGrpcClient.GetApprovalRequestLineStatusAsync(MiscEnumEntity.PurchaseIndent);
            var statusOrder = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
                 {
-                    ["Pending"]  = 0,
+                    [MiscEnumEntity.Pending]  = 0,
                     ["Rejected"] = 1,
                     ["Approved"] = 2
                 };

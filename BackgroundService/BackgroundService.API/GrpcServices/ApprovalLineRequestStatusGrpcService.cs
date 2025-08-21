@@ -31,7 +31,9 @@ namespace BackgroundService.API.GrpcServices
                   response.Approvalstatus.Add(new ApprovalRequestLineStatusDto
                   {
                       ModuleLineTransactionId = Convert.ToInt32(item.ModuleLineTransactionId),
-                      Status = item.Status?.ToString() ?? string.Empty
+                      Status = item.Status?.ToString() ?? string.Empty,
+                      ApproverBinding = item.ApproverBinding?.ToString() ?? string.Empty,
+                      ApproverValue = item.ApproverValue?.ToString() ?? string.Empty
                   });
               }
             

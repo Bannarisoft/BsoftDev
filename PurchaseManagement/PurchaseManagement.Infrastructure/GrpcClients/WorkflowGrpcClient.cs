@@ -79,7 +79,9 @@ namespace PurchaseManagement.Infrastructure.GrpcClients
             return response.Approvalstatus.Select(u => new Contracts.Dtos.Workflow.ApprovalRequestLineStatusDto
             {
                 ModuleLineTransactionId = u.ModuleLineTransactionId,
-                Status = u.Status
+                Status = u.Status,
+                ApproverBinding = u.ApproverBinding,
+                ApproverValue = u.ApproverValue
             }).ToList();
         }
     }
