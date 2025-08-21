@@ -17,9 +17,9 @@ namespace InventoryManagement.API.Controllers.Item
         public ItemMasterController(IMediator mediator) => _mediator = mediator;
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? search = null, [FromQuery] bool onlyActive = true)
+        public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? search = null, [FromQuery] bool onlyActive = true,int? itemGroupId = null,int? itemCategoryId = null)
         {
-            var (items, total) = await _mediator.Send(new GetAllItemsQuery { PageNumber = pageNumber, PageSize = pageSize, SearchTerm = search, OnlyActive = onlyActive });
+            var (items, total) = await _mediator.Send(new GetAllItemsQuery { PageNumber = pageNumber, PageSize = pageSize, SearchTerm = search, OnlyActive = onlyActive,  ItemGroupId     = itemGroupId,  ItemCategoryId  = itemCategoryId });
             return Ok(new { StatusCode = StatusCodes.Status200OK, data = items, totalCount = total, pageNumber, pageSize });
         }
 

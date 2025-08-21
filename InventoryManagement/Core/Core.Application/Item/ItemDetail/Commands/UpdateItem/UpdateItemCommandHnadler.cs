@@ -17,7 +17,6 @@ namespace Core.Application.Item.ItemDetail.Commands.UpdateItem
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
         private readonly ILogger<UpdateItemCommandHandler> _logger;
-
         private readonly IItemCommandRepository _itemRepo;
         private readonly IItemPurchaseCommandRepository _purchaseRepo;
         private readonly IItemInventoryCommandRepository _inventoryRepo;
@@ -25,7 +24,6 @@ namespace Core.Application.Item.ItemDetail.Commands.UpdateItem
         private readonly IItemSupplierCommandRepository _supplierRepo;
         private readonly IItemManufactureCommandRepository _manuRepo;
         private readonly IItemUomCommandRepository _uomRepo;
-
         private readonly IItemVariantValueCommandRepository _variantCmd;
         private readonly IItemVariantValueQueryRepository _variantQry;
 

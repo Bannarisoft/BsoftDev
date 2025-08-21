@@ -89,7 +89,7 @@ public class ItemVariantValueCommandRepository : IItemVariantValueCommandReposit
         // SaveChanges handled by UoW
     }
 
-    public async Task AddAsync(int itemId, int attributeId, int variantBasedOn, int attributeGroupId, string optionValue, CancellationToken ct = default)
+   /*  public async Task AddAsync(int itemId, int attributeId, int variantBasedOn, int attributeGroupId, string optionValue, CancellationToken ct = default)
     {
         await ValidateMiscIdsAsync(new[] { attributeId, variantBasedOn, attributeGroupId }, ct);
 
@@ -156,7 +156,7 @@ public class ItemVariantValueCommandRepository : IItemVariantValueCommandReposit
                             .Where(x => x.ItemId == itemId)
                             .ToListAsync(ct);
         if (rows.Count > 0) _db.RemoveRange(rows);
-    }
+    } */
 
     // IMPORTANT: only UPDATE NewItemId; do not insert a partial new row here
     public async Task MapOptionToChildAsync(

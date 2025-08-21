@@ -23,12 +23,11 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
             b.Property(x => x.ItemId)
              .HasColumnName("ItemId")
              .HasColumnType("int")
-             .IsRequired();
-            b.HasIndex(x => x.ItemId).IsUnique(); 
+             .IsRequired();            
             b.HasOne(x => x.Item)
              .WithMany(i => i.Manufacture)
              .HasForeignKey(x => x.ItemId)
-             .OnDelete(DeleteBehavior.Cascade);
+             .OnDelete(DeleteBehavior.Restrict);
 
             b.Property(x => x.UnitId)
              .HasColumnName("UnitId")
@@ -42,7 +41,7 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
             b.HasOne(x => x.MiscManufactureType)             
              .WithMany(i => i.ItemManufactureType)
              .HasForeignKey(x => x.ManufacturingTypeId)
-             .OnDelete(DeleteBehavior.NoAction);          
+             .OnDelete(DeleteBehavior.Restrict);          
         }
     }
 }

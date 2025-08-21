@@ -28,15 +28,11 @@ namespace Core.Domain.Entities.Item.ItemDetail
         public bool HasVariants { get; set; }
         public int? ParentItemId { get; set; }
         public ItemMaster? ParentItem { get; set; }
-        public ICollection<ItemMaster> ChildItems { get; set; } = new List<ItemMaster>();
-        
-        public string? ItemImage { get; set; }
-
-
+        public ICollection<ItemMaster> ChildItems { get; set; } = new List<ItemMaster>();        
+        public string? ItemImage { get; set; }        
         public ItemPurchase? Purchase { get; set; }
         public ItemInventory? Inventory { get; set; }
-        public ItemQuality? Quality { get; set; }
-     
+        public ItemQuality? Quality { get; set; }     
         public ICollection<ItemVariantValue> VariantValues { get; set; } = new List<ItemVariantValue>();
         public ICollection<ItemVariantValue> VariantNewItem { get; set; } = new List<ItemVariantValue>();
         public ICollection<ItemSupplier> Suppliers { get; set; } = new List<ItemSupplier>();
