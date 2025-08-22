@@ -39,7 +39,6 @@ namespace BackgroundService.Infrastructure.Data.Notification
         public DbSet<ApprovalDocument> ApprovalDocument { get; set; }
         public DbSet<ApprovalRequestLine> ApprovalRequestLine { get; set; }
         public DbSet<ApprovalRuleCondition> ApprovalRuleCondition { get; set; }
-        public DbSet<ApprovalTarget> ApprovalTarget { get; set; }
         public DbSet<RuleTargetOverride> RuleTargetOverride { get; set; }
         public DbSet<ApprovalDataField> ApprovalDataField { get; set; }
 
@@ -64,7 +63,6 @@ namespace BackgroundService.Infrastructure.Data.Notification
             modelBuilder.ApplyConfiguration(new ApprovalDocumentConfiguration());
             modelBuilder.ApplyConfiguration(new ApprovalRequestLineConfiguration());
             modelBuilder.ApplyConfiguration(new ApprovalRuleConditionConfiguration());
-            modelBuilder.ApplyConfiguration(new ApprovalTargetConfiguration());
             modelBuilder.ApplyConfiguration(new RuleTargetOverrideConfiguration());
             modelBuilder.ApplyConfiguration(new ApprovalDataFieldConfiguration());
 

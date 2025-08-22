@@ -58,6 +58,16 @@ namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
             .HasColumnType("int")
             .IsRequired();
 
+             builder.Property(t => t.Binding)
+            .HasColumnName("Binding")
+            .HasColumnType("nvarchar(10)")
+            .IsRequired();
+
+            builder.Property(t => t.Value)
+            .HasColumnName("Value")
+            .HasColumnType("nvarchar(200)")
+            .IsRequired();
+
             builder.Property(cf => cf.IsActive)
             .HasColumnName("IsActive")
             .HasColumnType("bit")

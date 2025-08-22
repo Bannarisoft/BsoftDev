@@ -320,7 +320,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                             )
                             OR
                             -- Inactive: include ONLY if WO exists AND status is allowed
-                            (PS.IsActive = 0 OR PSD.IsActive = 0
+                            ((PS.IsActive = 0 OR PSD.IsActive = 0)
                                 AND WO.Id IS NOT NULL
                                 AND MISC.Code IN @StatusCodes
                             )
@@ -371,7 +371,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                             )
                             OR
                             -- Inactive schedules: must have WO and allowed status
-                            (PS.IsActive = 0 OR PSD.IsActive = 0
+                            ((PS.IsActive = 0 OR PSD.IsActive = 0)
                                 AND WO.Id IS NOT NULL
                                 AND MISC.Code IN @StatusCodes
                             )

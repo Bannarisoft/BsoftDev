@@ -14,7 +14,6 @@ namespace Core.Application.PurchaseIndents.Queries.GetPendingIndentById
         public int UnitId { get; set; }
         public string Purpose { get; set; }
         public int ApprovalRequestHeaderId { get; set; }
-        public int ApprovalRequestLineId { get; set; }
         public ICollection<PendingIndentDepartmentByIdDto> IndentDepartments { get; set; }
         public ICollection<PendingIndentDetailByIdDto> IndentDetails { get; set; }
         
