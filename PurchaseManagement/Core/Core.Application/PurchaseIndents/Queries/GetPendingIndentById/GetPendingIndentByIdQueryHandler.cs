@@ -38,49 +38,29 @@ namespace Core.Application.PurchaseIndents.Queries.GetPendingIndentById
 
             var workflowResponse = await _workflowGrpcClient.GetApprovalRequestLineStatusAsync(MiscEnumEntity.PurchaseIndent);
 
+             var ApproverStatusLookup = workflowResponse.ToDictionary(d => d.ModuleLineTransactionId, d => d.Status);
+             var ApproverLookup = workflowResponse.ToDictionary(d => d.ModuleLineTransactionId, d => d.ApproverValue);
+             var ApproveRequestLineLookup = workflowResponse.ToDictionary(d => d.ModuleLineTransactionId, d => d.ApprovalRequestLineId);
+
+             Indent.ApprovalRequestHeaderId = workflowResponse.FirstOrDefault().ApprovalRequestId;
+
+            foreach (var dto in Indent.IndentDetails)
+            {
+                if (ApproverStatusLookup.TryGetValue(dto.Id, out var Status))
+                {
+                    dto.Status = Status;
+                }
+                if (ApproverLookup.TryGetValue(dto.Id, out var ApproverValue))
+                {
+                    dto.ApproverId = Convert.ToInt32(ApproverValue);
+                }
+                if (ApproveRequestLineLookup.TryGetValue(dto.Id, out var ApprovalRequestLineId))
+                {
+                    dto.ApprovalRequestLineId = ApprovalRequestLineId;
+                }
+            }
+
         
-           var statusOrder = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
-                {
-                    [MiscEnumEntity.Pending]  = 0,
-                    [MiscEnumEntity.Rejected] = 1,
-                    [MiscEnumEntity.Approved] = 2
-                };
-
-            var byLine = workflowResponse
-                .GroupBy(r => r.ModuleLineTransactionId)
-                .ToDictionary(
-                    g => g.Key,
-                    g => new
-                    {
-                        Status = g.Select(x => x.Status)
-                                  .OrderBy(s => statusOrder.TryGetValue(s ?? "", out var rank) ? rank : 99)
-                                  .FirstOrDefault() ?? string.Empty,
-
-                        ApproverId = g.Select(x => x.ApproverValue)
-                                      .Select(v => int.TryParse(v, out var n) ? n : (int?)null)
-                                      .Where(n => n.HasValue)
-                                      .Select(n => n.Value)
-                                      .FirstOrDefault(),
-                        ApprovalRequestId     = g.Select(x => x.ApprovalRequestId).FirstOrDefault(),
-                        ApprovalRequestLineId = g.Select(x => x.ApprovalRequestLineId).FirstOrDefault()
-                    });
-
-                foreach (var line in Indent.IndentDetails)
-                {
-                if (byLine.TryGetValue(line.Id, out var agg))
-                {
-                    line.Status = agg.Status;
-                    line.ApproverId = agg.ApproverId;   // 0 if none found
-                        
-                     line.ApprovalRequestId     = agg.ApprovalRequestId;
-                     line.ApprovalRequestLineId = agg.ApprovalRequestLineId;
-                    }
-                else
-                {
-                    line.Status = string.Empty;
-                    // line.ApproverId stays default
-                }
-                }
             var approverNameMap = await _usersAllGrpcClient.GetUserAllAsync();
             var approverNameLookup = approverNameMap.ToDictionary(d => d.UserId, d => d.UserName);
             foreach (var approverMap in Indent.IndentDetails)
