@@ -227,8 +227,8 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequest
                     ARL.ModuleLineTransactionId,
                     ARL.ApproverBinding,
                     ARL.ApproverValue,
-                    MM.Id            AS StatusId,
-                    MM.Code          AS StatusCode,
+                    MM.Id as StatusId ,         
+                    MM.Code as StatusCode ,         
                     ASD.StepOrder,
                     ROW_NUMBER() OVER (
                         PARTITION BY ARL.ModuleLineTransactionId
@@ -248,9 +248,8 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequest
                 ModuleLineTransactionId,
                 ApproverBinding,
                 ApproverValue,
-                StatusId,
-                StatusCode,
-                StepOrder
+                StatusId as Id,
+                StatusCode as Code
             FROM ranked
             WHERE rn = 1;";
 
