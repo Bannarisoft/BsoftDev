@@ -13,5 +13,6 @@ namespace Core.Application.Common.Interfaces.IPurchaseIndent
         Task<IndentHeader> GetByIdAsync(int id);
         Task<string> GeneratePurchaseIndentNumberAsync(int unitId);
         
+        
     }
 }

@@ -44,22 +44,21 @@ namespace PurchaseManagement.Infrastructure.Repositories.PurchaseIndents
             if (PurchaseIndentDelete != null)
             {
                 PurchaseIndentDelete.IsDeleted = indentHeader.IsDeleted;
-                return await _dbContext.SaveChangesAsync() >0;
+                return await _dbContext.SaveChangesAsync() > 0;
             }
-            return false; 
+            return false;
         }
 
-        public async Task<bool> UpdateAsync(IndentHeader indentHeader,string request )
+        public async Task<bool> UpdateAsync(IndentHeader indentHeader, string request)
         {
-             var existingPurchaseIndent = await _dbContext.IndentHeader
-              .Include(cf => cf.IndentDetails)
-            .Include(cf => cf.IndentDepartmentMappings)
-            .FirstOrDefaultAsync(u => u.Id == indentHeader.Id);
+            var existingPurchaseIndent = await _dbContext.IndentHeader
+             .Include(cf => cf.IndentDetails)
+           .FirstOrDefaultAsync(u => u.Id == indentHeader.Id);
 
             var Indent = _imapper.Map<UpdatePurchaseIndentCommand>(existingPurchaseIndent);
-            
-               var StatusMisc = await _miscMasterQueryRepository.GetMiscMasterByName(MiscEnumEntity.Status, MiscEnumEntity.Open);
-             var IndentLog = new IndentLog
+
+            var StatusMisc = await _miscMasterQueryRepository.GetMiscMasterByName(MiscEnumEntity.Status, MiscEnumEntity.Open);
+            var IndentLog = new IndentLog
             {
                 IndentHeaderId = indentHeader.Id,
                 ActionType = "Updated",
@@ -69,15 +68,16 @@ namespace PurchaseManagement.Infrastructure.Repositories.PurchaseIndents
                 StatusId = StatusMisc.Id
             };
 
-                await _logServiceCommand.CreateAsync(IndentLog);
-            
+            await _logServiceCommand.CreateAsync(IndentLog);
+
             if (existingPurchaseIndent != null)
             {
-                _dbContext.IndentDepartmentMapping.RemoveRange(existingPurchaseIndent.IndentDepartmentMappings);
+
 
                 existingPurchaseIndent.IndentTypeId = indentHeader.IndentTypeId;
                 existingPurchaseIndent.IndentDate = indentHeader.IndentDate;
                 existingPurchaseIndent.UnitId = indentHeader.UnitId;
+                existingPurchaseIndent.DepartmentId = indentHeader.DepartmentId;
                 existingPurchaseIndent.Purpose = indentHeader.Purpose;
 
                 foreach (var updatedDetail in indentHeader.IndentDetails)
@@ -103,14 +103,35 @@ namespace PurchaseManagement.Infrastructure.Repositories.PurchaseIndents
                 }
 
 
-                if (indentHeader.IndentDepartmentMappings?.Any() == true)
-                    await _dbContext.IndentDepartmentMapping.AddRangeAsync(indentHeader.IndentDepartmentMappings);
-
-
                 return await _dbContext.SaveChangesAsync() > 0;
             }
-            
+
             return false;
+        }
+        public async Task<List<IndentDetail>> UpdateIndentDetailAsync(List<IndentDetail> indentDetail)
+        {
+            if (indentDetail == null || indentDetail.Count == 0)
+                    return new List<IndentDetail>();
+
+                var ids = indentDetail.Select(d => d.Id).ToList();
+
+                var existing = await _dbContext.IndentDetail
+                    .Where(d => ids.Contains(d.Id))
+                    .ToListAsync();
+
+                
+                foreach (var entity in existing)
+                {
+                    var incoming = indentDetail.FirstOrDefault(u => u.Id == entity.Id);
+                    if (incoming == null) continue;
+
+                    entity.ApprovedQuantity = incoming.ApprovedQuantity;
+                    
+                }
+
+                await _dbContext.SaveChangesAsync();
+                return existing;
+                
         }
     }
 }

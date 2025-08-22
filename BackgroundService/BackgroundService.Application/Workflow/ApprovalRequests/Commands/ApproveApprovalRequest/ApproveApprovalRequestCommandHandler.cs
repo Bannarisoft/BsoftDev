@@ -8,6 +8,7 @@ using BackgroundService.Application.Notification.Common.Interfaces;
 using BackgroundService.Application.Workflow.Common.Interfaces.IApprovalRequest;
 using BackgroundService.Domain.Common;
 using BackgroundService.Domain.Entities.Workflow;
+using Contracts.Dtos.Purchase;
 using Contracts.Events.Workflow;
 using MediatR;
 
@@ -58,36 +59,43 @@ namespace BackgroundService.Application.Workflow.ApprovalRequests.Commands.Appro
                 approval.StatusId = request.IsApproved == 1 ? statusApproved.Id : statusRejected.Id;
             }
             
-
-            // var ApprovalReq = new ApprovalRequest
-                // {
-                //     Id = request.Id,
-                //     StatusId = status.Id,
-                //     ModifiedIP = currentIp,
-                //     ModifiedDate = currentTime,
-                //     ModifiedBy = userId,
-                //     ModifiedByName = username,
-                //     Action = "test"
-                // };
                 var result = await _approvalRequestCommand.Approve(ApprovalReq,cancellationToken);
-            // if (ApprovalStepDetailId is not null)
-            // {
-            //     var correlationId = Guid.NewGuid();
-            //     var @event = new TransactionCreatedEvent
-            //     {
-            //         CorrelationId = correlationId,
-            //         ModuleTypeName = request.ModuleTypeName,
-            //         ModuleTransactionId = request.ModuleTransactionId,
-            //         UnitId = request.UnitId,
-            //         DepartmentId = request.DepartmentId
-            //     };
                 
-            //     await _eventPublisher.SaveEventAsync(@event);
-            //     await _eventPublisher.PublishPendingEventsAsync();
-            // }
-             
 
-            return result;          
+
+            if (result)
+            {
+                var ApprovalReqLine = _imapper.Map<List<UpdateApprovedQtyDto>>(request.ApprovalRequestLine);
+                
+                var correlationId = Guid.NewGuid();
+                var @event = new ApprovedRejectedEvent
+                {
+                    CorrelationId = correlationId,
+                    IndentId = request.ModuleTransactionId,
+                    ApprovedQty = ApprovalReqLine
+                };
+
+                await _eventPublisher.SaveEventAsync(@event);
+                await _eventPublisher.PublishPendingEventsAsync();
+            }
+            // if (ApprovalStepDetailId is not null)
+                // {
+                //     var correlationId = Guid.NewGuid();
+                //     var @event = new TransactionCreatedEvent
+                //     {
+                //         CorrelationId = correlationId,
+                //         ModuleTypeName = request.ModuleTypeName,
+                //         ModuleTransactionId = request.ModuleTransactionId,
+                //         UnitId = request.UnitId,
+                //         DepartmentId = request.DepartmentId
+                //     };
+
+                //     await _eventPublisher.SaveEventAsync(@event);
+                //     await _eventPublisher.PublishPendingEventsAsync();
+                // }
+
+
+                return result;          
         }
     }
 }

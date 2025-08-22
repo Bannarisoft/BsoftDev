@@ -1,4 +1,5 @@
 using Core.Application.Common.Interfaces;
+using Core.Application.Consumers;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +27,9 @@ namespace PurchaseManagement.Infrastructure
             // Configure MassTransit with RabbitMQ
             services.AddMassTransit(x =>
             {
+                x.SetKebabCaseEndpointNameFormatter();
+                x.AddConsumer<ApprovedRejectedConsumer>();
+
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host("localhost", "/", h =>
@@ -33,7 +37,14 @@ namespace PurchaseManagement.Infrastructure
                         h.Username("guest");
                         h.Password("guest");
                     });
+
+                     cfg.ReceiveEndpoint("approved-rejected-task-queue", e =>
+                    {
+                        e.ConfigureConsumer<ApprovedRejectedConsumer>(context);
+                    });
                 });
+
+                
             });
 
             // Ensure MassTransit background service is added

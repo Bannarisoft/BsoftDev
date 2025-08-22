@@ -13,7 +13,7 @@ namespace Core.Application.PurchaseIndents.Command.CreatePurchaseIndent
         public int IndentTypeId { get; set; }
         public int UnitId { get; set; }
         public string Purpose { get; set; }
+        public int DepartmentId { get; set; }
         public ICollection<IndentDetailDto> IndentDetails { get; set; }
-        public ICollection<IndentDepartmentDto> IndentDepartments { get; set; }
     }
 }

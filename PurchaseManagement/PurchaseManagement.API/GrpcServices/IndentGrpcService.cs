@@ -29,6 +29,7 @@ namespace PurchaseManagement.API.GrpcServices
                    IndentDate = indents.IndentDate.ToString("yyyy-MM-dd"),
                    IndentTypeId = indents.IndentTypeId,
                    UnitId = indents.UnitId,
+                   DepartmentId = indents.DepartmentId,
                    Purpose = indents.Purpose ?? ""
                };
 
@@ -47,15 +48,7 @@ namespace PurchaseManagement.API.GrpcServices
                 });
             }
 
-            foreach (var m in indents.IndentDepartmentMappings ?? Enumerable.Empty<IndentDepartmentMapping>())
-              {
-                  dto.IndentDepartmentMappings.Add(new IndentDepartmentMappingDto
-                  {
-                      Id = m.Id,
-                      IndentHeaderId = m.IndentHeaderId,
-                      DepartmentId = m.DepartmentId
-                  });
-              }
+            
 
                return response;
            }
