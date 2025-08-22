@@ -223,11 +223,13 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequest
             SELECT ARL.Id,ARL.ApprovalRequestId,ARL.ModuleLineTransactionId,ARL.ApproverBinding,ARL.ApproverValue,MM.Id,MM.Code FROM [AppData].[ApprovalRequest] AR
             INNER JOIN [AppData].[ApprovalRequestLine] ARL ON AR.Id =ARL.ApprovalRequestId
             INNER JOIN [AppData].[MiscMaster] MM ON MM.Id = ARL.StatusId
-            WHERE  AR.WorkflowType=@WorkflowType";
+            INNER JOIN [AppData].[ApprovalStepDetail] ARL ON ARL.Id = AR.
+            WHERE MM.Code=@Status AND  AR.WorkflowType=@WorkflowType";
 
                var parameters = new
             {
-                WorkflowType = WorkFlowType
+                WorkflowType = WorkFlowType,
+                Status = MiscEnumEntity.Pending
             };
 
             var ApprovalRequest = await _dbConnection.QueryAsync<ApprovalRequestLine, Domain.Entities.Notification.MiscMaster, ApprovalRequestLine>(
