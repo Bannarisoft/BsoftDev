@@ -11,11 +11,12 @@ message ApprovalStatusRequest {
     string ModuleTypeName = 1;
 }
 message ApprovalRequestLineStatusDto {
-    int32 Id = 1;
+    int32 ApprovalRequestLineId = 1;
     int32 ModuleLineTransactionId = 2;
     string Status = 3;
     string ApproverBinding = 4;
     string ApproverValue = 5;
+    int32 ApprovalRequestId =6;
 }
 
 message ApprovalLineStatusListResponse {

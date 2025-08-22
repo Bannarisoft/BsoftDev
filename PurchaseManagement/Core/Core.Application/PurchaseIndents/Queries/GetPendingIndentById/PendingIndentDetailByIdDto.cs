@@ -9,6 +9,8 @@ namespace Core.Application.PurchaseIndents.Queries.GetPendingIndentById
     {
         public int Id { get; set; }
         public int IndentHeaderId { get; set; }
+        public int ApprovalRequestId { get; set; }
+        public int ApprovalRequestLineId { get; set; }
         public int ItemId { get; set; }
         public decimal QuantityRequired { get; set; }
         public DateOnly RequiredDate { get; set; }
@@ -18,7 +20,7 @@ namespace Core.Application.PurchaseIndents.Queries.GetPendingIndentById
         public string Status { get; set; }
         public int ApproverId { get; set; }
         public string ApproverName { get; set; }
-        public string ViewOnly { get; set; }
+        public string IsApprover { get; set; }
         
     }
 }
