@@ -44,30 +44,29 @@ namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
             .HasColumnType("int")
             .IsRequired();
 
-            builder.Property(t => t.TargetTypeId)
-           .HasColumnName("TargetTypeId")
-           .HasColumnType("int")
-           .IsRequired();
+            builder.Property(t => t.StopOnFirstMatch)
+           .HasColumnName("StopOnFirstMatch")
+           .HasColumnType("bit")
+              .HasConversion(
+        v => v == 1,         
+        v => v ? (byte)1 : (byte)0 
+         )
+            .IsRequired();
 
             builder.Property(t => t.ApprovalStepId)
             .HasColumnName("ApprovalStepId")
             .HasColumnType("int")
             .IsRequired();
 
-            builder.Property(t => t.ApprovalTypeId)
-           .HasColumnName("ApprovalTypeId")
-           .HasColumnType("int")
-           .IsRequired();
+             builder.Property(t => t.Binding)
+            .HasColumnName("Binding")
+            .HasColumnType("nvarchar(10)")
+            .IsRequired();
 
-            builder.Property(t => t.SLAHours)
-            .HasColumnName("SLAHours")
-            .HasColumnType("decimal(18,2)")
-            .IsRequired(false);
-
-            builder.Property(t => t.OnSLAAction)
-            .HasColumnName("OnSLAAction")
-            .HasColumnType("varchar(50)")
-            .IsRequired(false);
+            builder.Property(t => t.Value)
+            .HasColumnName("Value")
+            .HasColumnType("nvarchar(200)")
+            .IsRequired();
 
             builder.Property(cf => cf.IsActive)
             .HasColumnName("IsActive")
@@ -105,10 +104,6 @@ namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
             .HasForeignKey(ac => ac.ApprovalStepId)
             .OnDelete(DeleteBehavior.NoAction);
           
-          builder.HasOne(ac => ac.ApprovalType)
-          .WithMany(am => am.ApprovalType)
-          .HasForeignKey(ac => ac.ApprovalTypeId)
-          .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

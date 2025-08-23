@@ -19,12 +19,11 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
             b.Property(x => x.ItemId)
              .HasColumnName("ItemId")
              .HasColumnType("int")
-             .IsRequired();
-            b.HasIndex(x => x.ItemId).IsUnique();  
+             .IsRequired();            
             b.HasOne(x => x.Item)
              .WithOne(i => i.Inventory)
              .HasForeignKey<ItemInventory>(x => x.ItemId)
-             .OnDelete(DeleteBehavior.Cascade);
+             .OnDelete(DeleteBehavior.Restrict);
             
             b.Property(x => x.Weight)
              .HasColumnName("Weight")
@@ -47,7 +46,7 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
             b.HasOne(x => x.MiscDefaultMaterialRequestType)
              .WithMany(g => g.ItemInventoryDefaultMaterialRequestType) 
              .HasForeignKey(x => x.DefaultMaterialRequestTypeId)
-             .OnDelete(DeleteBehavior.NoAction);
+             .OnDelete(DeleteBehavior.Restrict);
 
             b.Property(x => x.ValuationMethodId)
              .HasColumnName("ValuationMethodId")
@@ -56,7 +55,7 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
             b.HasOne(x => x.MiscValuationMethod)
              .WithMany(g => g.ItemInventoryValuationMethod)              
              .HasForeignKey(x => x.ValuationMethodId)
-             .OnDelete(DeleteBehavior.NoAction);
+             .OnDelete(DeleteBehavior.Restrict);
 
             b.Property(x => x.ShelfLife)
              .HasColumnName("ShelfLife")
@@ -100,7 +99,7 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
             b.HasOne(x => x.MiscRequestType)
              .WithMany(g => g.ItemInventoryRequestType) 
              .HasForeignKey(x => x.RequestTypeId)
-             .OnDelete(DeleteBehavior.NoAction); 
+             .OnDelete(DeleteBehavior.Restrict); 
 
             b.Property(x => x.AllowNegativeStock)
              .HasColumnName("AllowNegativeStock")

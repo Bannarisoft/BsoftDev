@@ -1,5 +1,7 @@
 
+using Contracts.Interfaces.External.IParty;
 using Contracts.Interfaces.External.IUser;
+using GrpcServices.PartyManagement;
 using GrpcServices.UserManagement;
 using InventoryManagement.Infrastructure.GrpcClients;
 using Microsoft.Extensions.Configuration;
@@ -17,6 +19,7 @@ namespace InventoryManagement.Infrastructure
         public static IServiceCollection AddHttpClients(this IServiceCollection services, IConfiguration configuration)
         {
             var userManagementUrl = configuration["GrpcSettings:UserManagementUrl"];
+            var partyManagementUrl = configuration["GrpcSettings:PartyManagementUrl"];
 
             
             // ✅ Register Session gRPC Client
@@ -29,7 +32,46 @@ namespace InventoryManagement.Infrastructure
             .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
 
             services.AddScoped<IUserSessionGrpcClient, GrpcUserSessionClient>();
+            //unit grpc
+            services.AddGrpcClient<UnitService.UnitServiceClient>(options =>
+            {
+                options.Address = new Uri(userManagementUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            })
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
 
+            services.AddScoped<IUnitGrpcClient, UnitGrpcClient>();
+
+            //party grpc
+            services.AddGrpcClient<PartyService.PartyServiceClient>(options =>
+            {
+                options.Address = new Uri(partyManagementUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            })
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+
+            services.AddScoped<IPartyGrpcClient, PartyGrpcClient>();
+            //country grpc
+              services.AddGrpcClient<CountryService.CountryServiceClient>(options =>
+            {
+                options.Address = new Uri(userManagementUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            })
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+
+            services.AddScoped<ICountryGrpcClient,CountryGrpcClient>();
 
             return services;
         }

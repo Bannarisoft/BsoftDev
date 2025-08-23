@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AutoMapper;
+using Contracts.Events.Workflow;
 using Core.Application.Common.Exceptions;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.ILogService;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IPurchaseIndent;
@@ -22,8 +24,10 @@ namespace Core.Application.PurchaseIndents.Command.CreatePurchaseIndent
         private readonly ILogServiceCommand _logServiceCommand;
         private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
         private readonly IPurchaseIndentQuery _purchaseIndentQuery;
+        private readonly IEventPublisher _eventPublisher;
         public CreatePurchaseIndentCommandHandler(IPurchaseIndentCommand purchaseIndentCommand, IMapper imapper,
-        IMediator mediator, ILogServiceCommand logServiceCommand, IMiscMasterQueryRepository miscMasterQueryRepository, IPurchaseIndentQuery purchaseIndentQuery)
+        IMediator mediator, ILogServiceCommand logServiceCommand, IMiscMasterQueryRepository miscMasterQueryRepository, IPurchaseIndentQuery purchaseIndentQuery,
+        IEventPublisher eventPublisher)
         {
             _purchaseIndentCommand = purchaseIndentCommand;
             _imapper = imapper;
@@ -31,6 +35,7 @@ namespace Core.Application.PurchaseIndents.Command.CreatePurchaseIndent
             _logServiceCommand = logServiceCommand;
             _miscMasterQueryRepository = miscMasterQueryRepository;
             _purchaseIndentQuery = purchaseIndentQuery;
+            _eventPublisher = eventPublisher;
         }
         public async Task<int> Handle(CreatePurchaseIndentCommand request, CancellationToken cancellationToken)
         {
@@ -43,18 +48,39 @@ namespace Core.Application.PurchaseIndents.Command.CreatePurchaseIndent
 
             var StatusMisc = await _miscMasterQueryRepository.GetMiscMasterByName(MiscEnumEntity.Status, MiscEnumEntity.Open);
 
+            var indentReverseMap = _imapper.Map<IndentReverseMapDto>(result);
+
+            string serializedPayload = JsonSerializer.Serialize(indentReverseMap);
+
             var IndentLog = new IndentLog
             {
-                IndentHeaderId = result,
+                IndentHeaderId = result.Id,
                 ActionType = "Created",
                 ActionRemarks = "Indent Created",
-                NewData = JsonSerializer.Serialize(request),
+                NewData = serializedPayload,
                 StatusId = StatusMisc.Id
             };
 
                 await _logServiceCommand.CreateAsync(IndentLog);
+
+            if (result.Id > 0)
+            {
+                var correlationId = Guid.NewGuid();
+                var @event = new TransactionCreatedEvent
+                {
+                    CorrelationId = correlationId,
+                    ModuleTypeName = MiscEnumEntity.PurchaseIndent,
+                    ModuleTransactionId = result.Id,
+                    UnitId = request.UnitId,
+                    DepartmentId = request.DepartmentId,
+                    Payload = serializedPayload
+                };
+
+                await _eventPublisher.SaveEventAsync(@event);
+                await _eventPublisher.PublishPendingEventsAsync();
+            }
             
-            return result > 0 ? result : throw new ExceptionRules("Indent Creation Failed.");
+            return result.Id > 0 ? result.Id : throw new ExceptionRules("Indent Creation Failed.");
         }
     }
 }

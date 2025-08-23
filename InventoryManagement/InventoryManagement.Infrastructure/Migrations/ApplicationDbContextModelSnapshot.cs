@@ -547,8 +547,7 @@ namespace InventoryManagement.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ItemId")
-                        .IsUnique();
+                    b.HasIndex("ItemId");
 
                     b.HasIndex("ManufacturingTypeId");
 
@@ -816,8 +815,7 @@ namespace InventoryManagement.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ItemId")
-                        .IsUnique();
+                    b.HasIndex("ItemId");
 
                     b.ToTable("ItemSupplier", "Inventory");
                 });
@@ -847,8 +845,7 @@ namespace InventoryManagement.Infrastructure.Migrations
 
                     b.HasIndex("ConversionUOMId");
 
-                    b.HasIndex("ItemId")
-                        .IsUnique();
+                    b.HasIndex("ItemId");
 
                     b.ToTable("ItemUOM", "Inventory");
                 });
@@ -1408,23 +1405,23 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.MiscMaster", "MiscDefaultMaterialRequestType")
                         .WithMany("ItemInventoryDefaultMaterialRequestType")
                         .HasForeignKey("DefaultMaterialRequestTypeId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Core.Domain.Entities.Item.ItemDetail.ItemMaster", "Item")
                         .WithOne("Inventory")
                         .HasForeignKey("Core.Domain.Entities.Item.ItemDetail.ItemInventory", "ItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.MiscMaster", "MiscRequestType")
                         .WithMany("ItemInventoryRequestType")
                         .HasForeignKey("RequestTypeId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Core.Domain.Entities.MiscMaster", "MiscValuationMethod")
                         .WithMany("ItemInventoryValuationMethod")
                         .HasForeignKey("ValuationMethodId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Core.Domain.Entities.UOM", "WeightUOM")
                         .WithMany("InventoryUOM")
@@ -1447,13 +1444,13 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.Item.ItemDetail.ItemMaster", "Item")
                         .WithMany("Manufacture")
                         .HasForeignKey("ItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.MiscMaster", "MiscManufactureType")
                         .WithMany("ItemManufactureType")
                         .HasForeignKey("ManufacturingTypeId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Item");
@@ -1476,7 +1473,7 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.MiscMaster", "MiscClassification")
                         .WithMany("ItemMasterClassification")
                         .HasForeignKey("ItemClassificationId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Core.Domain.Entities.Item.ItemGroup", "ItemGroup")
                         .WithMany("ItemMasterGroup")
@@ -1496,7 +1493,7 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.MiscMaster", "MiscStatus")
                         .WithMany("ItemMasterStatus")
                         .HasForeignKey("XPlantMaterialStatusId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("HSNMaster");
 
@@ -1518,7 +1515,7 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.Item.ItemDetail.ItemMaster", "Item")
                         .WithOne("Purchase")
                         .HasForeignKey("Core.Domain.Entities.Item.ItemDetail.ItemPurchase", "ItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.UOM", "PurchaseUOM")
@@ -1546,7 +1543,7 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.Item.ItemDetail.ItemMaster", "Item")
                         .WithOne("Quality")
                         .HasForeignKey("Core.Domain.Entities.Item.ItemDetail.ItemQuality", "ItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("InspectionTemplate");
@@ -1561,7 +1558,7 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.Item.ItemDetail.ItemMaster", "Item")
                         .WithMany("Suppliers")
                         .HasForeignKey("ItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Item");
@@ -1578,7 +1575,7 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.Item.ItemDetail.ItemMaster", "Item")
                         .WithMany("ItemUOMs")
                         .HasForeignKey("ItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("ConversionUOM");
@@ -1591,18 +1588,18 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.MiscTypeMaster", "MiscAttributeGroup")
                         .WithMany("ItemAttributeGroup")
                         .HasForeignKey("AttributeGroupId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Core.Domain.Entities.MiscMaster", "MiscAttribute")
                         .WithMany("ItemAttribute")
                         .HasForeignKey("AttributeId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.Item.ItemDetail.ItemMaster", "ItemMaster")
                         .WithMany("VariantValues")
                         .HasForeignKey("ItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.Item.ItemDetail.ItemMaster", "NewItem")
@@ -1613,7 +1610,7 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.MiscMaster", "MiscVariantBasedOn")
                         .WithMany("ItemAttributeBasedOn")
                         .HasForeignKey("VariantBasedOn")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("ItemMaster");

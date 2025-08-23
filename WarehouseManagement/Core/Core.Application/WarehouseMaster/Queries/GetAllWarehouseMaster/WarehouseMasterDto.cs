@@ -40,7 +40,9 @@ namespace Core.Application.WarehouseMaster.GetAllWarehouseMaster
         public bool IsScrapWarehouse { get; set; }
         public bool IsTransitWarehouse { get; set; }
         public decimal MaxCapacity { get; set; }
-        public bool IsDefaultStockEntry { get; set; }        
+        public bool IsDefaultStockEntry { get; set; }
         public byte IsActive { get; set; }
+        
+         public List<int> AllowedItemGroupIds { get; set; } = new();
     }
 }

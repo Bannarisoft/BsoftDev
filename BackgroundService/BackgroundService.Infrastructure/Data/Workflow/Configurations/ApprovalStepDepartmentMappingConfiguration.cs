@@ -12,7 +12,7 @@ namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
     {
         public void Configure(EntityTypeBuilder<ApprovalStepDepartmentMapping> builder)
         {
-             builder.ToTable("ApprovalStepDepartmentMapping", "AppData");
+            builder.ToTable("ApprovalStepDepartmentMapping", "AppData");
 
             builder.HasKey(t => t.Id);
             builder.Property(t => t.Id)

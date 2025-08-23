@@ -6,6 +6,8 @@ using Core.Application.PurchaseIndents.Command.CreatePurchaseIndent;
 using Core.Application.PurchaseIndents.Command.DeletePurchaseIndent;
 using Core.Application.PurchaseIndents.Command.UpdatePurchaseIndent;
 using Core.Application.PurchaseIndents.Queries.GetAllPurchaseIndent;
+using Core.Application.PurchaseIndents.Queries.GetPendingIndent;
+using Core.Application.PurchaseIndents.Queries.GetPendingIndentById;
 using Core.Application.PurchaseIndents.Queries.GetPurchaseIndentById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -76,11 +78,38 @@ namespace PurchaseManagement.API.Controllers
             });
 
         }
-         [HttpGet("{id}")]        
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var Indent = await Mediator.Send(new GetPurchaseIndentByIdQuery() { Id = id});           
-            return Ok(new { StatusCode=StatusCodes.Status200OK, data = Indent,message = "" });            
+            var Indent = await Mediator.Send(new GetPurchaseIndentByIdQuery() { Id = id });
+            return Ok(new { StatusCode = StatusCodes.Status200OK, data = Indent, message = "" });
         }
+        [HttpGet("pending")]
+        public async Task<IActionResult> GetPendingPurchaseIndentAsync([FromQuery] int PageNumber, [FromQuery] int PageSize, [FromQuery] string? SearchTerm = null)
+        {
+            var PurchaseIndent = await Mediator.Send(
+             new GetPendingIndentQuery
+             {
+                 PageNumber = PageNumber,
+                 PageSize = PageSize,
+                 SearchTerm = SearchTerm
+             });
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data = PurchaseIndent.Data,
+                TotalCount = PurchaseIndent.TotalCount,
+                PageNumber = PurchaseIndent.PageNumber,
+                PageSize = PurchaseIndent.PageSize
+            });
+        }
+        
+         [HttpGet("pending/{id}")]
+        public async Task<IActionResult> GetPendingIndentByIdAsync(int id)
+        {
+            var Indent = await Mediator.Send(new GetPendingIndentByIdQuery() { Id = id });
+            return Ok(new { StatusCode = StatusCodes.Status200OK, data = Indent, message = "" });
+        }
+
     }
 }

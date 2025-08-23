@@ -3,6 +3,7 @@ using Core.Application.Item.ItemDetail.Queries.GetAllItems;
 using Core.Domain.Entities.Item.ItemDetail;
 using Core.Domain.Entities.Item.ItemDetail.Variant;
 
+using DomainStatus = Core.Domain.Common.BaseEntity.Status;
 namespace Core.Application.Common.Mappings.Item.ItemDetail
 {
     public sealed class ItemProfile : Profile
@@ -10,11 +11,17 @@ namespace Core.Application.Common.Mappings.Item.ItemDetail
         public ItemProfile()
         {
             // ---------------- WRITE MAPS (DTO -> Entity) ----------------
+            CreateMap<byte, DomainStatus>()
+                .ConvertUsing(b => b == 1 ? DomainStatus.Active : DomainStatus.Inactive);
+
+            CreateMap<DomainStatus, byte>()
+                .ConvertUsing(s => s == DomainStatus.Active ? (byte)1 : (byte)0);
+
             CreateMap<ItemDto, ItemMaster>()
                 .ForMember(d => d.Id, o => o.Ignore())
                 .ForMember(d => d.ParentItemId,
                     o => o.MapFrom(src => src.ParentItemId > 0 ? src.ParentItemId : (int?)null))
-                // ignore navs/collections — handled by dedicated repos
+                .ForMember(d => d.IsActive, o => o.MapFrom(src => src.IsActive))
                 .ForMember(d => d.ChildItems, o => o.Ignore())
                 .ForMember(d => d.Purchase, o => o.Ignore())
                 .ForMember(d => d.Inventory, o => o.Ignore())

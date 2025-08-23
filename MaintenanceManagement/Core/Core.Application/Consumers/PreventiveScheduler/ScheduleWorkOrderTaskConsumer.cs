@@ -47,8 +47,10 @@ namespace Core.Application.Consumers.PreventiveScheduler
                 {
 
 
-                    var startDateTime = detail.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue);
-                    var delay = startDateTime - DateTime.Today;
+                    // var startDateTime = detail.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue);
+                    var targetDateTime = detail.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue);
+                    var delay = targetDateTime - DateTime.Now;
+                    // var delay = startDateTime - DateTime.Today;
                     string newJobId;
                     var delayInMinutes = (int)delay.TotalMinutes;
                     

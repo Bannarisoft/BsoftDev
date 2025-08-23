@@ -8,7 +8,6 @@ public abstract class ItemLogRepositoryBase
 {
     protected readonly ApplicationDbContext _db;
     private readonly IIPAddressService _ipAddressService;
-
     public record PropertyChange(string Property, string? OldValue, string? NewValue);
 
     // Properties we don't want to log (keys/audit/rowversion etc.)
@@ -126,7 +125,7 @@ public abstract class ItemLogRepositoryBase
                 PropertyName = c.Property,
                 OldValue = c.OldValue,
                 NewValue = c.NewValue,
-                CreatedBy = int.Parse(_ipAddressService.GetCurrentUserId()),
+                CreatedBy = _ipAddressService.GetUserId(),
                 CreatedDate = DateTime.UtcNow,
                 CreatedByName = _ipAddressService.GetUserName(),
                 CreatedIP = _ipAddressService.GetSystemIPAddress()

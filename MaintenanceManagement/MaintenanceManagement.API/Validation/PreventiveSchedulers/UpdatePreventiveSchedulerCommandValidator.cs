@@ -8,6 +8,7 @@ using Core.Application.Common.Interfaces.IMachineGroup;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveScheduler;
+using Core.Domain.Common;
 using FluentValidation;
 using MaintenanceManagement.API.Validation.Common;
 
@@ -183,7 +184,29 @@ namespace MaintenanceManagement.API.Validation.PreventiveSchedulers
                                 RuleFor(x => x.MachineGroupId)
                                   .MustAsync(async (MachineGroupId, cancellation) => 
                                  await _preventiveSchedulerQuery.MachingroupValidation(MachineGroupId))
-                                .WithMessage($"{rule.Error}"); 
+                                .WithMessage($"{rule.Error}");
+
+                                RuleFor(x => x.Id)
+                                .MustAsync(async (command,id, context,cancellation) =>
+                                 {
+                                         var current = await _preventiveSchedulerQuery
+                                                .OnetimeFrequencyValidation(id, cancellation);
+
+                                                var incoming = command.FrequencyTypeId;
+                                                var incomingFrequency = await _miscMasterQueryRepository.GetByIdAsync(incoming);
+                                               if (current.FrequencyTypeId == incoming) return true;
+
+                                         var isFlip =
+                                          (current.MiscFrequencyType.Code == MiscEnumEntity.FrequencyType.Code && incomingFrequency.Code == MiscEnumEntity.Every)
+                                          || (current.MiscFrequencyType.Code == MiscEnumEntity.Every && incomingFrequency.Code == MiscEnumEntity.FrequencyType.Code);
+                                                 if (!isFlip) return true;
+                                                
+                
+                                   return !await _preventiveSchedulerQuery.OneTimeSchedulerValidate(
+                                                                                     id,
+                                                                                     cancellation); 
+                                  })                
+                               .WithMessage("Work Order has already been generated. You cannot update frequency type."); 
                                 break;
                     default:                        
                         break;   

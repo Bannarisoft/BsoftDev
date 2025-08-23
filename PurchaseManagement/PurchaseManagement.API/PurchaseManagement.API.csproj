@@ -28,5 +28,8 @@
     <ProjectReference Include="..\PurchaseManagement.Infrastructure\PurchaseManagement.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Shared\Contracts\Contracts.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Protobuf Include="..\..\Shared\Contracts\Protos\indent.proto" GrpcServices="Server"/>
+</ItemGroup>
 
 </Project>

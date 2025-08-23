@@ -89,11 +89,11 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalStepDet
                          Id = workFlow.Id,
                          ModuleTypeName = workFlow.ModuleTypeName
                      };
-                     detail.ApprovalType = new Domain.Entities.Notification.MiscMaster
-                     {
-                         Id = approvalType.Id,
-                         Code = approvalType.Code
-                     };
+                    //  detail.ApprovalType = new Domain.Entities.Notification.MiscMaster
+                    //  {
+                    //      Id = approvalType.Id,
+                    //      Code = approvalType.Code
+                    //  };
                      return detail;
                 },
                 parameters,
@@ -122,16 +122,17 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalStepDet
 
               var ApprovalStepDetailDictionary = new Dictionary<int, ApprovalStepDetail>();
 
-            var ApprovalStepDetailResponse = await _dbConnection.QueryAsync<ApprovalStepDetail, ApprovalStepUnitMapping, ApprovalStepDepartmentMapping, RuleSkipApproverMapping,ApprovalStepDetail>(
+            // var ApprovalStepDetailResponse = await _dbConnection.QueryAsync<ApprovalStepDetail, ApprovalStepUnitMapping, ApprovalStepDepartmentMapping, RuleSkipApproverMapping,ApprovalStepDetail>(
+            var ApprovalStepDetailResponse = await _dbConnection.QueryAsync<ApprovalStepDetail, ApprovalStepUnitMapping,ApprovalStepDetail>(
                 query,
-                (approvalStep, approvalStepUnit, approvalStepDepartment, ruleSkipApprover) =>
+                (approvalStep, approvalStepUnit) =>
                 {
                     if (!ApprovalStepDetailDictionary.TryGetValue(approvalStep.Id, out var existingApprovalStep))
                     {
                         existingApprovalStep = approvalStep;
                         existingApprovalStep.ApprovalStepUnitMappings = new List<ApprovalStepUnitMapping>();
-                        existingApprovalStep.ApprovalStepDepartmentMappings = new List<ApprovalStepDepartmentMapping>();
-                        existingApprovalStep.RuleSkipApproverMappings = new List<RuleSkipApproverMapping>();
+                        // existingApprovalStep.ApprovalStepDepartmentMappings = new List<ApprovalStepDepartmentMapping>();
+                        // existingApprovalStep.RuleSkipApproverMappings = new List<RuleSkipApproverMapping>();
                         ApprovalStepDetailDictionary[approvalStep.Id] = existingApprovalStep;
                     }
 
@@ -141,16 +142,16 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalStepDet
                         existingApprovalStep.ApprovalStepUnitMappings.Add(approvalStepUnit);
                     }
 
-                     if (!existingApprovalStep.ApprovalStepDepartmentMappings!
-                        .Any(a => a.Id == approvalStepDepartment.Id))
-                    {
-                        existingApprovalStep.ApprovalStepDepartmentMappings.Add(approvalStepDepartment);
-                    }
-                    if (!existingApprovalStep.RuleSkipApproverMappings!
-                        .Any(a => a.Id == ruleSkipApprover.Id))
-                    {
-                        existingApprovalStep.RuleSkipApproverMappings.Add(ruleSkipApprover);
-                    }
+                    //  if (!existingApprovalStep.ApprovalStepDepartmentMappings!
+                    //     .Any(a => a.Id == approvalStepDepartment.Id))
+                    // {
+                    //     existingApprovalStep.ApprovalStepDepartmentMappings.Add(approvalStepDepartment);
+                    // }
+                    // if (!existingApprovalStep.RuleSkipApproverMappings!
+                    //     .Any(a => a.Id == ruleSkipApprover.Id))
+                    // {
+                    //     existingApprovalStep.RuleSkipApproverMappings.Add(ruleSkipApprover);
+                    // }
 
                     return existingApprovalStep;
                 },

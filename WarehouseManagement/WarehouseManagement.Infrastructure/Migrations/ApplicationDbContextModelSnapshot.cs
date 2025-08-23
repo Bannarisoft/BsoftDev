@@ -22,6 +22,79 @@ namespace WarehouseManagement.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Core.Domain.Entities.BinMaster", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("BinCapacity")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<string>("BinCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("BinName")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("CapacityUOMId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("IsActive")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IsDeleted")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("RackId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RackId");
+
+                    b.HasIndex("WarehouseId", "BinCode")
+                        .IsUnique()
+                        .HasDatabaseName("UQ_Bin_Warehouse_BinCode");
+
+                    b.ToTable("BinMaster", "Warehouse", t =>
+                        {
+                            t.HasCheckConstraint("CK_BinCapacity_Positive", "[BinCapacity] > 0");
+                        });
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.RackMaster", b =>
                 {
                     b.Property<int>("Id")
@@ -309,6 +382,24 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.ToTable("WarehouseMaster", "Warehouse");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.BinMaster", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.RackMaster", "Rack")
+                        .WithMany("Bins")
+                        .HasForeignKey("RackId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Core.Domain.Entities.WarehouseMaster", "Warehouse")
+                        .WithMany("Bins")
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Rack");
+
+                    b.Navigation("Warehouse");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.RackMaster", b =>
                 {
                     b.HasOne("Core.Domain.Entities.WarehouseMaster", "Warehouse")
@@ -341,9 +432,16 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Navigation("ParentWarehouse");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.RackMaster", b =>
+                {
+                    b.Navigation("Bins");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.WarehouseMaster", b =>
                 {
                     b.Navigation("AllowedItemGroups");
+
+                    b.Navigation("Bins");
 
                     b.Navigation("ChildWarehouses");
 

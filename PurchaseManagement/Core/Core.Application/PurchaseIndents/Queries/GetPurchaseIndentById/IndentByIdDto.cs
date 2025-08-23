@@ -12,8 +12,8 @@ namespace Core.Application.PurchaseIndents.Queries.GetPurchaseIndentById
         public DateOnly IndentDate { get; set; }
         public int IndentTypeId { get; set; }
         public int UnitId { get; set; }
+        public int DepartmentId { get; set; }
         public string Purpose { get; set; }
-        public ICollection<IndentDepartmentByIdDto> IndentDepartments { get; set; }
         public ICollection<IndentDetailByIdDto> IndentDetails { get; set; }
     }
 }

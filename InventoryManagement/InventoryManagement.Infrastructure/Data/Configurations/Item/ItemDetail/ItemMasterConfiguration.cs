@@ -59,7 +59,7 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
             b.HasOne(x => x.MiscClassification)
              .WithMany(c => c.ItemMasterClassification)
              .HasForeignKey(x => x.ItemClassificationId)
-             .OnDelete(DeleteBehavior.NoAction);
+             .OnDelete(DeleteBehavior.Restrict);
 
             b.Property(x => x.Description).HasColumnName("Description").HasColumnType("varchar(500)").IsRequired(false);
             b.Property(x => x.ValidFrom).HasColumnName("ValidFrom").HasColumnType("date").IsRequired(false);
@@ -68,7 +68,7 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
             b.HasOne(x => x.MiscStatus)
              .WithMany(c => c.ItemMasterStatus)
              .HasForeignKey(x => x.XPlantMaterialStatusId)
-             .OnDelete(DeleteBehavior.NoAction);
+             .OnDelete(DeleteBehavior.Restrict);
 
             b.Property(x => x.IsStockItem).HasColumnName("IsStockItem").HasColumnType("bit");
             b.Property(x => x.MaintainStock).HasColumnName("MaintainStock").HasColumnType("bit");
@@ -82,51 +82,6 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
              .OnDelete(DeleteBehavior.Restrict);
 
             b.Property(x => x.ItemImage).HasColumnName("ItemImage").HasColumnType("nvarchar(255)").IsRequired(false);
-
-            // ---------- IMPORTANT PART: set dependents to Restrict ----------
-            // 1:1 tabs – DO NOT cascade; prevent delete when a tab exists
-            b.HasOne(x => x.Purchase)
-             .WithOne(p => p.Item)
-             .HasForeignKey<ItemPurchase>(p => p.ItemId)
-             .OnDelete(DeleteBehavior.Restrict);
-
-            b.HasOne(x => x.Inventory)
-             .WithOne(i => i.Item)
-             .HasForeignKey<ItemInventory>(i => i.ItemId)
-             .OnDelete(DeleteBehavior.Restrict);
-
-            b.HasOne(x => x.Quality)
-             .WithOne(q => q.Item)
-             .HasForeignKey<ItemQuality>(q => q.ItemId)
-             .OnDelete(DeleteBehavior.Restrict);
-
-            // Collections – Restrict so parent delete fails if any rows exist
-            b.HasMany(x => x.Suppliers)
-             .WithOne(s => s.Item)
-             .HasForeignKey(s => s.ItemId)
-             .OnDelete(DeleteBehavior.Restrict);
-
-            b.HasMany(x => x.Manufacture)
-             .WithOne(m => m.Item)
-             .HasForeignKey(m => m.ItemId)
-             .OnDelete(DeleteBehavior.Restrict);
-
-            b.HasMany(x => x.ItemUOMs)
-             .WithOne(u => u.Item)
-             .HasForeignKey(u => u.ItemId)
-             .OnDelete(DeleteBehavior.Restrict);
-
-            // Variants – Restrict (prevents deleting item while variant rows exist)
-            b.HasMany(x => x.VariantValues)
-             .WithOne(v => v.ItemMaster)
-             .HasForeignKey(v => v.ItemId)
-             .OnDelete(DeleteBehavior.Restrict);
-
-            // If you also have the reverse link (NewItemId -> ItemMaster)
-            b.HasMany(x => x.VariantNewItem)
-             .WithOne(v => v.NewItem)
-             .HasForeignKey(v => v.NewItemId)
-             .OnDelete(DeleteBehavior.Restrict);
 
             // --- BaseEntity columns (unchanged) ---
             b.Property(x => x.IsActive).HasColumnName("IsActive").HasColumnType("bit").HasConversion(statusConverter).IsRequired();

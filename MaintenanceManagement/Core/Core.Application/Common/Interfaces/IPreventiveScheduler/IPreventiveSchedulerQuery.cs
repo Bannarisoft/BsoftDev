@@ -8,7 +8,7 @@ namespace Core.Application.Common.Interfaces.IPreventiveScheduler
 {
     public interface IPreventiveSchedulerQuery
     {
-        Task<(IEnumerable<dynamic> PreventiveSchedulerList, int)> GetAllPreventiveSchedulerAsync(int PageNumber, int PageSize, string? SearchTerm,List<int> departmentIds);
+        Task<(IEnumerable<dynamic> PreventiveSchedulerList, int)> GetAllPreventiveSchedulerAsync(int PageNumber, int PageSize, string? SearchTerm, List<int> departmentIds);
         Task<PreventiveSchedulerHeader> GetByIdAsync(int id);
 
         Task<bool> SoftDeleteValidation(int Id);
@@ -33,5 +33,7 @@ namespace Core.Application.Common.Interfaces.IPreventiveScheduler
         Task<Core.Domain.Entities.ActivityMaster> GetActivityIdByName(string ActivityName);
         Task<PreventiveSchedulerHeader> GetDetailSchedulerByPreventiveScheduleId(int Id);
         Task<List<Core.Domain.Entities.MachineMaster>> GetUnMappedMachineIdByCode(int Id);
+        Task<bool> OneTimeSchedulerValidate(int preventiveSchedulerId, CancellationToken ct);
+         Task<PreventiveSchedulerHeader> OnetimeFrequencyValidation(int id, CancellationToken ct);
     }
 }

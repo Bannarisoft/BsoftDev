@@ -57,7 +57,7 @@ namespace Core.Application.WarehouseMaster.Command.UpdateWarehouseMaster
             }
 
             // Step 4: Save
-            var updatedId = await _warehouseMasterCommandRepository.UpdateAsync(warehouse);
+            var updatedId = await _warehouseMasterCommandRepository.UpdateAsync(warehouse);                            
 
             // Step 5: Audit Log
             var audit = new AuditLogsDomainEvent(

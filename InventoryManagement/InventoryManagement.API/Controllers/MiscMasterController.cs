@@ -73,10 +73,10 @@ namespace InventoryManagement.API.Controllers
            
         }
             [HttpGet("by-name")]
-        public async Task<IActionResult> GetMiscMaster([FromQuery] string? name,[FromQuery] string MiscTypeCode)
+        public async Task<IActionResult> GetMiscMaster([FromQuery] string? name,[FromQuery] string? MiscTypeCode,string? MiscTypeDesc)
         {
           
-            var miscmaster = await Mediator.Send(new GetMiscMasterAutoCompleteQuery {SearchPattern = name,MiscTypeCode=MiscTypeCode});
+            var miscmaster = await Mediator.Send(new GetMiscMasterAutoCompleteQuery {SearchPattern = name,MiscTypeCode=MiscTypeCode,MiscTypeDesc=MiscTypeDesc});
             
             return Ok( new { StatusCode=StatusCodes.Status200OK, data = miscmaster });
             

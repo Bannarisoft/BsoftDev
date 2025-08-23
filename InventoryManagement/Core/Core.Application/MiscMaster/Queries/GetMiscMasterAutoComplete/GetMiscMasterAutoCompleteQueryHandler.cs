@@ -25,7 +25,7 @@ namespace Core.Application.MiscMaster.Queries.GetMiscMasterAutoComplete
 
           public  async Task<List<GetMiscMasterAutoCompleteDto>> Handle(GetMiscMasterAutoCompleteQuery request, CancellationToken cancellationToken)
         {
-            var miscTypeMasters  = await _miscMasterQueryRepository.GetMiscMaster(request.SearchPattern,request.MiscTypeCode);
+            var miscTypeMasters  = await _miscMasterQueryRepository.GetMiscMaster(request.SearchPattern,request.MiscTypeCode,request.MiscTypeDesc);
 
            
 
