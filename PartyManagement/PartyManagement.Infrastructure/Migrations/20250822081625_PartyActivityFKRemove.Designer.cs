@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PartyManagement.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using PartyManagement.Infrastructure.Data;
 namespace PartyManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250822081625_PartyActivityFKRemove")]
+    partial class PartyActivityFKRemove
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -199,12 +202,17 @@ namespace PartyManagement.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("PartyId");
 
+                    b.Property<int?>("PartyMasterId")
+                        .HasColumnType("int");
+
                     b.Property<string>("TableName")
                         .IsRequired()
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("TableName");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PartyMasterId");
 
                     b.ToTable("PartyActivityLog", "Party");
                 });
@@ -505,10 +513,6 @@ namespace PartyManagement.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CIN")
-                        .HasColumnType("nvarchar(25)")
-                        .HasColumnName("CIN");
-
                     b.Property<int>("CompanyId")
                         .HasColumnType("int")
                         .HasColumnName("CompanyId");
@@ -552,17 +556,9 @@ namespace PartyManagement.Infrastructure.Migrations
                         .HasColumnType("nvarchar(20)")
                         .HasColumnName("GSTNumber");
 
-                    b.Property<DateTimeOffset?>("GSTRegistrationDate")
-                        .HasColumnType("datetimeoffset")
-                        .HasColumnName("GSTRegistrationDate");
-
                     b.Property<int?>("GSTStateCode")
                         .HasColumnType("int")
                         .HasColumnName("GSTStateCode");
-
-                    b.Property<string>("IECode")
-                        .HasColumnType("nvarchar(25)")
-                        .HasColumnName("IECode");
 
                     b.Property<bool>("Is206AB206CCAApplicable")
                         .HasColumnType("bit")
@@ -611,10 +607,6 @@ namespace PartyManagement.Infrastructure.Migrations
                     b.Property<string>("MSMENO")
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("MSMENO");
-
-                    b.Property<DateTimeOffset?>("MSMERegistrationDate")
-                        .HasColumnType("datetimeoffset")
-                        .HasColumnName("MSMERegistrationDate");
 
                     b.Property<int?>("MSMETypeId")
                         .HasColumnType("int")
@@ -748,6 +740,13 @@ namespace PartyManagement.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("MiscTypeMaster");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.PartyActivityLog", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.PartyMaster", null)
+                        .WithMany("PartyActivityLogTypes")
+                        .HasForeignKey("PartyMasterId");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.PartyAddress", b =>
@@ -974,6 +973,8 @@ namespace PartyManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.PartyMaster", b =>
                 {
+                    b.Navigation("PartyActivityLogTypes");
+
                     b.Navigation("PartyAddressTypes");
 
                     b.Navigation("PartyBankTypes");

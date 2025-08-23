@@ -140,23 +140,46 @@ namespace PartyManagement.Infrastructure.Repositories.PartyMaster
             return (partyMasters, totalCount);
         }
 
-        public async Task<List<GetPartyMasterAutoCompleteDto>> GetPartyMasterAutoComplete(string searchPattern)
+        public async Task<List<GetPartyMasterAutoCompleteDto>> GetPartyMasterAutoComplete(List<int> partyTypeIds,string searchPattern)
         {
-            searchPattern = searchPattern ?? string.Empty; // Prevent null issues
+                    var sql = @"
+                    SELECT 
+                        a.Id, 
+                        a.PartyCode,
+                        a.PartyName
+                    FROM Party.PartyMaster a
+                    INNER JOIN Party.PartyType b 
+                        ON a.Id = b.PartyId
+                    INNER JOIN Party.MiscMaster c 
+                        ON b.PartyTypeId = c.Id
+                    WHERE a.IsDeleted = 0  
+                    AND a.IsActive = 1
+                    /**where**/
+                    GROUP BY a.Id, a.PartyCode, a.PartyName";
 
-            const string query = @"
-             SELECT Id, PartyCode,PartyName 
-            FROM Party.PartyMaster 
-            WHERE IsDeleted = 0  and IsActive=1
-            AND PartyName LIKE @SearchPattern OR PartyCode LIKE @SearchPattern";
-            var parameters = new
-            {
-                SearchPattern = $"%{searchPattern}%"
-                
-            };
+                // Dynamic filtering
+                var filters = new List<string>
+                {
+                    "(a.PartyName LIKE @SearchPattern OR a.PartyCode LIKE @SearchPattern)"
+                };
 
-            var partyMasters = await _dbConnection.QueryAsync<GetPartyMasterAutoCompleteDto>(query, parameters);
-            return partyMasters.ToList();
+                if (partyTypeIds != null && partyTypeIds.Any())
+                {
+                    filters.Add("b.PartyTypeId IN @PartyTypeIds");
+                }
+
+                var whereClause = "AND " + string.Join(" AND ", filters);
+                sql = sql.Replace("/**where**/", whereClause);
+
+                var parameters = new
+                {
+                    PartyTypeIds = partyTypeIds,
+                    SearchPattern = $"%{searchPattern}%"
+                };
+
+                var result = await _dbConnection.QueryAsync<GetPartyMasterAutoCompleteDto>(sql, parameters);
+
+                return result.ToList();
         }
 
         

@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IPartyMaster;
 using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using Org.BouncyCastle.Asn1.Icao;
 using PartyManagement.Infrastructure.Data;
 
 namespace PartyManagement.Infrastructure.Repositories.PartyMaster
@@ -13,9 +9,11 @@ namespace PartyManagement.Infrastructure.Repositories.PartyMaster
     public class PartyMasterCommandRepository : IPartyMasterCommandRepository
     {
         private readonly ApplicationDbContext _applicationDbContext;
-        public PartyMasterCommandRepository(ApplicationDbContext applicationDbContext)
+        private readonly IIPAddressService _ipAddressService;
+        public PartyMasterCommandRepository(ApplicationDbContext applicationDbContext, IIPAddressService ipAddressService)
         {
             _applicationDbContext = applicationDbContext;
+            _ipAddressService = ipAddressService;
         }
 
         public async Task<int> CreateAsync(Core.Domain.Entities.PartyMaster partyMaster)
@@ -31,7 +29,7 @@ namespace PartyManagement.Infrastructure.Repositories.PartyMaster
 
         public async Task<bool> DeleteAsync(int Id, Core.Domain.Entities.PartyMaster partyMaster)
         {
-             // Fetch the PartyMaster to delete from the database
+            // Fetch the PartyMaster to delete from the database
             var partymasterToDelete = await _applicationDbContext.PartyMaster.FirstOrDefaultAsync(u => u.Id == Id);
 
             // If the PartyMaster does not exist
@@ -97,6 +95,9 @@ namespace PartyManagement.Infrastructure.Repositories.PartyMaster
             if (existingParty == null)
                 return false;
 
+                      // ✅ Track changes for PartyMaster 
+           await TrackChanges(existingParty, partyMaster, existingParty.Id, "PartyMaster");
+
             // Update the existing PartyMaster properties
 
             existingParty.PartyName = partyMaster.PartyName;
@@ -125,24 +126,34 @@ namespace PartyManagement.Infrastructure.Repositories.PartyMaster
             existingParty.IsInternalCustomer = partyMaster.IsInternalCustomer;
             existingParty.IsInternalSupplier = partyMaster.IsInternalSupplier;
             existingParty.IsStopPayment = partyMaster.IsStopPayment;
+            existingParty.GSTRegistrationDate = partyMaster.GSTRegistrationDate;
+            existingParty.MSMERegistrationDate = partyMaster.MSMERegistrationDate;
+            existingParty.CIN = partyMaster.CIN;
+            existingParty.IECode = partyMaster.IECode;
             existingParty.IsActive = partyMaster.IsActive;
+
+  
 
 
             // PartyTypes - Update if exists, else Insert
-            
+
             if (partyMaster.PartyTypes != null)
             {
                 foreach (var incoming in partyMaster.PartyTypes)
                 {
                     if (incoming.Id > 0 && incoming.PartyId > 0)
                     {
-                        var existingChild = existingParty.PartyTypes
+                        var existingChildpartytypes = existingParty.PartyTypes
                             .FirstOrDefault(pt => pt.Id == incoming.Id && pt.PartyId == Id);
 
-                        if (existingChild != null)
+                        if (existingChildpartytypes != null)
                         {
-                            existingChild.PartyGroupId = incoming.PartyGroupId;
-                            existingChild.PartyTypeId = incoming.PartyTypeId;
+                                   // Update Log - PartyType
+                            await TrackChanges(existingChildpartytypes, incoming, existingParty.Id, "PartyType");
+                            existingChildpartytypes.PartyGroupId = incoming.PartyGroupId;
+                            existingChildpartytypes.PartyTypeId = incoming.PartyTypeId;
+
+                     
                         }
                     }
                     else // New record (Id == 0)
@@ -153,34 +164,41 @@ namespace PartyManagement.Infrastructure.Repositories.PartyMaster
                             PartyTypeId = incoming.PartyTypeId,
                             PartyGroupId = incoming.PartyGroupId
                         });
+
+                        // Insert Log - PartyType
+                        await LogChange(existingParty.Id, "PartyType", "PartyTypeId-PartyGroupId", "", incoming.PartyTypeId + "," + incoming.PartyGroupId, "Insert");
                     }
                 }
             }
 
-        
 
-           // Partycontacts - Update if exists, else Insert
+
+            // Partycontacts - Update if exists, else Insert
+           
             if (partyMaster.PartyContactTypes != null)
             {
                 foreach (var incoming in partyMaster.PartyContactTypes)
                 {
                     if (incoming.Id > 0 && incoming.PartyId > 0)
                     {
-                        var existingChild = existingParty.PartyContactTypes
+                        var existingChildpartyciontact = existingParty.PartyContactTypes
                             .FirstOrDefault(pt => pt.Id == incoming.Id && pt.PartyId == Id);
 
-                        if (existingChild != null)
+                        if (existingChildpartyciontact != null)
                         {
-                            existingChild.FirstName = incoming.FirstName;
-                            existingChild.LastName = incoming.LastName;
-                            existingChild.GenderId = incoming.GenderId;
-                            existingChild.Designation = incoming.Designation;
-                            existingChild.EmailID = incoming.EmailID;
-                            existingChild.MobileNo = incoming.MobileNo;
-                            existingChild.Phone = incoming.Phone;
-                            existingChild.PreferredChannelId = incoming.PreferredChannelId;
-                            existingChild.ContactTypeId = incoming.ContactTypeId;
-                            existingChild.ContactBy = incoming.ContactBy;
+                            // Update Log - PartyType
+                            await TrackChanges(existingChildpartyciontact, incoming, existingParty.Id, "PartyContact");
+                            existingChildpartyciontact.FirstName = incoming.FirstName;
+                            existingChildpartyciontact.LastName = incoming.LastName;
+                            existingChildpartyciontact.GenderId = incoming.GenderId;
+                            existingChildpartyciontact.Designation = incoming.Designation;
+                            existingChildpartyciontact.EmailID = incoming.EmailID;
+                            existingChildpartyciontact.MobileNo = incoming.MobileNo;
+                            existingChildpartyciontact.Phone = incoming.Phone;
+                            existingChildpartyciontact.PreferredChannelId = incoming.PreferredChannelId;
+                            existingChildpartyciontact.ContactTypeId = incoming.ContactTypeId;
+                            existingChildpartyciontact.ContactBy = incoming.ContactBy;
+                            
                         }
                     }
                     else // New record (Id == 0)
@@ -199,29 +217,36 @@ namespace PartyManagement.Infrastructure.Repositories.PartyMaster
                             ContactTypeId = incoming.ContactTypeId,
                             ContactBy = incoming.ContactBy
                         });
+
+                        // Insert Log - PartyContact
+                        await LogChange(existingParty.Id, "PartyContact", "ContactBy", "", incoming.ContactBy ?? string.Empty, "Insert");
                     }
                 }
             }
 
-           // PartyAddresses - Update if exists, else Insert
-        if (partyMaster.PartyAddressTypes != null)
-        {
-            foreach (var incoming in partyMaster.PartyAddressTypes)
+            // PartyAddresses - Update if exists, else Insert
+
+            if (partyMaster.PartyAddressTypes != null)
             {
+                foreach (var incoming in partyMaster.PartyAddressTypes)
+                {
                     if (incoming.Id > 0 && incoming.PartyId > 0)
                     {
-                        var existingChild = existingParty.PartyAddressTypes
+                        var existingChildpartyaddress = existingParty.PartyAddressTypes
                             .FirstOrDefault(pt => pt.Id == incoming.Id && pt.PartyId == Id);
 
-                        if (existingChild != null)
+                        if (existingChildpartyaddress != null)
                         {
-                            existingChild.AddressType = incoming.AddressType;
-                            existingChild.AddressLine1 = incoming.AddressLine1;
-                            existingChild.AddressLine2 = incoming.AddressLine2;
-                            existingChild.City = incoming.City;
-                            existingChild.State = incoming.State;
-                            existingChild.PostalCode = incoming.PostalCode;
-                            existingChild.Country = incoming.Country;
+                            // Update Log - PartyAddress
+                            await TrackChanges(existingChildpartyaddress, incoming, existingParty.Id, "PartyAddress");
+                            existingChildpartyaddress.AddressType = incoming.AddressType;
+                            existingChildpartyaddress.AddressLine1 = incoming.AddressLine1;
+                            existingChildpartyaddress.AddressLine2 = incoming.AddressLine2;
+                            existingChildpartyaddress.City = incoming.City;
+                            existingChildpartyaddress.State = incoming.State;
+                            existingChildpartyaddress.PostalCode = incoming.PostalCode;
+                            existingChildpartyaddress.Country = incoming.Country;
+                            
 
                         }
                     }
@@ -238,30 +263,37 @@ namespace PartyManagement.Infrastructure.Repositories.PartyMaster
                             PostalCode = incoming.PostalCode,
                             Country = incoming.Country
                         });
-                    }
-            }
-        }
 
-          // PartyBanks - Update if exists, else Insert
-        if (partyMaster.PartyBankTypes != null)
-        {
-            foreach (var incoming in partyMaster.PartyBankTypes)
+                        // Insert Log - PartyAddress
+                        await LogChange(existingParty.Id, "PartyAddress", "AddressType", "", incoming.AddressType ?? string.Empty, "Insert");
+                    }
+                }
+            }
+
+            // PartyBanks - Update if exists, else Insert
+
+            if (partyMaster.PartyBankTypes != null)
             {
+                foreach (var incoming in partyMaster.PartyBankTypes)
+                {
                     if (incoming.Id > 0 && incoming.PartyId > 0)
                     {
-                        var existingChild = existingParty.PartyBankTypes
+                        var existingChildpartybank = existingParty.PartyBankTypes
                             .FirstOrDefault(pt => pt.Id == incoming.Id && pt.PartyId == Id);
 
-                        if (existingChild != null)
+                        if (existingChildpartybank != null)
                         {
-                            existingChild.BankName = incoming.BankName;
-                            existingChild.BankAccountNumber = incoming.BankAccountNumber;
-                            existingChild.BankBranch = incoming.BankBranch;
-                            existingChild.IFSCCode = incoming.IFSCCode;
-                            existingChild.SWIFTCode = incoming.SWIFTCode;
-                            existingChild.AccountTypeId = incoming.AccountTypeId;
-                            existingChild.IsDefaultAccount = incoming.IsDefaultAccount;
-                            existingChild.IsPrimaryAccount = incoming.IsPrimaryAccount;
+                              // Update Log - PartyBank
+                            await TrackChanges(existingChildpartybank, incoming, existingParty.Id, "PartyBank");
+                            existingChildpartybank.BankName = incoming.BankName;
+                            existingChildpartybank.BankAccountNumber = incoming.BankAccountNumber;
+                            existingChildpartybank.BankBranch = incoming.BankBranch;
+                            existingChildpartybank.IFSCCode = incoming.IFSCCode;
+                            existingChildpartybank.SWIFTCode = incoming.SWIFTCode;
+                            existingChildpartybank.AccountTypeId = incoming.AccountTypeId;
+                            existingChildpartybank.IsDefaultAccount = incoming.IsDefaultAccount;
+                            existingChildpartybank.IsPrimaryAccount = incoming.IsPrimaryAccount;
+                          
 
                         }
                     }
@@ -279,11 +311,15 @@ namespace PartyManagement.Infrastructure.Repositories.PartyMaster
                             IsDefaultAccount = incoming.IsDefaultAccount,
                             IsPrimaryAccount = incoming.IsPrimaryAccount
                         });
+
+                        // Insert Log - PartyBank
+                        await LogChange(existingParty.Id, "PartyBank", "BankName", "", incoming.BankName ?? string.Empty, "Insert");
                     }
+                }
             }
-        }
 
             // PartyDocuments - Update if exists, else Insert
+
             if (partyMaster.PartyDocumentTypes != null && partyMaster.PartyDocumentTypes.Any())
             {
                 partyMaster.PartyDocumentTypes = partyMaster.PartyDocumentTypes
@@ -305,13 +341,15 @@ namespace PartyManagement.Infrastructure.Repositories.PartyMaster
 
                         if (incoming.Id > 0 && incoming.PartyId > 0)
                         {
-                            var existingChild = existingParty.PartyDocumentTypes
+                            var existingChildpartydocument = existingParty.PartyDocumentTypes
                                 ?.FirstOrDefault(pt => pt.Id == incoming.Id && pt.PartyId == Id);
 
-                            if (existingChild != null)
+                            if (existingChildpartydocument != null)
                             {
-                                existingChild.DocumentId = incoming.DocumentId;
-                                existingChild.FileName = incoming.FileName;
+                                existingChildpartydocument.DocumentId = incoming.DocumentId;
+                                existingChildpartydocument.FileName = incoming.FileName;
+                                // Update Log - PartyDocument
+                                //await TrackChanges(existingChild, incoming, existingParty.Id, "PartyDocument");
                             }
                         }
                         else
@@ -324,20 +362,82 @@ namespace PartyManagement.Infrastructure.Repositories.PartyMaster
                                     DocumentId = incoming.DocumentId,
                                     FileName = incoming.FileName,
                                     UploadedDate = DateTimeOffset.Now
+
                                 });
+                                // Insert Log - PartyDocument
+                                await LogChange(existingParty.Id, "PartyDocument", "FileName", "", incoming.FileName, "Insert");
                             }
                         }
                     }
                 }
-                
-        }
 
-             _applicationDbContext.PartyMaster.Update(existingParty);
+            }
+
+          //  _applicationDbContext.PartyMaster.Update(existingParty);
 
             var result = await _applicationDbContext.SaveChangesAsync();
 
             // success even if 0 changes (no modification detected)
             return result >= 0;
-    }
+        }
+
+        public async Task<bool> LogChange(int partyId, string tableName, string columnName, string oldValue, string newValue, string actionType)
+        {
+            var log = new PartyActivityLog
+            {
+                PartyId = partyId,
+                TableName = tableName,
+                ColumnName = columnName,
+                OldValue = oldValue ?? "",
+                NewValue = newValue ?? "",
+                ActionType = actionType,
+                ChangedBy = _ipAddressService.GetUserId(),
+                ChangedByName = _ipAddressService.GetUserName(),
+                ChangedIp = _ipAddressService.GetSystemIPAddress(),
+                ChangedOn = DateTimeOffset.UtcNow
+            };
+            await _applicationDbContext.PartyActivityLog.AddAsync(log);
+            
+            return true;
+
+        }
+        //Track changes for PartyMaster root & child entity (all fields handled automatically)
+        private async Task TrackChanges<T>(T existingEntity, T newEntity, int partyId, string tableName)
+        {
+            var entityType = typeof(T);
+            var properties = entityType.GetProperties();
+
+            // Fields we don't want to track (audit/system)
+            var ignoreProps = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "CreatedBy", "CreatedByName", "CreatedDate", "CreatedIP",
+                "ModifiedBy", "ModifiedByName", "ModifiedDate", "ModifiedIP"
+            };
+
+            foreach (var prop in properties)
+            {
+                //  Skip navigation properties (collections / complex entities)
+                if ((typeof(System.Collections.IEnumerable).IsAssignableFrom(prop.PropertyType) 
+                    && prop.PropertyType != typeof(string))
+                    || (prop.PropertyType.IsClass && prop.PropertyType != typeof(string)))
+                    continue;
+
+                // Skip system/audit fields
+                if (ignoreProps.Contains(prop.Name))
+                    continue;
+
+                var existingValue = prop.GetValue(existingEntity)?.ToString() ?? "";
+                var newValue = prop.GetValue(newEntity)?.ToString() ?? "";
+
+                if (existingValue != newValue)
+                {
+                    await LogChange(partyId, tableName, prop.Name, existingValue, newValue, "Update");
+                }
+            }
+        }
+
+
+
+
     }
 }

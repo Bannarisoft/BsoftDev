@@ -25,12 +25,6 @@ namespace PartyManagement.Infrastructure.Data.Configurations
               .HasColumnType("int")  // Set as int
               .IsRequired();
 
-            // Foreign Key Relationship
-            builder.HasOne(m => m.PartyLogActivity)
-                .WithMany(t => t.PartyActivityLogTypes)
-                .HasForeignKey(m => m.PartyId) // Foreign Key property in PartyContact
-                .OnDelete(DeleteBehavior.Restrict); // Use .Cascade if needed
-
             builder.Property(m => m.TableName)
                 .HasColumnName("TableName")
                 .HasColumnType("nvarchar(100)")

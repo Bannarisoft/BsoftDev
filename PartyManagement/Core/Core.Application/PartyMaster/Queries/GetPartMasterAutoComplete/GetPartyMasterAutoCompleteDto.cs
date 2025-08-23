@@ -10,5 +10,6 @@ namespace Core.Application.PartyMaster.Queries.GetPartMasterAutoComplete
         public int Id { get; set; }
         public string? PartyCode { get; set; }
         public string? PartyName { get; set; }
+
     }
 }

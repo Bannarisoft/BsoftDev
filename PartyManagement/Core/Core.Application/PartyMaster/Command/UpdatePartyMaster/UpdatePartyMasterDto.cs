@@ -39,6 +39,10 @@ namespace Core.Application.PartyMaster.Command.UpdatePartyMaster
         public byte IsInternalSupplier { get; set; }
         public byte IsInternalCustomer { get; set; }
         public byte IsStopPayment { get; set; }
+        public DateTimeOffset? GSTRegistrationDate { get; set; }
+        public DateTimeOffset? MSMERegistrationDate { get; set; }
+        public string? CIN { get; set; }
+        public string? IECode { get; set; }
         public byte IsActive { get; set; }
         public List<UpdatePartyTypeDto>? PartyTypesUpdate { get; set; }
         public List<UpdatePartyContactDto>? PartyContactsUpdate { get; set; }
