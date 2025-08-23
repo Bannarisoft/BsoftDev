@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Core.Application.Common;
 using Core.Application.Common.Interfaces.IWarehouseMaster;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using WarehouseManagement.Infrastructure.Data;
 
 namespace WarehouseManagement.Infrastructure.Repositories.WarehouseMaster
@@ -14,9 +15,12 @@ namespace WarehouseManagement.Infrastructure.Repositories.WarehouseMaster
 
         private readonly ApplicationDbContext _context;
 
-        public WarehouseMasterCommandRepository(ApplicationDbContext context)
+        public readonly ILogger<WarehouseMasterCommandRepository> _logger;
+
+        public WarehouseMasterCommandRepository(ApplicationDbContext context, ILogger<WarehouseMasterCommandRepository> logger)
         {
             _context = context;
+            _logger = logger;
         }
         public async Task<int> CreateAsync(Core.Domain.Entities.WarehouseMaster warehouseMaster)
         {
@@ -31,7 +35,18 @@ namespace WarehouseManagement.Infrastructure.Repositories.WarehouseMaster
         public async Task<int> UpdateAsync(Core.Domain.Entities.WarehouseMaster warehouseMaster)
         {
             _context.WarehouseMasters.Update(warehouseMaster);
-            await _context.SaveChangesAsync();
+
+            try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateException ex)
+                {
+                    var root = ex.GetBaseException(); // usually SqlException
+                    _logger.LogError(root, "DB save failed: {Msg}", root.Message);
+                    throw; // or map to API error
+                }
+           // await _context.SaveChangesAsync();
             return warehouseMaster.Id;
         }
 

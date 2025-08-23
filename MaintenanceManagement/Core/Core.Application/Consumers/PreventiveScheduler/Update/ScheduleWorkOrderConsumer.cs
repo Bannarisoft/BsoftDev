@@ -65,7 +65,9 @@ namespace Core.Application.Consumers.PreventiveScheduler.Update
                                 _backgroundServiceClient.RemoveHangFireJob(detail.HangfireJobId, context.Message.token);
                             }
 
-                            var delay = detail.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today;
+                            // var delay = detail.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today;
+                            var targetDateTime = detail.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue);
+                            var delay = targetDateTime - DateTime.Now;
 
                             string newJobId;
                             var delayInMinutes = (int)delay.TotalMinutes;

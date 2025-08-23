@@ -18,7 +18,9 @@ namespace Core.Application.Common.Interfaces.IWarehouseMaster
         Task<bool> ExistsByNameAsync(string warehouseName, int? excludeId = null);
 
         Task<List<GetWarehouseAutoCompleteDto>> GetWarehouseMasterAutoCompletes(string searchPattern);
-         
-        Task<List<GetParentWarehouseDto>> GetParentWarehouseMaster(); 
+
+        Task<List<GetParentWarehouseDto>> GetParentWarehouseMaster();
+
+        Task<List<WarehouseMasterDto>> GetwarehouseAsync();
     }
 }

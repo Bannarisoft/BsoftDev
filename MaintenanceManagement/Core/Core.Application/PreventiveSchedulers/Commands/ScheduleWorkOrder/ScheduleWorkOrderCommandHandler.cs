@@ -8,8 +8,11 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
+using Core.Application.Common.Interfaces.IPreventiveSchedulerLog;
 using Core.Application.Common.Interfaces.IWorkOrder;
+using Core.Domain.Common;
 using MediatR;
+using Newtonsoft.Json;
 using static Core.Domain.Common.MiscEnumEntity;
 
 namespace Core.Application.PreventiveSchedulers.Commands.ScheduleWorkOrder
@@ -22,17 +25,21 @@ namespace Core.Application.PreventiveSchedulers.Commands.ScheduleWorkOrder
         private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
         private readonly IWorkOrderCommandRepository _workOrderRepository;
         private readonly IIPAddressService _ipAddressService;
-        public ScheduleWorkOrderCommandHandler( IPreventiveSchedulerQuery preventiveSchedulerQuery,IMapper mapper, IMediator mediator,IMiscMasterQueryRepository miscMasterQueryRepository ,IWorkOrderCommandRepository workOrderRepository,IIPAddressService iPAddressService)
+        private readonly IPreventiveScheduleLogService _preventiveScheduleLogService;
+        public ScheduleWorkOrderCommandHandler(IPreventiveSchedulerQuery preventiveSchedulerQuery, IMapper mapper, IMediator mediator,
+        IMiscMasterQueryRepository miscMasterQueryRepository, IWorkOrderCommandRepository workOrderRepository, IIPAddressService iPAddressService, IPreventiveScheduleLogService preventiveScheduleLogService)
         {
-            _preventiveSchedulerQuery=preventiveSchedulerQuery;
-            _mapper=mapper;
-            _mediator=mediator;
-            _miscMasterQueryRepository=miscMasterQueryRepository;
-            _workOrderRepository=workOrderRepository;
+            _preventiveSchedulerQuery = preventiveSchedulerQuery;
+            _mapper = mapper;
+            _mediator = mediator;
+            _miscMasterQueryRepository = miscMasterQueryRepository;
+            _workOrderRepository = workOrderRepository;
             _ipAddressService = iPAddressService;
+            _preventiveScheduleLogService = preventiveScheduleLogService;
         }
         public async Task<ApiResponseDTO<bool>> Handle(ScheduleWorkOrderCommand request, CancellationToken cancellationToken)
         {
+            
             var miscdetail = await _miscMasterQueryRepository.GetMiscMasterByName(WOStatus.MiscCode,StatusOpen.Code);
          //   var ExistItems = await _preventiveSchedulerQuery.ExistPreventivescheduleItem(request.PreventiveScheduleId);
            // var scheduledetail;
@@ -40,26 +47,27 @@ namespace Core.Application.PreventiveSchedulers.Commands.ScheduleWorkOrder
                  var scheduledetail = await _preventiveSchedulerQuery.GetWorkOrderScheduleDetailById(request.PreventiveScheduleId);
             
             
-
+        await _preventiveScheduleLogService.CaptureLogs(scheduledetail.Id,request.PreventiveScheduleId,"Hangfire tigger Schedule Work Order",JsonConvert.SerializeObject(request));
+        
              await AuditLogPublisher.PublishAuditLogAsync(
-                     _mediator,
-                     actionDetail: $"Schedule Work Order request",
-                     actionCode: "Schedule work order",
-                     actionName: "Schedule work order",
-                     module: "Preventive",
-                     requestData: request,
-                     cancellationToken
-                    );
+                    _mediator,
+                    actionDetail: $"Schedule Work Order request",
+                    actionCode: "Schedule work order",
+                    actionName: "Schedule work order",
+                    module: "Preventive",
+                    requestData: request,
+                    cancellationToken
+                   );
                 
                        var workOrderRequest =  _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(scheduledetail, opt =>
                         {
                             opt.Items["StatusId"] = miscdetail.Id;
                             opt.Items["PreventiveSchedulerDetailId"] = scheduledetail.PreventiveSchedulerDetails?.FirstOrDefault()?.Id;   
                         });
-                        workOrderRequest.CreatedByName="System";
+                        workOrderRequest.CreatedByName=MiscEnumEntity.System;
                         workOrderRequest.CreatedBy=1;
                         workOrderRequest.CreatedDate=DateTime.Now;
-                        workOrderRequest.CreatedIP="192.168";
+                        workOrderRequest.CreatedIP=_ipAddressService.GetSystemIPAddress() ?? "System";
                         
                         await AuditLogPublisher.PublishAuditLogAsync(
                      _mediator,

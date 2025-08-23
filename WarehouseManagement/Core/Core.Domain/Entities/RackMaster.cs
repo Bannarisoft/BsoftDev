@@ -22,6 +22,6 @@ namespace Core.Domain.Entities
         public decimal? RackHeight { get; set; }
         public int? DimensionUOMId { get; set; }
         
-
+        public ICollection<BinMaster> Bins { get; set; } = new List<BinMaster>();
     }
 }

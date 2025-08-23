@@ -158,7 +158,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
             const string query = @"
                     SELECT Id 
                     FROM Maintenance.MachineMaster 
-                    WHERE MachineGroupId = @MachineGroupId AND IsDeleted = 0 AND UnitId = @UnitId";
+                    WHERE MachineGroupId = @MachineGroupId AND IsDeleted = 0 AND IsActive=1 AND UnitId = @UnitId";
 
             var machineMaster = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineMaster>(query, new { MachineGroupId, UnitId });
             return machineMaster.ToList();

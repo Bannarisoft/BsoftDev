@@ -20,9 +20,9 @@ namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
                 .HasColumnType("int")
                 .IsRequired();
 
-            builder.Property(t => t.WorkflowTypeId)
-            .HasColumnName("WorkflowTypeId")
-            .HasColumnType("int")
+            builder.Property(t => t.WorkflowType)
+            .HasColumnName("WorkflowType")
+            .HasColumnType("nvarchar(200)")
             .IsRequired();
 
             builder.Property(t => t.ModuleTransactionId)
@@ -60,6 +60,11 @@ namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
            .HasColumnType("int")
            .IsRequired();
 
+           builder.Property(t => t.Action)
+           .HasColumnName("Action")
+           .HasColumnType("Varchar(50)")
+           .IsRequired(true);
+
            builder.Property(t => t.Remark)
            .HasColumnName("Remark")
            .HasColumnType("Varchar(max)")
@@ -71,10 +76,6 @@ namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
             builder.Property(cf => cf.ModifiedIP)
                 .HasColumnType("varchar(255)");
 
-            builder.HasOne(ac => ac.WorkflowType)
-      .WithMany(am => am.ApprovalRequest)
-      .HasForeignKey(ac => ac.WorkflowTypeId)
-      .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasOne(ac => ac.ApprovalStepDetail)
            .WithMany(am => am.ApprovalRequest)

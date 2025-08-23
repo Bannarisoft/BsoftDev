@@ -11,5 +11,6 @@ namespace Contracts.Interfaces.External.IWorkflow
         Task<List<ApprovalRequestStatusDto>> GetAllApprovalRequestStatusAsync(string ModuleTypeName);
         Task<List<ApprovalByApproverDto>> GetAllApprovalRequestByApprover(string ModuleTypeName, int ApproverId);
         Task<List<int>> GetAllApprovalRequestByApproved(string ModuleTypeName);
+        Task<List<ApprovalRequestLineStatusDto>> GetApprovalRequestLineStatusAsync(string ModuleTypeName);
     }
 }

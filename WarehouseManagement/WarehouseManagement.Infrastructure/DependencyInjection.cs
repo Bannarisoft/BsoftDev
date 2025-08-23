@@ -3,6 +3,7 @@ using Contracts.Interfaces.External.IInvetoryManagement;
 using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.AuditLog;
+using Core.Application.Common.Interfaces.IBinMaster;
 using Core.Application.Common.Interfaces.IRackMaster;
 using Core.Application.Common.Interfaces.IWarehouseMaster;
 using Core.Application.Common.Mappings;
@@ -17,6 +18,7 @@ using PartyManagement.Infrastructure.Repositories;
 using Serilog;
 using WarehouseManagement.Infrastructure.Data;
 using WarehouseManagement.Infrastructure.GrpcClients;
+using WarehouseManagement.Infrastructure.Repositories.BinMaster;
 using WarehouseManagement.Infrastructure.Repositories.RackMaster;
 using WarehouseManagement.Infrastructure.Repositories.WarehouseMaster;
 using WarehouseManagement.Infrastructure.Services;
@@ -102,6 +104,9 @@ namespace WarehouseManagement.Infrastructure
             services.AddScoped<IRackMasterQueryRepository, RackMasterQueryRepository>();
             services.AddScoped<IRackMasterCommandRepository, RackMasterCommandRepository>();
             services.AddScoped<IRackCodeGenerator, RackCodeGenerator>();
+            services.AddScoped<IBinMasterQueryRepository, BinMasterQueryRepository>();
+            services.AddScoped<IBinMasterCommandRepository, BinMasterCommandRepository>();
+            services.AddScoped<IBinCodeGenerator, BinCodeGenerator>();
     
 
 
@@ -115,7 +120,8 @@ namespace WarehouseManagement.Infrastructure
            
              services.AddAutoMapper(
                  typeof(WarehouseMasterProfile),
-                 typeof(RackMasterProfile)
+                 typeof(RackMasterProfile),
+                 typeof(BinMasterProfile)
 
             );
             return services;
