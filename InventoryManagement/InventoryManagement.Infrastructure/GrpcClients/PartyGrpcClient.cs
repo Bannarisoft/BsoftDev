@@ -18,7 +18,7 @@ namespace InventoryManagement.Infrastructure.GrpcClients
             _httpContextAccessor = httpContextAccessor; 
         }
 
-        public async Task<List<Contracts.Dtos.Party.PartyDto>> GetAllPartyAsync()
+        public async Task<List<Contracts.Dtos.Party.PartyDto>> GetAllPartyMasterAsync()
         {
             var token = _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].ToString();
 
@@ -33,7 +33,7 @@ namespace InventoryManagement.Infrastructure.GrpcClients
                 { "Authorization", token }
             };
 
-            var response = await _client.GetAllPartyAsync(new Empty(), new CallOptions(metadata));
+            var response = await _client.GetAllPartyMasterAsync(new Empty(), new CallOptions(metadata));
 
             return response.Parties.Select(u => new Contracts.Dtos.Party.PartyDto
             {

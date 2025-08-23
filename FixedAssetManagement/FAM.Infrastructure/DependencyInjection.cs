@@ -120,7 +120,7 @@ namespace FAM.Infrastructure
                     maxRetryCount: 5, // Number of retry attempts
                     maxRetryDelay: TimeSpan.FromSeconds(30), // Delay between retries
                     errorNumbersToAdd: null); // Add specific SQL error numbers to retry on (optional)
-            }));
+            }));           
 
             // Register IDbConnection for Dapper
             services.AddTransient<IDbConnection>(sp => new SqlConnection(connectionString));

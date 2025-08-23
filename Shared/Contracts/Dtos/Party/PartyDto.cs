@@ -9,7 +9,7 @@ namespace Contracts.Dtos.Party
     public class PartyDto
     {
         public int PartyId { get; set; }
-        public string PartyCode { get; set; }
+        public string PartyCode { get; set; } 
         public string PartyName { get; set; }
         public int RegistrationTypeId { get; set; }
         public string GSTNumber { get; set; }

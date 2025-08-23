@@ -7,6 +7,7 @@ using Core.Application.Item.ItemDetail.Queries.GetAllItems;
 using Core.Domain.Common;
 using Core.Domain.Entities.Item.ItemDetail.Variant;
 using Dapper;
+using Grpc.Core;
 using InventoryManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Queries
@@ -224,9 +225,7 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Querie
                 dto.Purchase.CountryName =
                     countryMap.TryGetValue(cid, out var name) ? name : null;
             }
-
-            
-            /* // 🔹 Party gRPC — get supplier names
+           // 🔹 Party gRPC — get supplier names
            if (dto.Suppliers != null && dto.Suppliers.Count > 0)
             {
                 var supplierIds = dto.Suppliers
@@ -234,22 +233,26 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Querie
                     .Where(id => id > 0)
                     .Distinct()
                     .ToHashSet();
-
                 if (supplierIds.Count > 0)
                 {
-                    // 4) Parties (no-arg call). Then filter to only the suppliers you need.
-                    var parties = await _partyGrpcClient.GetAllPartyAsync();
-                    // Adjust property names below to match your Party DTO (Id/Name OR PartyId/PartyName).                    
-                    var partyMap = parties
-                        .Where(p => supplierIds.Contains(p.PartyId))
-                        .GroupBy(p => p.PartyId)
-                        .ToDictionary(g => g.Key, g => g.First().PartyName);
+                    try
+                    {
+                        var parties = await _partyGrpcClient.GetAllPartyMasterAsync();
+                        // Adjust property names below to match your Party DTO (Id/Name OR PartyId/PartyName).                    
+                        var partyMap = parties
+                            .Where(p => supplierIds.Contains(p.PartyId))
+                            .GroupBy(p => p.PartyId)
+                            .ToDictionary(g => g.Key, g => g.First().PartyName);
 
-                    foreach (var s in dto.Suppliers)
-                        s.SupplierName = partyMap.TryGetValue(s.SupplierId, out var name) ? name : null;
+                        foreach (var s in dto.Suppliers)
+                            s.SupplierName = partyMap.TryGetValue(s.SupplierId, out var name) ? name : null;
+                    }
+                    catch (RpcException ex) when (ex.StatusCode == StatusCode.Unimplemented || ex.StatusCode == StatusCode.Unavailable)
+                    {
+                        
+                    }
                 }
-            } */
-
+            }
             return dto;
         }
         public async Task<string> GetBaseDirectoryAsync(CancellationToken ct = default)

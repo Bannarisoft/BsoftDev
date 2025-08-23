@@ -6,6 +6,6 @@ namespace Contracts.Interfaces.External.IParty
 {
     public interface IPartyGrpcClient
     {
-        Task<List<PartyDto>> GetAllPartyAsync();
+        Task<List<PartyDto>> GetAllPartyMasterAsync();
     }
 }

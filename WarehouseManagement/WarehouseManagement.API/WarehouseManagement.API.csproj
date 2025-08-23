@@ -27,5 +27,9 @@
     <ProjectReference Include="..\WarehouseManagement.Infrastructure\WarehouseManagement.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Shared\Contracts\Contracts.csproj" />
   </ItemGroup>
-
+  <ItemGroup>   
+   <Protobuf Include="..\..\Shared\Contracts\Protos\rack.proto" GrpcServices="Server"/>
+   <Protobuf Include="..\..\Shared\Contracts\Protos\bin.proto" GrpcServices="Server"/>
+   <Protobuf Include="..\..\Shared\Contracts\Protos\warehouse.proto" GrpcServices="Server"/>
+  </ItemGroup>
 </Project>

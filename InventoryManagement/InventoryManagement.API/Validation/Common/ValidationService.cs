@@ -13,6 +13,9 @@ using Core.Application.Item.ItemDetail.Queries.GetAllItems;
 using Core.Application.Item.ItemGroup.Commands.CreateItemGroup;
 using Core.Application.Item.ItemGroup.Commands.DeleteItemGroup;
 using Core.Application.Item.ItemGroup.Commands.UpdateItemGroup;
+using Core.Application.Item.PutAway.Commands.CreatePutAwayRule;
+using Core.Application.Item.PutAway.Commands.DeletePutAwayRule;
+using Core.Application.Item.PutAway.Commands.UpdatePutAwayRule;
 using Core.Application.Item.Templates.CreateTemplate;
 using Core.Application.Item.Templates.SearchTemplates;
 using Core.Application.MiscMaster;
@@ -33,6 +36,7 @@ using InventoryManagement.API.Validation.HSNMaster;
 using InventoryManagement.API.Validation.Item.ItemCategory;
 using InventoryManagement.API.Validation.Item.ItemDetail;
 using InventoryManagement.API.Validation.Item.ItemGroup;
+using InventoryManagement.API.Validation.Item.PutAway;
 using InventoryManagement.API.Validation.MiscMaster;
 using InventoryManagement.API.Validation.MiscTypeMaster;
 using InventoryManagement.API.Validation.UOM;
@@ -79,10 +83,12 @@ namespace InventoryManagement.API.Validation.Common
             services.AddScoped<IValidator<ItemSupplierDto>, ItemSupplierDtoValidator>();
             services.AddScoped<IValidator<ItemManufactureDto>, ItemManufacturingDtoValidator>();
             services.AddScoped<IValidator<ItemUomDto>, ItemUomDtoValidator>();
-            services.AddValidatorsFromAssembly(typeof(CreateItemCommandValidator).Assembly);       
+            services.AddValidatorsFromAssembly(typeof(CreateItemCommandValidator).Assembly);
             services.AddScoped<IValidator<CreateTemplateCommand>, CreateTemplateCommandValidator>();
             services.AddScoped<IValidator<TemplateParamDto>, TemplateParamDtoValidator>();
-      
+
+            services.AddScoped<IValidator<CreatePutAwayRuleCommand>, CreatePutAwayRuleCommandValidator>();            
+            services.AddScoped<IValidator<DeletePutAwayRuleCommand>, DeletePutAwayRuleCommandValidator>();      
         }
     }
 }

@@ -1,5 +1,6 @@
 using Core.Domain.Common;
 using Core.Domain.Entities.Item.ItemDetail;
+using Core.Domain.Entities.Item.PutAway;
 
 namespace Core.Domain.Entities.Item
 {
@@ -10,11 +11,12 @@ namespace Core.Domain.Entities.Item
         public string? ItemCategoryName { get; set; }
         public byte? IsGroup { get; set; }
         public int? ParentCategoryId { get; set; }
-        public ItemCategory ItemCategoryParent { get; set; } = null!; // Navigation property to ItemGroup
+        public ItemCategory ItemCategoryParent { get; set; } = null!;
         public ICollection<ItemCategory>? ChildCategories { get; set; } = new List<ItemCategory>(); // For hierarchical categories
         public byte? IsBudgetApplicable { get; set; }
         public int? RootCategoryId { get; set; }
-        public ItemCategory? RootCategory { get; set; } 
+        public ItemCategory? RootCategory { get; set; }
         public ICollection<ItemMaster>? ItemMasterCategory { get; set; } 
+        public ICollection<PutAwayRule>? PutAwayRuleCategory { get; set; } = new List<PutAwayRule>();
     }
 }
