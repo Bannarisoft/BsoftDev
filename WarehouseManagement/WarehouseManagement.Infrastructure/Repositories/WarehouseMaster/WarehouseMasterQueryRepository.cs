@@ -22,7 +22,7 @@ namespace WarehouseManagement.Infrastructure.Repositories.WarehouseMaster
             _dbConnection = dbConnection;
         }
 
-      public async Task<(List<WarehouseMasterDto>, int)> GetAllAsync(int pageNumber, int pageSize, string searchTerm)
+        public async Task<(List<WarehouseMasterDto>, int)> GetAllAsync(int pageNumber, int pageSize, string searchTerm)
         {
             var sql = @"
                 DECLARE @TotalCount INT;
@@ -31,7 +31,7 @@ namespace WarehouseManagement.Infrastructure.Repositories.WarehouseMaster
                 -- total count
                 SELECT @TotalCount = COUNT(*)
                 FROM Warehouse.WarehouseMaster w
-                WHERE w.IsDeleted = 0
+                WHERE w.IsDeleted = 0  
                 AND (
                     @Search IS NULL OR @Search = '' 
                     OR (w.WarehouseCode LIKE @Search OR w.WarehouseName LIKE @Search OR w.ContactPersonName LIKE @Search)
@@ -44,7 +44,7 @@ namespace WarehouseManagement.Infrastructure.Repositories.WarehouseMaster
                 INSERT INTO #PagedIds(Id)
                 SELECT w.Id
                 FROM Warehouse.WarehouseMaster w
-                WHERE w.IsDeleted = 0
+                WHERE w.IsDeleted = 0  
                 AND (
                     @Search IS NULL OR @Search = '' 
                     OR (w.WarehouseCode LIKE @Search OR w.WarehouseName LIKE @Search OR w.ContactPersonName LIKE @Search)
@@ -98,7 +98,7 @@ namespace WarehouseManagement.Infrastructure.Repositories.WarehouseMaster
                 SELECT m.WarehouseId, m.ItemGroupId
                 FROM Warehouse.WarehouseItemGroupMapping m
                 JOIN #PagedIds p ON p.Id = m.WarehouseId
-                WHERE m.IsActive = 1 AND m.IsDeleted = 0;
+                WHERE m.IsDeleted = 0;
 
                 -- total count out
                 SELECT @TotalCount AS TotalCount;
@@ -114,7 +114,7 @@ namespace WarehouseManagement.Infrastructure.Repositories.WarehouseMaster
             using var multi = await _dbConnection.QueryMultipleAsync(sql, parameters);
 
             var warehouses = (await multi.ReadAsync<WarehouseMasterDto>()).ToList();
-            var mappings   = (await multi.ReadAsync<(int WarehouseId, int ItemGroupId)>()).ToList();
+            var mappings = (await multi.ReadAsync<(int WarehouseId, int ItemGroupId)>()).ToList();
             var totalCount = await multi.ReadFirstAsync<int>();
 
             var mapLookup = mappings
@@ -213,14 +213,14 @@ namespace WarehouseManagement.Infrastructure.Repositories.WarehouseMaster
                     wm.CreatedBy, wm.CreatedDate, wm.CreatedByName, wm.CreatedIP,
                     wm.ModifiedBy, wm.ModifiedDate, wm.ModifiedByName, wm.ModifiedIP
                 FROM Warehouse.WarehouseMaster wm
-                WHERE wm.Id = @Id AND wm.IsDeleted = 0 AND wm.IsActive = 1; 
+                WHERE wm.Id = @Id AND wm.IsDeleted = 0 ; 
 
                
                 SELECT wigm.ItemGroupId
                 FROM Warehouse.WarehouseItemGroupMapping wigm
                 WHERE wigm.WarehouseId = @Id
-                AND wigm.IsActive = 1
-                AND wigm.IsDeleted = 0;
+                
+                AND wigm.IsDeleted = 0 ;
             ";
 
             using var multi = await _dbConnection.QueryMultipleAsync(sql, new { Id = id });
@@ -299,7 +299,7 @@ namespace WarehouseManagement.Infrastructure.Repositories.WarehouseMaster
 
         public async Task<List<GetParentWarehouseDto>> GetParentWarehouseMaster()
         {
-                      const string sql = @"
+            const string sql = @"
                                             SELECT
                                                 w.Id   AS Id,
                                                 w.WarehouseCode AS ParentWarehouseCode,
@@ -315,8 +315,18 @@ namespace WarehouseManagement.Infrastructure.Repositories.WarehouseMaster
             return rows.AsList();
 
         }
-                
-                
+
+        public async Task<List<WarehouseMasterDto>> GetwarehouseAsync()
+        {
+            const string sql = @"SELECT Id, WarehouseCode, WarehouseName, UnitId
+                                        FROM Warehouse.WarehouseMaster
+                                        WHERE IsDeleted = 0";
+
+            var items = (await _dbConnection.QueryAsync<WarehouseMasterDto>(sql)).ToList();
+            return items;
+        }      
+        
+                 
             
             
     }

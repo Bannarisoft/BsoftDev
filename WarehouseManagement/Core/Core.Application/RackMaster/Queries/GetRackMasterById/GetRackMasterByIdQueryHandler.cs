@@ -34,22 +34,22 @@ namespace Core.Application.RackMaster.Queries.GetRackMasterById
             var result = await _rackMasterQueryRepository.GetByIdAsync(request.Id);
             if (result is null )
             {
-                throw new ValidationException($"MiscTypeMaster with Id {request.Id} not found.");
+                throw new ValidationException($"RackMaster with Id {request.Id} not found.");
               
             }
            
-            var misctypemaster = _mapper.Map<RackMasterDto>(result);
+            var rackMasterDto = _mapper.Map<RackMasterDto>(result);
 
             //Domain Event
                     var domainEvent = new AuditLogsDomainEvent(
                         actionDetail: "GetById",
                         actionCode: "",        
                         actionName: "",
-                        details: $"MiscTypeMaster details {misctypemaster.Id} was fetched.",
-                        module:"MiscTypeMaster"
+                        details: $"  RackMaster details {rackMasterDto.Id} was fetched.",
+                        module:"RackMaster"
                     );
                     await _mediator.Publish(domainEvent, cancellationToken);
-            return  misctypemaster;
+            return  rackMasterDto;
         }
            
         }
