@@ -36,6 +36,11 @@ namespace BackgroundService.Application.Workflow.Common.Mappings
             CreateMap<ApproveApprovalRequestLineDto, UpdateApprovedQtyDto>()
             .ForMember(dest => dest.ApprovedQuantity, opt => opt.MapFrom(src => src.ApprovedQuantity))
             .ForMember(dest => dest.IndentDetailId, opt => opt.MapFrom(src => src.ModuleLineTransactionId));
+
+            CreateMap<ApproveApprovalRequestLineDto, ApproveLineStatusDto>()
+            .ForMember(dest => dest.ApprovalRequestLineId, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.ModuleLineTransactionId, opt => opt.MapFrom(src => src.ModuleLineTransactionId))
+            .ForMember(dest => dest.IsApproved, opt => opt.MapFrom(src => src.IsApproved));
             
         }
     }
