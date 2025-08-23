@@ -13,8 +13,8 @@ namespace Core.Domain.Entities
         public int IndentTypeId { get; set; }
         public int UnitId { get; set; }
         public string Purpose { get; set; }
+        public int DepartmentId { get; set; }
         public ICollection<IndentDetail> IndentDetails { get; set; }
-        public ICollection<IndentDepartmentMapping> IndentDepartmentMappings { get; set; }
         public MiscMaster IndentType { get; set; }
     }
 }

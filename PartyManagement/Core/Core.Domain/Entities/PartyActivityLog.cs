@@ -9,7 +9,6 @@ namespace Core.Domain.Entities
     {
         public int Id { get; set; }
         public int PartyId { get; set; }
-        public PartyMaster PartyLogActivity { get; set; } = null!;
         public string TableName { get; set; } = string.Empty;
         public string? ColumnName { get; set; }
         public string? OldValue { get; set; }

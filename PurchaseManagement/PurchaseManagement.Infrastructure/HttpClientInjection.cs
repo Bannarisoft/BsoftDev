@@ -84,6 +84,17 @@ namespace PurchaseManagement.Infrastructure
 
             services.AddScoped<IUsersAllGrpcClient, UsersGrpcClient>();
 
+            services.AddGrpcClient<ApproverService.ApproverServiceClient>(options =>
+            {
+                options.Address = new Uri(backGroundServiceUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            })
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+
 
             return services;
         }

@@ -22,7 +22,7 @@ namespace Core.Application.PartyMaster.Queries.GetPartMasterAutoComplete
         }
         public async Task<List<GetPartyMasterAutoCompleteDto>> Handle(GetPartyMasterAutoCompleteQuery request, CancellationToken cancellationToken)
         {
-             var result = await _ipartyMasterQueryRepository.GetPartyMasterAutoComplete(request.SearchPattern);
+             var result = await _ipartyMasterQueryRepository.GetPartyMasterAutoComplete(request.PartyTypeIds,request.SearchPattern ?? string.Empty);
             var partymaster = _mapper.Map<List<GetPartyMasterAutoCompleteDto>>(result);
              //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(

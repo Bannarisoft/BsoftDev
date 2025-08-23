@@ -7,6 +7,7 @@ using BackgroundService.Application.Dto;
 using BackgroundService.Application.Workflow.ApprovalRequests.Commands.ApproveApprovalRequest;
 using BackgroundService.Application.Workflow.ApprovalRequests.Queries.GetAllApprovalRequest;
 using BackgroundService.Domain.Entities.Workflow;
+using Contracts.Dtos.Purchase;
 
 namespace BackgroundService.Application.Workflow.Common.Mappings
 {
@@ -29,9 +30,18 @@ namespace BackgroundService.Application.Workflow.Common.Mappings
             .ForMember(dest => dest.ApprovalRequestLines, opt => opt.MapFrom(src => src.ApprovalRequestLine))
             .ForMember(dest => dest.ApprovalDocuments, opt => opt.MapFrom(src => src.ApprovalDocument));
 
-             CreateMap<ApprovalDocumentDto, ApprovalDocument>();
+            CreateMap<ApprovalDocumentDto, ApprovalDocument>();
 
-            CreateMap<ApproveApprovalRequestLineDto,ApprovalRequestLine>();
+            CreateMap<ApproveApprovalRequestLineDto, ApprovalRequestLine>();
+            CreateMap<ApproveApprovalRequestLineDto, UpdateApprovedQtyDto>()
+            .ForMember(dest => dest.ApprovedQuantity, opt => opt.MapFrom(src => src.ApprovedQuantity))
+            .ForMember(dest => dest.IndentDetailId, opt => opt.MapFrom(src => src.ModuleLineTransactionId));
+
+            CreateMap<ApproveApprovalRequestLineDto, ApproveLineStatusDto>()
+            .ForMember(dest => dest.ApprovalRequestLineId, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.ModuleLineTransactionId, opt => opt.MapFrom(src => src.ModuleLineTransactionId))
+            .ForMember(dest => dest.IsApproved, opt => opt.MapFrom(src => src.IsApproved));
+            
         }
     }
 }

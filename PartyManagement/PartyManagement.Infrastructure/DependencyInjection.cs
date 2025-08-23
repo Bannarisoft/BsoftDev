@@ -107,6 +107,7 @@ namespace PartyManagement.Infrastructure
             services.AddScoped<IMiscMasterQueryRepository, MiscMasterQueryRepository>();
             services.AddScoped<IPartyMasterQueryRepository, PartyMasterQueryRepository>();
             services.AddScoped<IPartyMasterCommandRepository, PartyMasterCommandRepository>();
+            services.AddScoped<IPartyActivityLogCommandRepository, PartyActivityLogCommandRepository>();
 
 
             // Miscellaneous services

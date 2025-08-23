@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using BackgroundService.Application.Notification.Common.Interfaces;
 using BackgroundService.Application.Workflow.Common.Interfaces.IApprovalRequest;
+using BackgroundService.Domain.Common;
 using BackgroundService.Domain.Entities.Workflow;
 using BackgroundService.Infrastructure.Data.Notification;
 using Dapper;
@@ -15,57 +17,37 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequest
     {
         private readonly NotificationDbContext _notificationDbContext;
         private readonly IDbConnection _dbConnection;
-        public ApprovalRequestCommandRepository(NotificationDbContext notificationDbContext, IDbConnection dbConnection)
+        private readonly IIPAddressService _ipAddressService;
+        
+        public ApprovalRequestCommandRepository(NotificationDbContext notificationDbContext, IDbConnection dbConnection, IIPAddressService ipAddressService)
         {
             _notificationDbContext = notificationDbContext;
             _dbConnection = dbConnection;
+            _ipAddressService = ipAddressService;
         }
 
-        public async Task<bool> Approve(ApprovalRequest approvalRequest,CancellationToken ct)
+        public async Task<int> Approve(ApprovalRequest approvalRequest,string ApprovalRequestLines,CancellationToken ct)
         {
-              var header = await _notificationDbContext.ApprovalRequest
-        .Include(h => h.ApprovalRequestLines)
-        .FirstOrDefaultAsync(h => h.Id == approvalRequest.Id, ct);
+                var p = new DynamicParameters();
+        p.Add("@HeaderId", approvalRequest.Id, DbType.Int32);
+        p.Add("@JsonUpdates", ApprovalRequestLines, DbType.String);
+        p.Add("@Approved", MiscEnumEntity.Approved, DbType.String);
+        p.Add("@Rejected", MiscEnumEntity.Rejected, DbType.String);
+        p.Add("@Pending", MiscEnumEntity.Pending, DbType.String);
+        p.Add("@ModifiedBy", _ipAddressService.GetUserId(), DbType.Int32);
+        p.Add("@NewHeaderStatusId", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-           if (header == null) return false;
-        
-           using var tx = await _notificationDbContext.Database.BeginTransactionAsync(ct);
-        
-           // 2) Header: copy exactly from payload (status is authoritative from request)
-           header.StatusId        = approvalRequest.StatusId;
-           header.ModifiedBy      = approvalRequest.ModifiedBy;
-           header.ModifiedByName  = approvalRequest.ModifiedByName;
-           header.ModifiedDate    = approvalRequest.ModifiedDate;
-           header.ModifiedIP      = approvalRequest.ModifiedIP;
-        
-           // 3) Lines: update only those present in the payload, by Id
-           if (approvalRequest.ApprovalRequestLines != null && approvalRequest.ApprovalRequestLines.Count > 0)
-           {
-               var existingById = header.ApprovalRequestLines.ToDictionary(l => l.Id);
-        
-               foreach (var patch in approvalRequest.ApprovalRequestLines)
-               {
-                   if (!existingById.TryGetValue(patch.Id, out var line))
-                   {
-                       // Optional: support adds when Id == 0
-                       // if (patch.Id == 0) { header.ApprovalRequestLines.Add(patch); continue; }
-                       continue; // ignore unknown Ids
-                   }
-        
-                   // Apply EXACTLY what client sent (no extra logic)
-                   line.StatusId       = patch.StatusId;
-        
-                   // Audit from header payload (or use patch fields if you prefer)
-                   line.ModifiedBy     = approvalRequest.ModifiedBy;
-                   line.ModifiedByName = approvalRequest.ModifiedByName;
-                   line.ModifiedDate   = approvalRequest.ModifiedDate;
-                   line.ModifiedIP     = approvalRequest.ModifiedIP;
-               }
-           }
-        
-           var rows = await _notificationDbContext.SaveChangesAsync(ct);
-           await tx.CommitAsync(ct);
-           return rows > 0;
+        // Use CommandDefinition to pass the cancellation token
+        var cmd = new CommandDefinition(
+            commandText: "[AppData].[usp_Approval_UpdateLines]",
+            parameters: p,
+            commandType: CommandType.StoredProcedure,
+            cancellationToken: ct
+        );
+
+         await _dbConnection.ExecuteAsync(cmd);
+
+          return p.Get<int>("@NewHeaderStatusId");
         }
 
         public async Task<bool> CreateBulkAsync(string workflowType, int transactionId, string contextJson)

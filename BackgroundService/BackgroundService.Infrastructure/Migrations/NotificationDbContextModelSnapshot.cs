@@ -1071,6 +1071,30 @@ namespace BackgroundService.Infrastructure.Migrations
                     b.ToTable("ApprovalRuleCondition", "AppData");
                 });
 
+            modelBuilder.Entity("BackgroundService.Domain.Entities.Workflow.ApprovalStepDepartmentMapping", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ApprovalStepDetailId")
+                        .HasColumnType("int")
+                        .HasColumnName("ApprovalStepDetailId");
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int")
+                        .HasColumnName("DepartmentId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApprovalStepDetailId");
+
+                    b.ToTable("ApprovalStepDepartmentMapping", "AppData");
+                });
+
             modelBuilder.Entity("BackgroundService.Domain.Entities.Workflow.ApprovalStepDetail", b =>
                 {
                     b.Property<int>("Id")
@@ -1083,6 +1107,11 @@ namespace BackgroundService.Infrastructure.Migrations
                     b.Property<int>("ApprovalStepId")
                         .HasColumnType("int")
                         .HasColumnName("ApprovalStepId");
+
+                    b.Property<string>("Binding")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(10)")
+                        .HasColumnName("Binding");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
@@ -1129,6 +1158,11 @@ namespace BackgroundService.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("StopOnFirstMatch");
 
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(200)")
+                        .HasColumnName("Value");
+
                     b.Property<int>("WorkFlowTypeId")
                         .HasColumnType("int")
                         .HasColumnName("WorkFlowTypeId");
@@ -1166,70 +1200,6 @@ namespace BackgroundService.Infrastructure.Migrations
                     b.HasIndex("ApprovalStepDetailId");
 
                     b.ToTable("ApprovalStepUnitMapping", "AppData");
-                });
-
-            modelBuilder.Entity("BackgroundService.Domain.Entities.Workflow.ApprovalTarget", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ApprovalStepDetailId")
-                        .HasColumnType("int")
-                        .HasColumnName("ApprovalStepDetailId");
-
-                    b.Property<string>("Binding")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("Binding");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset?>("CreatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsActive");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsDeleted");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset?>("ModifiedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(200)")
-                        .HasColumnName("Value");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApprovalStepDetailId");
-
-                    b.ToTable("ApprovalTarget", "AppData");
                 });
 
             modelBuilder.Entity("BackgroundService.Domain.Entities.Workflow.RuleTargetOverride", b =>
@@ -1596,6 +1566,17 @@ namespace BackgroundService.Infrastructure.Migrations
                     b.Navigation("Rule");
                 });
 
+            modelBuilder.Entity("BackgroundService.Domain.Entities.Workflow.ApprovalStepDepartmentMapping", b =>
+                {
+                    b.HasOne("BackgroundService.Domain.Entities.Workflow.ApprovalStepDetail", "ApprovalStepDetail")
+                        .WithMany("ApprovalStepDepartmentMappings")
+                        .HasForeignKey("ApprovalStepDetailId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("ApprovalStepDetail");
+                });
+
             modelBuilder.Entity("BackgroundService.Domain.Entities.Workflow.ApprovalStepDetail", b =>
                 {
                     b.HasOne("BackgroundService.Domain.Entities.Notification.MiscMaster", "ApprovalStep")
@@ -1623,17 +1604,6 @@ namespace BackgroundService.Infrastructure.Migrations
                 {
                     b.HasOne("BackgroundService.Domain.Entities.Workflow.ApprovalStepDetail", "ApprovalStepDetail")
                         .WithMany("ApprovalStepUnitMappings")
-                        .HasForeignKey("ApprovalStepDetailId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("ApprovalStepDetail");
-                });
-
-            modelBuilder.Entity("BackgroundService.Domain.Entities.Workflow.ApprovalTarget", b =>
-                {
-                    b.HasOne("BackgroundService.Domain.Entities.Workflow.ApprovalStepDetail", "ApprovalStepDetail")
-                        .WithMany("ApprovalTargets")
                         .HasForeignKey("ApprovalStepDetailId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
@@ -1740,9 +1710,9 @@ namespace BackgroundService.Infrastructure.Migrations
 
                     b.Navigation("ApprovalRules");
 
-                    b.Navigation("ApprovalStepUnitMappings");
+                    b.Navigation("ApprovalStepDepartmentMappings");
 
-                    b.Navigation("ApprovalTargets");
+                    b.Navigation("ApprovalStepUnitMappings");
                 });
 
             modelBuilder.Entity("BackgroundService.Domain.Entities.Workflow.WorkflowType", b =>

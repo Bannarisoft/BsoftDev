@@ -12,6 +12,7 @@ namespace Contracts.Dtos.Purchase
         public string IndentDate { get; set; }
         public int IndentTypeId { get; set; }
         public int UnitId { get; set; }
+        public int DepartmentId { get; set; }
         public string Purpose { get; set; }
         public ICollection<IndentDetailDto> IndentDetails { get; set; }
     }

@@ -9,6 +9,7 @@ namespace BackgroundService.Application.Workflow.Common.Interfaces.IApprovalRequ
     public interface IApprovalRequestGrpcQuery
     {
         Task<List<ApprovalRequest>> GetApprovalRequestByWorkFlowTypeAsync(string WorkFlowType);
-        Task<List<ApprovalRequestLine>> GetApprovalRequestLineByWorkFlowTypeAsync(string WorkFlowType);
+        Task<List<ApprovalRequestLine>> GetApproverListByWorkFlowTypeAsync(string WorkFlowType);
+        Task<List<dynamic>> ApprovalRequestLineStatusByWorkFlowType(string WorkFlowType);
     }
 }

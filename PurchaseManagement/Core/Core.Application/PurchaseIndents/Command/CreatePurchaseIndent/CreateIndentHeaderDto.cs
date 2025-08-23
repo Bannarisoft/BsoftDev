@@ -12,6 +12,7 @@ namespace Core.Application.PurchaseIndents.Command.CreatePurchaseIndent
         public DateOnly IndentDate { get; set; }
         public int IndentTypeId { get; set; }
         public int UnitId { get; set; }
+        public int DepartmentId { get; set; }
         public string Purpose { get; set; }
         
     }

@@ -206,8 +206,6 @@ namespace PartyManagement.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PartyId");
-
                     b.ToTable("PartyActivityLog", "Party");
                 });
 
@@ -507,6 +505,10 @@ namespace PartyManagement.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("CIN")
+                        .HasColumnType("nvarchar(25)")
+                        .HasColumnName("CIN");
+
                     b.Property<int>("CompanyId")
                         .HasColumnType("int")
                         .HasColumnName("CompanyId");
@@ -550,9 +552,17 @@ namespace PartyManagement.Infrastructure.Migrations
                         .HasColumnType("nvarchar(20)")
                         .HasColumnName("GSTNumber");
 
+                    b.Property<DateTimeOffset?>("GSTRegistrationDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("GSTRegistrationDate");
+
                     b.Property<int?>("GSTStateCode")
                         .HasColumnType("int")
                         .HasColumnName("GSTStateCode");
+
+                    b.Property<string>("IECode")
+                        .HasColumnType("nvarchar(25)")
+                        .HasColumnName("IECode");
 
                     b.Property<bool>("Is206AB206CCAApplicable")
                         .HasColumnType("bit")
@@ -601,6 +611,10 @@ namespace PartyManagement.Infrastructure.Migrations
                     b.Property<string>("MSMENO")
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("MSMENO");
+
+                    b.Property<DateTimeOffset?>("MSMERegistrationDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("MSMERegistrationDate");
 
                     b.Property<int?>("MSMETypeId")
                         .HasColumnType("int")
@@ -734,17 +748,6 @@ namespace PartyManagement.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("MiscTypeMaster");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.PartyActivityLog", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.PartyMaster", "PartyLogActivity")
-                        .WithMany("PartyActivityLogTypes")
-                        .HasForeignKey("PartyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("PartyLogActivity");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.PartyAddress", b =>
@@ -971,8 +974,6 @@ namespace PartyManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.PartyMaster", b =>
                 {
-                    b.Navigation("PartyActivityLogTypes");
-
                     b.Navigation("PartyAddressTypes");
 
                     b.Navigation("PartyBankTypes");

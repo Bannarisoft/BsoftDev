@@ -88,7 +88,6 @@ namespace PartyManagement.Infrastructure.Repositories.PartyMaster
             partyMaster.PartyDocuments = (await multi.ReadAsync<PartyMasterDto.PartyDocumentDto>()).ToList();
             return partyMaster;
         }
-      
 
         public async Task<(List<GetPartyMasterDto>, int)> GetAllPartyMasterAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
@@ -140,7 +139,48 @@ namespace PartyManagement.Infrastructure.Repositories.PartyMaster
 
             return (partyMasters, totalCount);
         }
-     
+
+        public async Task<List<GetPartyMasterAutoCompleteDto>> GetPartyMasterAutoComplete(List<int> partyTypeIds,string searchPattern)
+        {
+                    var sql = @"
+                    SELECT 
+                        a.Id, 
+                        a.PartyCode,
+                        a.PartyName
+                    FROM Party.PartyMaster a
+                    INNER JOIN Party.PartyType b 
+                        ON a.Id = b.PartyId
+                    INNER JOIN Party.MiscMaster c 
+                        ON b.PartyTypeId = c.Id
+                    WHERE a.IsDeleted = 0  
+                    AND a.IsActive = 1
+                    /**where**/
+                    GROUP BY a.Id, a.PartyCode, a.PartyName";
+
+                // Dynamic filtering
+                var filters = new List<string>
+                {
+                    "(a.PartyName LIKE @SearchPattern OR a.PartyCode LIKE @SearchPattern)"
+                };
+
+                if (partyTypeIds != null && partyTypeIds.Any())
+                {
+                    filters.Add("b.PartyTypeId IN @PartyTypeIds");
+                }
+
+                var whereClause = "AND " + string.Join(" AND ", filters);
+                sql = sql.Replace("/**where**/", whereClause);
+
+                var parameters = new
+                {
+                    PartyTypeIds = partyTypeIds,
+                    SearchPattern = $"%{searchPattern}%"
+                };
+
+                var result = await _dbConnection.QueryAsync<GetPartyMasterAutoCompleteDto>(sql, parameters);
+
+                return result.ToList();
+        }
         public async Task<List<GetPartyMasterAutoCompleteDto>> GetPartyMasterAutoComplete(string searchPattern)
         {
             searchPattern = searchPattern ?? string.Empty; // Prevent null issues

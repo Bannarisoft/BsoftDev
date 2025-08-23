@@ -13,8 +13,8 @@ namespace Core.Application.PurchaseIndents.Command.UpdatePurchaseIndent
         public int IndentTypeId { get; set; }
         public int UnitId { get; set; }
         public string Purpose { get; set; }
+        public int DepartmentId { get; set; }
         public byte IsActive { get; set; }
         public ICollection<IndentDetailUpdateDto> IndentDetails { get; set; }
-        public ICollection<IndentDepartmentUpdateDto> IndentDepartments { get; set; }
     }
 }

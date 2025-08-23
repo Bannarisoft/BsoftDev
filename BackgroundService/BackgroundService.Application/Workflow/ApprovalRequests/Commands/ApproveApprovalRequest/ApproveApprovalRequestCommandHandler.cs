@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AutoMapper;
 using BackgroundService.Application.Interfaces.IMiscMaster;
@@ -8,6 +9,7 @@ using BackgroundService.Application.Notification.Common.Interfaces;
 using BackgroundService.Application.Workflow.Common.Interfaces.IApprovalRequest;
 using BackgroundService.Domain.Common;
 using BackgroundService.Domain.Entities.Workflow;
+using Contracts.Dtos.Purchase;
 using Contracts.Events.Workflow;
 using MediatR;
 
@@ -39,6 +41,7 @@ namespace BackgroundService.Application.Workflow.ApprovalRequests.Commands.Appro
 
             var statusApproved = await _miscMasterQuery.GetMiscMasterByName(MiscEnumEntity.ApprovalStatus, MiscEnumEntity.Approved);
             var statusRejected = await _miscMasterQuery.GetMiscMasterByName(MiscEnumEntity.ApprovalStatus, MiscEnumEntity.Rejected);
+            var statusPending = await _miscMasterQuery.GetMiscMasterByName(MiscEnumEntity.ApprovalStatus, MiscEnumEntity.Pending);
             string currentIp = _ipAddressService.GetSystemIPAddress();
             int userId = _ipAddressService.GetUserId();
             string username = _ipAddressService.GetUserName();
@@ -46,48 +49,48 @@ namespace BackgroundService.Application.Workflow.ApprovalRequests.Commands.Appro
             var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);
 
             var ApprovalReq = _imapper.Map<ApprovalRequest>(request);
+        //    var isPending = await _approvalRequestQuery.IsAnyApprovalPending(ApprovalReq.Id,cancellationToken);
+        //     if (isPending)
+        //     {
+        //         ApprovalReq.StatusId = statusPending.Id;
+        //     }
+        //     else
+        //     {
+        //         ApprovalReq.StatusId = request.IsApproved == 1 ? statusApproved.Id : statusRejected.Id;
+        //     }
             
-            ApprovalReq.StatusId = request.IsApproved == 1 ? statusApproved.Id : statusRejected.Id;
             ApprovalReq.ModifiedIP = currentIp;
             ApprovalReq.ModifiedDate = currentTime;
             ApprovalReq.ModifiedBy = userId;
             ApprovalReq.ModifiedByName = username;
 
-            foreach (var approval in ApprovalReq.ApprovalRequestLines)
+            var LineStatus =  _imapper.Map<List<ApproveLineStatusDto>>(request.ApprovalRequestLine);
+            foreach (var line in LineStatus)
             {
-                approval.StatusId = request.IsApproved == 1 ? statusApproved.Id : statusRejected.Id;
+                line.NewStatusId = line.IsApproved  == 1 ? statusApproved.Id : statusRejected.Id;
             }
             
-
-            // var ApprovalReq = new ApprovalRequest
-                // {
-                //     Id = request.Id,
-                //     StatusId = status.Id,
-                //     ModifiedIP = currentIp,
-                //     ModifiedDate = currentTime,
-                //     ModifiedBy = userId,
-                //     ModifiedByName = username,
-                //     Action = "test"
-                // };
-                var result = await _approvalRequestCommand.Approve(ApprovalReq,cancellationToken);
-            // if (ApprovalStepDetailId is not null)
-            // {
-            //     var correlationId = Guid.NewGuid();
-            //     var @event = new TransactionCreatedEvent
-            //     {
-            //         CorrelationId = correlationId,
-            //         ModuleTypeName = request.ModuleTypeName,
-            //         ModuleTransactionId = request.ModuleTransactionId,
-            //         UnitId = request.UnitId,
-            //         DepartmentId = request.DepartmentId
-            //     };
+                var result = await _approvalRequestCommand.Approve(ApprovalReq,JsonSerializer.Serialize(LineStatus),cancellationToken);
                 
-            //     await _eventPublisher.SaveEventAsync(@event);
-            //     await _eventPublisher.PublishPendingEventsAsync();
-            // }
-             
 
-            return result;          
+
+            
+                var ApprovalReqLine = _imapper.Map<List<UpdateApprovedQtyDto>>(request.ApprovalRequestLine);
+                
+                var correlationId = Guid.NewGuid();
+                var @event = new ApprovedRejectedEvent
+                {
+                    CorrelationId = correlationId,
+                    IndentId = request.ModuleTransactionId,
+                    ApprovedQty = ApprovalReqLine
+                };
+
+                await _eventPublisher.SaveEventAsync(@event);
+                await _eventPublisher.PublishPendingEventsAsync();
+        
+
+
+                return true;          
         }
     }
 }
