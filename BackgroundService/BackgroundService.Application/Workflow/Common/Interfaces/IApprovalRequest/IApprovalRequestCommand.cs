@@ -9,7 +9,7 @@ namespace BackgroundService.Application.Workflow.Common.Interfaces.IApprovalRequ
     public interface IApprovalRequestCommand
     {
         Task<bool> CreateBulkAsync(string WorkflowType, int TransactionId, string ContextJson);
-        Task<bool> Approve(ApprovalRequest approvalRequest,CancellationToken ct);
+        Task<int> Approve(ApprovalRequest approvalRequest, CancellationToken ct);
         Task<bool> Reject(ApprovalRequest approvalRequest);
     }
 }

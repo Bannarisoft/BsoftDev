@@ -22,20 +22,17 @@ namespace BackgroundService.API.GrpcServices
          public override async Task<ApprovalLineStatusListResponse> GetApprovalRequestLineStatus(ApprovalStatusRequest request, ServerCallContext context)
         {
 
-            var data = await _approvalRequestGrpcQuery.GetApprovalRequestLineByWorkFlowTypeAsync(request.ModuleTypeName);
-             var ApprovalReqDto = _mapper.Map<List<ApprovalRequestLineDto>>(data);
+            var data = await _approvalRequestGrpcQuery.ApprovalRequestLineStatusByWorkFlowType(request.ModuleTypeName);
+             
             var response = new ApprovalLineStatusListResponse();
             
-            foreach (var item in ApprovalReqDto)
+            foreach (var item in data)
               {
                   response.Approvalstatus.Add(new ApprovalRequestLineStatusDto
                   {
-                      ApprovalRequestLineId = item.Id,
+                      
                       ModuleLineTransactionId = Convert.ToInt32(item.ModuleLineTransactionId),
-                      Status = item.Status?.ToString() ?? string.Empty,
-                      ApproverBinding = item.ApproverBinding?.ToString() ?? string.Empty,
-                      ApproverValue = item.ApproverValue?.ToString() ?? string.Empty,
-                      ApprovalRequestId = item.ApprovalRequestId
+                      Status = item.Status?.ToString() ?? string.Empty
                   });
               }
             

@@ -11,8 +11,8 @@ namespace BackgroundService.Application.Workflow.Common.Interfaces.IApprovalRequ
         Task<List<int>> GetApprovalStepDetailByIdAsync(string WorkFlowType, int ModuleTransactionId, int UnitId, int DepartmentId);
         Task<(List<ApprovalRequest>, int)> GetAllApprovalRequestAsync(int PageNumber, int PageSize, string? SearchTerm);
         Task<List<dynamic>> GetAllApprovalRequestByWorkflowType(string ModuleTypeName);
-        Task<List<dynamic>> GetAllApprovalRequestByApprover(string ModuleTypeName, int ApproverId);
-        Task<List<int>> GetAllApprovalRequestByApproved(string ModuleTypeName);
         Task<List<int>> StartApprovalProcessAsync(List<int> Id, Dictionary<string, object> requestData);
+        Task<bool> IsAnyApprovalPending(int Id, CancellationToken cancellationToken);
+        
     }
 }

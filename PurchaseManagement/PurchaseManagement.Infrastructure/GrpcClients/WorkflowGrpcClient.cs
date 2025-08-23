@@ -16,21 +16,15 @@ namespace PurchaseManagement.Infrastructure.GrpcClients
         private readonly ApprovalRequestStatusAllService.ApprovalRequestStatusAllServiceClient _approvalRequestStatusAllService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ApprovalRequestLineStatusService.ApprovalRequestLineStatusServiceClient _approvalRequestLineStatusService;
+        private readonly ApproverService.ApproverServiceClient _approverServiceClient;
         public WorkflowGrpcClient(ApprovalRequestStatusAllService.ApprovalRequestStatusAllServiceClient approvalRequestStatusAllService,
-        IHttpContextAccessor httpContextAccessor, ApprovalRequestLineStatusService.ApprovalRequestLineStatusServiceClient approvalRequestLineStatusService)
+        IHttpContextAccessor httpContextAccessor, ApprovalRequestLineStatusService.ApprovalRequestLineStatusServiceClient approvalRequestLineStatusService,
+        ApproverService.ApproverServiceClient approverServiceClient)
         {
             _approvalRequestStatusAllService = approvalRequestStatusAllService;
             _httpContextAccessor = httpContextAccessor;
             _approvalRequestLineStatusService = approvalRequestLineStatusService;
-        }
-        public Task<List<int>> GetAllApprovalRequestByApproved(string ModuleTypeName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<ApprovalByApproverDto>> GetAllApprovalRequestByApprover(string ModuleTypeName, int ApproverId)
-        {
-            throw new NotImplementedException();
+            _approverServiceClient = approverServiceClient;
         }
 
         public async Task<List<Contracts.Dtos.Workflow.ApprovalRequestStatusDto>> GetAllApprovalRequestStatusAsync(string ModuleTypeName)
@@ -77,6 +71,31 @@ namespace PurchaseManagement.Infrastructure.GrpcClients
             var response = await _approvalRequestLineStatusService.GetApprovalRequestLineStatusAsync(request, new CallOptions(metadata));
 
             return response.Approvalstatus.Select(u => new Contracts.Dtos.Workflow.ApprovalRequestLineStatusDto
+            {
+                ModuleLineTransactionId = u.ModuleLineTransactionId,
+                Status = u.Status
+            }).ToList();
+        }
+
+        public async Task<List<Contracts.Dtos.Workflow.ApproverListDto>> GetApproverListAsync(string ModuleTypeName)
+        {
+            var token = _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].ToString();
+
+            if (string.IsNullOrWhiteSpace(token))
+                throw new UnauthorizedAccessException("Authorization token not found.");
+
+            if (!token.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                token = $"Bearer {token}";
+
+            var metadata = new Metadata
+            {
+                { "Authorization", token }
+            };
+             var request = new GrpcServices.BackgroundService.Line.ApproverRequest { ModuleTypeName = ModuleTypeName };
+
+            var response = await _approverServiceClient.GetApproverAsync(request, new CallOptions(metadata));
+
+            return response.Approvalstatus.Select(u => new Contracts.Dtos.Workflow.ApproverListDto
             {
                 ModuleLineTransactionId = u.ModuleLineTransactionId,
                 Status = u.Status,
