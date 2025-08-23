@@ -88,6 +88,7 @@ namespace PartyManagement.Infrastructure.Repositories.PartyMaster
             partyMaster.PartyDocuments = (await multi.ReadAsync<PartyMasterDto.PartyDocumentDto>()).ToList();
             return partyMaster;
         }
+      
 
         public async Task<(List<GetPartyMasterDto>, int)> GetAllPartyMasterAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
@@ -140,6 +141,20 @@ namespace PartyManagement.Infrastructure.Repositories.PartyMaster
             return (partyMasters, totalCount);
         }
 
+        public async Task<List<GetPartyMasterAutoCompleteDto>> GetByIdsAsync(IEnumerable<int> ids)
+        {
+            var idList = ids?.Distinct().ToList() ?? new List<int>();
+            if (idList.Count == 0) return new();
+
+            const string sql = @"
+                SELECT Id, PartyCode, PartyName
+                FROM Party.PartyMaster
+                WHERE IsDeleted = 0 AND IsActive = 1 AND Id IN @Ids;
+            ";
+
+            var rows = await _dbConnection.QueryAsync<GetPartyMasterAutoCompleteDto>(sql, new { Ids = idList });
+            return rows.ToList();
+        }
         public async Task<List<GetPartyMasterAutoCompleteDto>> GetPartyMasterAutoComplete(string searchPattern)
         {
             searchPattern = searchPattern ?? string.Empty; // Prevent null issues
@@ -152,7 +167,7 @@ namespace PartyManagement.Infrastructure.Repositories.PartyMaster
             var parameters = new
             {
                 SearchPattern = $"%{searchPattern}%"
-                
+
             };
 
             var partyMasters = await _dbConnection.QueryAsync<GetPartyMasterAutoCompleteDto>(query, parameters);

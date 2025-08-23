@@ -9,6 +9,7 @@ namespace Core.Application.Dashboard.CardView
         public int? OpenWorkOrder { get; set; }
         public int? InProgressWorkOrder { get; set; }
         public int? ClosedWorkOrder { get; set; }
+        public int? OverDueWorkOrder { get; set; }
         public List<ConsumptionDto> TopConsumptions { get; set; } = new();
     }
 }

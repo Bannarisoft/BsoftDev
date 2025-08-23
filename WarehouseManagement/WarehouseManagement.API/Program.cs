@@ -72,6 +72,7 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapGrpcService<RackGrpcService>().EnableGrpcWeb();    
     endpoints.MapGrpcService<WarehouseGrpcService>().EnableGrpcWeb();        
+    endpoints.MapGrpcService<BinGrpcService>().EnableGrpcWeb();     
     endpoints.MapControllers();
 });
 app.Run();

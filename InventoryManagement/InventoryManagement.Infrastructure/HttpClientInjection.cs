@@ -2,7 +2,7 @@
 using Contracts.Interfaces.External.IParty;
 using Contracts.Interfaces.External.IUser;
 using Contracts.Interfaces.External.IWarehouse;
-using GrpcServices.PartyManagement;
+using GrpcServices.Party.Party;
 using GrpcServices.UserManagement;
 using GrpcServices.Warehouse.Bin;
 using GrpcServices.Warehouse.Rack;
@@ -114,8 +114,8 @@ namespace InventoryManagement.Infrastructure
             })
             .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
             .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
-
             services.AddScoped<IWarehouseGrpcClient, WarehouseGrpcClient>();
+            
 
 
             return services;

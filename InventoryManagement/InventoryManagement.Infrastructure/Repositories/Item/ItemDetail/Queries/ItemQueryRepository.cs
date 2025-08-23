@@ -67,194 +67,198 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Querie
 
         public async Task<ItemDetailsDto?> GetByIdAsync(int id, CancellationToken ct = default)
         {
-            var dto =  await _db.ItemMaster
-            .AsNoTracking()
-            .Where(i => i.Id == id && i.IsDeleted == BaseEntity.IsDelete.NotDeleted)
-            .Select(i => new ItemDetailsDto
-            {
-                // base
-                Id = i.Id,
-                UnitId = i.UnitId,
-                ItemCode = i.ItemCode,
-                ItemName = i.ItemName,
-                HSNId = i.HSNId,
-                HSNCode = i.HSNMaster != null ? i.HSNMaster.HSNCode : null,
-                ItemGroupId = i.ItemGroupId,
-                ItemGroupName = i.ItemGroup != null ? i.ItemGroup.ItemGroupName : null,
-                ItemCategoryId = i.ItemCategoryId,
-                ItemCategoryName = i.ItemCategory != null ? i.ItemCategory.ItemCategoryName : null,
-                StockUomId = i.StockUomId,
-                StockUOM = i.UOM != null ? i.UOM.UOMName : null,
-                ItemClassificationId = i.ItemClassificationId,
-                ItemClassification = i.MiscClassification != null ? i.MiscClassification.Code : null,
-                Description = i.Description,
-                ValidFrom = i.ValidFrom,
-                XPlantMaterialStatusId = i.XPlantMaterialStatusId,
-                XPlantMaterialStatus = i.MiscStatus != null ? i.MiscStatus.Code : null,
-                IsStockItem = i.IsStockItem,
-                MaintainStock = i.MaintainStock,
-                HasVariants = i.HasVariants,
-                ParentItemId = i.ParentItemId,
-                ParentItemName = i.ParentItem != null ? i.ParentItem.ItemName : null,
-                ItemImage = i.ItemImage,
+            // 1) Load the item (single EF query)
+            var dto = await _db.ItemMaster
+                .AsNoTracking()
+                .Where(i => i.Id == id && i.IsDeleted == BaseEntity.IsDelete.NotDeleted)
+                .Select(i => new ItemDetailsDto
+                {
+                    // base
+                    Id = i.Id,
+                    UnitId = i.UnitId,
+                    ItemCode = i.ItemCode,
+                    ItemName = i.ItemName,
+                    HSNId = i.HSNId,
+                    HSNCode = i.HSNMaster != null ? i.HSNMaster.HSNCode : null,
+                    ItemGroupId = i.ItemGroupId,
+                    ItemGroupName = i.ItemGroup != null ? i.ItemGroup.ItemGroupName : null,
+                    ItemCategoryId = i.ItemCategoryId,
+                    ItemCategoryName = i.ItemCategory != null ? i.ItemCategory.ItemCategoryName : null,
+                    StockUomId = i.StockUomId,
+                    StockUOM = i.UOM != null ? i.UOM.UOMName : null,
+                    ItemClassificationId = i.ItemClassificationId,
+                    ItemClassification = i.MiscClassification != null ? i.MiscClassification.Code : null,
+                    Description = i.Description,
+                    ValidFrom = i.ValidFrom,
+                    XPlantMaterialStatusId = i.XPlantMaterialStatusId,
+                    XPlantMaterialStatus = i.MiscStatus != null ? i.MiscStatus.Code : null,
+                    IsStockItem = i.IsStockItem,
+                    MaintainStock = i.MaintainStock,
+                    HasVariants = i.HasVariants,
+                    ParentItemId = i.ParentItemId,
+                    ParentItemName = i.ParentItem != null ? i.ParentItem.ItemName : null,
+                    ItemImage = i.ItemImage,
 
-                // tabs (1-1)
-                Purchase = i.Purchase == null ? null : new ItemPurchaseDetailDto
-                {
-                    PurchaseUomId = i.Purchase.PurchaseUomId,
-                    PurchaseUOM = i.Purchase.PurchaseUOM != null ? i.Purchase.PurchaseUOM.UOMName : null,
-                    LeadTimeDays = i.Purchase.LeadTimeDays,
-                    SafetyStock = i.Purchase.SafetyStock,
-                    GrProcessingTimeDays = i.Purchase.GrProcessingTimeDays,
-                    AutomaticPo = i.Purchase.AutomaticPo,
-                    OriginCountryId = i.Purchase.OriginCountryId,
-                    TariffNumber = i.Purchase.TariffNumber
-                },
-                Inventory = i.Inventory == null ? null : new ItemInventoryDetailDto
-                {
-                    InventoryUOM = i.Inventory.WeightUOM != null ? i.Inventory.WeightUOM.UOMName : null,
-                    DefaultMaterialRequestType = i.MiscStatus != null ? i.MiscStatus.Code : null,
-                    ValuationMethod = i.MiscStatus != null ? i.MiscStatus.Code : null,
-                    RequestType = i.MiscStatus != null ? i.MiscStatus.Code : null,
-                    Weight = i.Inventory.Weight,
-                    WeightUomId = i.Inventory.WeightUomId,
-                    DefaultMaterialRequestTypeId = i.Inventory.DefaultMaterialRequestTypeId,
-                    ValuationMethodId = i.Inventory.ValuationMethodId,
-                    ShelfLife = i.Inventory.ShelfLife,
-                    UpperTolerance = i.Inventory.UpperTolerance,
-                    LowerTolerance = i.Inventory.LowerTolerance,
-                    BatchNumberSeries = i.Inventory.BatchNumberSeries,
-                    SerialNumberSeries = i.Inventory.SerialNumberSeries,
-                    ReorderLevel = i.Inventory.ReorderLevel,
-                    ReorderQty = i.Inventory.ReorderQty,
-                    RequestTypeId = i.Inventory.RequestTypeId,
-                    AllowNegativeStock = i.Inventory.AllowNegativeStock,
-                    BatchManagement = i.Inventory.BatchManagement,
-                    ApplyBatchNumber = i.Inventory.ApplyBatchNumber
-                },
-                Quality = i.Quality == null ? null : new ItemQualityDetailDto
-                {
-                    InspectionTemplateId = i.Quality.InspectionTemplateId,
-                    CertificateTypeId = i.Quality.CertificateTypeId,
-                    InspLotProcessingTime = i.Quality.InspLotProcessingTime,
-                    InspectionRequired = i.Quality.InspectionRequired,
-                    QualityInspectionFree = i.Quality.QualityInspectionFree,
-                    IsCertificateRequiredFromSupplier = i.Quality.IsCertificateRequiredFromSupplier,
-                    CertificateType = i.MiscStatus != null ? i.MiscStatus.Code : null,
-                },
-
-                // collections
-                Suppliers = i.Suppliers
-                    .OrderBy(s => s.SupplierId)
-                    .Select(s => new ItemSupplierDetailDto
+                    // tabs (1-1)
+                    Purchase = i.Purchase == null ? null : new ItemPurchaseDetailDto
                     {
-                        SupplierId     = s.SupplierId,
-                        UnitId         = s.UnitId,
-                        SupplierPartNo = s.SupplierPartNo
-                    })
-                    .ToList(),
-
-                Manufacture = i.Manufacture
-                    .OrderBy(m => m.UnitId)
-                    .Select(m => new ItemManufactureDetailDto
+                        PurchaseUomId = i.Purchase.PurchaseUomId,
+                        PurchaseUOM = i.Purchase.PurchaseUOM != null ? i.Purchase.PurchaseUOM.UOMName : null,
+                        LeadTimeDays = i.Purchase.LeadTimeDays,
+                        SafetyStock = i.Purchase.SafetyStock,
+                        GrProcessingTimeDays = i.Purchase.GrProcessingTimeDays,
+                        AutomaticPo = i.Purchase.AutomaticPo,
+                        OriginCountryId = i.Purchase.OriginCountryId,
+                        TariffNumber = i.Purchase.TariffNumber
+                    },
+                    Inventory = i.Inventory == null ? null : new ItemInventoryDetailDto
                     {
-                        UnitId = m.UnitId,
-                        ManufacturingTypeId = m.ManufacturingTypeId,
-                        ManufacturingType = _db.MiscMaster
-                            .Where(mm => mm.Id == m.ManufacturingTypeId)
-                            .Select(mm => mm.Code)
-                            .FirstOrDefault()
-                    })
-                    .ToList(),
-
-                Uoms = i.ItemUOMs
-                    .OrderBy(u => u.Id)
-                    .Select(u => new ItemDetailUomDto
+                        InventoryUOM = i.Inventory.WeightUOM != null ? i.Inventory.WeightUOM.UOMName : null,
+                        DefaultMaterialRequestType = i.MiscStatus != null ? i.MiscStatus.Code : null,
+                        ValuationMethod = i.MiscStatus != null ? i.MiscStatus.Code : null,
+                        RequestType = i.MiscStatus != null ? i.MiscStatus.Code : null,
+                        Weight = i.Inventory.Weight,
+                        WeightUomId = i.Inventory.WeightUomId,
+                        DefaultMaterialRequestTypeId = i.Inventory.DefaultMaterialRequestTypeId,
+                        ValuationMethodId = i.Inventory.ValuationMethodId,
+                        ShelfLife = i.Inventory.ShelfLife,
+                        UpperTolerance = i.Inventory.UpperTolerance,
+                        LowerTolerance = i.Inventory.LowerTolerance,
+                        BatchNumberSeries = i.Inventory.BatchNumberSeries,
+                        SerialNumberSeries = i.Inventory.SerialNumberSeries,
+                        ReorderLevel = i.Inventory.ReorderLevel,
+                        ReorderQty = i.Inventory.ReorderQty,
+                        RequestTypeId = i.Inventory.RequestTypeId,
+                        AllowNegativeStock = i.Inventory.AllowNegativeStock,
+                        BatchManagement = i.Inventory.BatchManagement,
+                        ApplyBatchNumber = i.Inventory.ApplyBatchNumber
+                    },
+                    Quality = i.Quality == null ? null : new ItemQualityDetailDto
                     {
-                        ConversionUOMId = u.ConversionUOMId,
-                        ConversionRate = u.ConversionRate,
-                        ConversionUOM = u.ConversionUOM != null ? u.ConversionUOM.UOMName : null
-                    })
-                    .ToList(),
+                        InspectionTemplateId = i.Quality.InspectionTemplateId,
+                        CertificateTypeId = i.Quality.CertificateTypeId,
+                        InspLotProcessingTime = i.Quality.InspLotProcessingTime,
+                        InspectionRequired = i.Quality.InspectionRequired,
+                        QualityInspectionFree = i.Quality.QualityInspectionFree,
+                        IsCertificateRequiredFromSupplier = i.Quality.IsCertificateRequiredFromSupplier,
+                        CertificateType = i.MiscStatus != null ? i.MiscStatus.Code : null,
+                    },
 
-                // variant values (same table for template or child)
-                VariantValues = _db.Set<ItemVariantValue>()
-                .Where(v => v.ItemId == i.Id)
-                .OrderBy(v => v.AttributeId)
-                .Select(v => new VariantDetailDto
-                {
-                    AttributeId = v.AttributeId,
-                    OptionValue = v.OptionValue,
-                    VariantBasedOn = v.VariantBasedOn,
-                    AttributeGroupId = v.AttributeGroupId,
+                    // collections
+                    Suppliers = i.Suppliers
+                        .OrderBy(s => s.SupplierId)
+                        .Select(s => new ItemSupplierDetailDto
+                        {
+                            SupplierId = s.SupplierId,
+                            UnitId = s.UnitId,
+                            SupplierPartNo = s.SupplierPartNo
+                        })
+                        .ToList(),
 
-                    VariantBasedOnValue = v.MiscVariantBasedOn != null ? v.MiscVariantBasedOn.Code : null,
-                    AttributeGroup = v.MiscAttributeGroup != null ? v.MiscAttributeGroup.Description : null,
-                    AttributeName = v.MiscAttribute != null ? v.MiscAttribute.Code : null
+                    Manufacture = i.Manufacture
+                        .OrderBy(m => m.UnitId)
+                        .Select(m => new ItemManufactureDetailDto
+                        {
+                            UnitId = m.UnitId,
+                            ManufacturingTypeId = m.ManufacturingTypeId,
+                            ManufacturingType = _db.MiscMaster
+                                .Where(mm => mm.Id == m.ManufacturingTypeId)
+                                .Select(mm => mm.Code)
+                                .FirstOrDefault()
+                        })
+                        .ToList(),
+
+                    Uoms = i.ItemUOMs
+                        .OrderBy(u => u.Id)
+                        .Select(u => new ItemDetailUomDto
+                        {
+                            ConversionUOMId = u.ConversionUOMId,
+                            ConversionRate = u.ConversionRate,
+                            ConversionUOM = u.ConversionUOM != null ? u.ConversionUOM.UOMName : null
+                        })
+                        .ToList(),
+
+                    VariantValues = _db.Set<ItemVariantValue>()
+                        .Where(v => v.ItemId == i.Id)
+                        .OrderBy(v => v.AttributeId)
+                        .Select(v => new VariantDetailDto
+                        {
+                            AttributeId = v.AttributeId,
+                            OptionValue = v.OptionValue,
+                            VariantBasedOn = v.VariantBasedOn,
+                            AttributeGroupId = v.AttributeGroupId,
+                            VariantBasedOnValue = v.MiscVariantBasedOn != null ? v.MiscVariantBasedOn.Code : null,
+                            AttributeGroup = v.MiscAttributeGroup != null ? v.MiscAttributeGroup.Description : null,
+                            AttributeName = v.MiscAttribute != null ? v.MiscAttribute.Code : null
+                        })
+                        .ToList(),
                 })
-                .ToList(),
-            })
-            .FirstOrDefaultAsync(ct);
-            
-            if (dto is null) return null;
-            //Unit gRPC           
-            var unitIds = new HashSet<int> { dto.UnitId };
-            if (dto.Suppliers != null)
-                foreach (var s in dto.Suppliers) unitIds.Add(s.UnitId);
-            if (dto.Manufacture != null)
-                foreach (var m in dto.Manufacture) unitIds.Add(m.UnitId);
-           
-            var units = await _unitGrpcClient.GetAllUnitAsync(); 
-            var unitMap = units.ToDictionary(u => u.UnitId, u => u.UnitName);
-            // 4) Fill names
-            dto.UnitName = unitMap.TryGetValue(dto.UnitId, out var nm) ? nm : null;
+                .FirstOrDefaultAsync(ct);
 
+            if (dto is null) return null;
+
+            // 2) Enrich with Units (gRPC)
+            var unitIds = new HashSet<int> { dto.UnitId };
+            if (dto.Suppliers != null) foreach (var s in dto.Suppliers) unitIds.Add(s.UnitId);
+            if (dto.Manufacture != null) foreach (var m in dto.Manufacture) unitIds.Add(m.UnitId);
+
+            var units = await _unitGrpcClient.GetAllUnitAsync();
+            var unitMap = units.ToDictionary(u => u.UnitId, u => u.UnitName);
+
+            dto.UnitName = unitMap.TryGetValue(dto.UnitId, out var uName) ? uName : null;
             if (dto.Suppliers != null)
                 foreach (var s in dto.Suppliers)
                     s.UnitName = unitMap.TryGetValue(s.UnitId, out var n) ? n : null;
-
             if (dto.Manufacture != null)
                 foreach (var m in dto.Manufacture)
                     m.UnitName = unitMap.TryGetValue(m.UnitId, out var n) ? n : null;
 
-            //Country grpc
-            var countries = _countryGrpcClient.GetAllCountryAsync();
-            var countryMap= countries.Result.ToDictionary(x => x.CountryId,x => x.CountryName);
+            // 3) Enrich with Countries (gRPC) — avoid .Result
+            var countries = await _countryGrpcClient.GetAllCountryAsync();
+            var countryMap = countries.ToDictionary(x => x.CountryId, x => x.CountryName);
             if (dto.Purchase?.OriginCountryId is int cid)
-            {
-                dto.Purchase.CountryName =
-                    countryMap.TryGetValue(cid, out var name) ? name : null;
-            }
-           // 🔹 Party gRPC — get supplier names
-           if (dto.Suppliers != null && dto.Suppliers.Count > 0)
+                dto.Purchase.CountryName = countryMap.TryGetValue(cid, out var cn) ? cn : null;
+
+           // inside ItemQueryRepository.GetByIdAsync (AFTER EF has finished and dto is materialized)
+            if (dto.Suppliers != null && dto.Suppliers.Count > 0)
             {
                 var supplierIds = dto.Suppliers
                     .Select(s => s.SupplierId)
                     .Where(id => id > 0)
                     .Distinct()
-                    .ToHashSet();
+                    .ToList();
+
                 if (supplierIds.Count > 0)
                 {
-                    try
+                    // Option A: sequential (simplest, avoids hammering)
+                    var nameMap = new Dictionary<int, string>();
+                    foreach (var sid in supplierIds)
                     {
-                        var parties = await _partyGrpcClient.GetAllPartyMasterAsync();
-                        // Adjust property names below to match your Party DTO (Id/Name OR PartyId/PartyName).                    
-                        var partyMap = parties
-                            .Where(p => supplierIds.Contains(p.PartyId))
-                            .GroupBy(p => p.PartyId)
-                            .ToDictionary(g => g.Key, g => g.First().PartyName);
+                        try
+                        {
+                            var list = await _partyGrpcClient.GetAutoCompleteAsync(sid.ToString(), ct);
+                            var exact = list.FirstOrDefault(p => p.Id == sid);
 
-                        foreach (var s in dto.Suppliers)
-                            s.SupplierName = partyMap.TryGetValue(s.SupplierId, out var name) ? name : null;
+                            if (exact != null) nameMap[sid] = exact.PartyName;
+                            else if (list.Count > 0) nameMap[sid] = list[0].PartyName;
+                        }
+                        catch (Grpc.Core.RpcException)
+                        {
+                            // ignore gracefully (service unavailable / unimplemented)
+                        }
                     }
-                    catch (RpcException ex) when (ex.StatusCode == StatusCode.Unimplemented || ex.StatusCode == StatusCode.Unavailable)
-                    {
-                        
-                    }
+
+                    foreach (var s in dto.Suppliers)
+                        s.SupplierName = nameMap.TryGetValue(s.SupplierId, out var nm) ? nm : null;
                 }
             }
+
+
+            // ✅ Make sure to return the DTO
             return dto;
         }
+
+
         public async Task<string> GetBaseDirectoryAsync(CancellationToken ct = default)
         {
             const string query = @"

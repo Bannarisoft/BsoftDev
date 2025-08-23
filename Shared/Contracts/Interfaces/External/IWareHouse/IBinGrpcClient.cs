@@ -8,7 +8,12 @@ namespace Contracts.Interfaces.External.IWarehouse
 {
     public interface IBinGrpcClient
     {
-        Task<List<BinDto>> GetAllMasterAsync(int warehouseId, int? rackId = null, string search = null, bool onlyActive = true, CancellationToken ct = default);
-        Task<BinDto> GetByIdAsync(int id, CancellationToken ct = default);
+        Task<List<BinDto>> GetAllBinMasterAsync(
+            int warehouseId,
+            int? rackId = null,
+            string? search = null,
+            bool onlyActive = true,
+            CancellationToken ct = default);
+        Task<BinDto?> GetByIdAsync(int id, CancellationToken ct = default);
     }
 }

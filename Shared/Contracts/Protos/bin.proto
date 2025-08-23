@@ -1,38 +1,41 @@
 syntax = "proto3";
 
 option csharp_namespace = "GrpcServices.Warehouse.Bin";
-
 package warehouse.bin;
 
 service BinService {
-  // Filter-friendly "get all"
   rpc GetAllBinMaster (BinListRequest) returns (BinListResponse);
-  // Optional: direct lookup
-  rpc GetBinById (GetBinByIdRequest) returns (BinDto);
+  rpc GetBinById      (GetBinByIdRequest) returns (BinDto);
 }
 
 message BinListRequest {
-  int32 warehouseId = 1;    // required
-  int32 rackId = 2;         // optional: 0/absent = any rack
-  string search = 3;        // optional: code/name contains
-  bool onlyActive = 4;      // default true
-}
-
-message GetBinByIdRequest {
-  int32 id = 1;
-}
-
-message BinDto {
-  int32 id = 1;
-  int32 warehouseId = 2;
-  int32 rackId = 3;
-  string binCode = 4;
-  string binName = 5;
-  double binCapacity = 6;
-  int32 capacityUOMId = 7;
-  int32 isActive = 8; // keep int to mirror your style
+  int32 pageNumber = 1;
+  int32 pageSize   = 2;
+  string search    = 3; // optional
 }
 
 message BinListResponse {
-  repeated BinDto bins = 1;
+  repeated BinDto items = 1;
+  int32 totalCount = 2;
+  int32 pageNumber = 3;
+  int32 pageSize   = 4;
+}
+
+message GetBinByIdRequest { int32 id = 1; }
+
+message BinDto {
+  int32 id = 1;
+  string binCode = 2;
+  string binName = 3;
+
+  int32 warehouseId = 4;
+  string warehouseCode = 5;
+  string warehouseName = 6;
+
+  int32 rackId = 7;        // 0 = NULL
+  string rackCode = 8;
+  string rackName = 9;
+
+  double binCapacity = 10;
+  int32 capacityUOMId = 11;  
 }
