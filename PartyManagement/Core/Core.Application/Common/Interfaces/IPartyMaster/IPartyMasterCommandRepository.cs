@@ -14,6 +14,7 @@ namespace Core.Application.Common.Interfaces.IPartyMaster
         Task<string> GetNextPartyCodeAsync();
         Task<bool> DeleteFileDetailsDocumentAsync(int Id, int PartyId, string filename);
         Task<List<int>> GetPartyDocumentIdsAsync(int partyId);
+        Task<bool> LogChange(int partyId, string tableName, string columnName, string oldValue, string newValue,string actionType);
         
     }
 }

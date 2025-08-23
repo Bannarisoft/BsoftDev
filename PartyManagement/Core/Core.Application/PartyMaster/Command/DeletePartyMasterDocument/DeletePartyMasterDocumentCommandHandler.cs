@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IPartyMaster;
+using Core.Domain.Entities;
 using MediatR;
 
 namespace Core.Application.PartyMaster.Command.DeletePartyMasterDocument
@@ -13,13 +14,17 @@ namespace Core.Application.PartyMaster.Command.DeletePartyMasterDocument
         private readonly IFileUploadService _fileUploadService;   
         private readonly IPartyMasterQueryRepository _ipartyMasterQueryRepository;
         private readonly IPartyMasterCommandRepository _ipartyMasterCommandRepository;
+        private readonly IPartyActivityLogCommandRepository _ipartyActivityLogCommandRepository;
+        private readonly IIPAddressService _ipAddressService;
 
 
-        public DeletePartyMasterDocumentCommandHandler(IPartyMasterQueryRepository ipartyMasterQueryRepository, IFileUploadService fileUploadService, IPartyMasterCommandRepository partyMasterCommandRepository)
+        public DeletePartyMasterDocumentCommandHandler(IPartyMasterQueryRepository ipartyMasterQueryRepository, IFileUploadService fileUploadService, IPartyMasterCommandRepository partyMasterCommandRepository, IPartyActivityLogCommandRepository partyActivityLogCommandRepository, IIPAddressService ipAddressService)
         {
             _ipartyMasterQueryRepository = ipartyMasterQueryRepository;
             _fileUploadService = fileUploadService;
             _ipartyMasterCommandRepository = partyMasterCommandRepository;
+            _ipartyActivityLogCommandRepository = partyActivityLogCommandRepository;
+            _ipAddressService = ipAddressService;
         }
 
         public async Task<bool> Handle(DeletePartyMasterDocumentCommand request, CancellationToken cancellationToken)
@@ -59,6 +64,8 @@ namespace Core.Application.PartyMaster.Command.DeletePartyMasterDocument
                 {
                     throw new Exception("Document entry not found or deletion failed in DB.");
                 }
+                
+                await _ipartyMasterCommandRepository.LogChange(request.PartyId, "PartyDocuments", "FileName", request.FileName?? "", "", "Delete");                  
             }
 
             return true;

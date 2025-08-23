@@ -4,11 +4,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.PartyMaster.Command.CreatePartyMaster;
+using Core.Application.PartyMaster.Command.DeletePartyMaster;
 using Core.Application.PartyMaster.Command.DeletePartyMasterDocument;
 using Core.Application.PartyMaster.Command.UpdatePartyMaster;
 using Core.Application.PartyMaster.Command.UploadPartyMasterDocument;
 using Core.Application.PartyMaster.Queries.GetPartMaster;
 using Core.Application.PartyMaster.Queries.GetPartMasterAutoComplete;
+using Core.Application.PartyMaster.Queries.GetPartyActivityLog;
 using Core.Application.PartyMaster.Queries.GetPartyGroupLoad;
 using Core.Application.PartyMaster.Queries.GetPartyMasterById;
 using MassTransit.Futures.Contracts;
@@ -92,6 +94,7 @@ namespace PartyManagement.API.Controllers
 
         }
 
+
         [HttpPost("upload-document")]
         public async Task<IActionResult> UploadDocument(UploadPartyMasterDocumentCommand uploadFileCommand)
         {
@@ -173,15 +176,71 @@ namespace PartyManagement.API.Controllers
             });
         }
 
-         [HttpGet("by-name")]
-        public async Task<IActionResult> GetPartyMasterAutoComplete([FromQuery] string? Typename)
+        [HttpGet("by-name")]
+        public async Task<IActionResult> GetPartyMasterAutoComplete(
+            [FromQuery] string? partyTypeIds,
+            [FromQuery] string? Typename)
         {
-            var PartyMaster = await Mediator.Send(new GetPartyMasterAutoCompleteQuery
+            // Convert comma-separated string to List<int>
+            List<int>? parsedPartyTypeIds = null;
+            if (!string.IsNullOrWhiteSpace(partyTypeIds))
             {
+                parsedPartyTypeIds = partyTypeIds
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(int.Parse)
+                    .ToList();
+            }
+
+            var partyMaster = await Mediator.Send(new GetPartyMasterAutoCompleteQuery
+            {
+                PartyTypeIds = parsedPartyTypeIds,
                 SearchPattern = Typename ?? string.Empty
             });
 
-            return Ok(new { StatusCode = StatusCodes.Status200OK, data = PartyMaster });
-        }       
+            return Ok(new 
+            { 
+                StatusCode = StatusCodes.Status200OK, 
+                Data = partyMaster 
+            });
+        }
+
+        [HttpGet("PartActivityLog/{partyId}")]
+        [ActionName(nameof(GetByPartyIdAsync))]
+        public async Task<IActionResult> GetByPartyIdAsync(int partyId, CancellationToken cancellationToken)
+        {
+            var logs = await _mediator.Send(new GetPartyActivityLogQuery { PartyId = partyId }, cancellationToken);
+
+            if (logs == null || !logs.Any())
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    data = (object?)null,
+                    message = $"No activity logs found for PartyId {partyId}"
+                });
+            }
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data = logs,
+                message = "Party activity logs fetched successfully"
+            });
+        }
+        
+        [HttpDelete ("{id}")]
+        public async Task<IActionResult> DeleteAsync(int id)
+        {
+
+            // Process the delete command
+            await _mediator.Send(new DeletePartyMasterCommand { Id = id });
+
+            return Ok(new
+            {
+                message = "Deleted successfully.",
+                statusCode = StatusCodes.Status200OK
+            });
+
+        }     
     }
 }

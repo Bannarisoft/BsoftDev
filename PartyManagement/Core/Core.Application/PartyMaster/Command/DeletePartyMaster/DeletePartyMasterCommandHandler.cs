@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.Exceptions;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IPartyMaster;
+using Core.Domain.Entities;
 using Core.Domain.Events;
 using MediatR;
 
@@ -16,12 +18,18 @@ namespace Core.Application.PartyMaster.Command.DeletePartyMaster
         private readonly IPartyMasterCommandRepository _ipartyMasterCommandRepository;
         private readonly IMediator _imediator;
         private readonly IMapper _imapper;
+        private readonly IPartyActivityLogCommandRepository _ipartyActivityLogCommandRepository;
+        
+        private readonly IIPAddressService _ipAddressService;
 
-        public DeletePartyMasterCommandHandler(IPartyMasterCommandRepository ipartyMasterCommandRepository, IMediator imediator, IMapper imapper)
+        public DeletePartyMasterCommandHandler(IPartyMasterCommandRepository ipartyMasterCommandRepository, IMediator imediator, IMapper imapper, IPartyActivityLogCommandRepository ipartyActivityLogCommandRepository, IIPAddressService ipAddressService)
         {
             _ipartyMasterCommandRepository = ipartyMasterCommandRepository;
             _imediator = imediator;
             _imapper = imapper;
+            _ipartyActivityLogCommandRepository = ipartyActivityLogCommandRepository;
+            _ipAddressService = ipAddressService;
+          
         }
 
         public async Task<bool> Handle(DeletePartyMasterCommand request, CancellationToken cancellationToken)
@@ -36,9 +44,18 @@ namespace Core.Application.PartyMaster.Command.DeletePartyMaster
                 actionName: partymaster.PartyCode ?? "NULL",
                 details: $"PartyMaster details was deleted",
                 module: "PartyMaster");
-            await _imediator.Publish(domainEvent);
+                await _imediator.Publish(domainEvent);
 
-            return result == true ? result : throw new ExceptionRules("PartyMaster deletion failed.");
+            if (result)
+            {
+                await _ipartyMasterCommandRepository.LogChange(partymaster.Id, "PartyMaster", "IsDeleted", "0", "1", "Delete");  
+
+                return true;
+            }
+            else
+            {
+                throw new ExceptionRules("PartyMaster deletion failed.");
+            }
         }
     }
 }

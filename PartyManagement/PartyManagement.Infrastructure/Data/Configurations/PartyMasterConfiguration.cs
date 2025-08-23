@@ -250,7 +250,25 @@ namespace PartyManagement.Infrastructure.Data.Configurations
             builder.Property(m => m.PartyStatus)
               .HasColumnName("PartyStatus")
               .HasColumnType("nvarchar(20)");
-               
+
+            builder.Property(x => x.GSTRegistrationDate)
+                   .HasColumnName("GSTRegistrationDate")
+                    .HasColumnType("datetimeoffset")
+                  .IsRequired(false); // Allows NULL in DB
+
+
+            builder.Property(x => x.MSMERegistrationDate)
+                   .HasColumnName("MSMERegistrationDate")
+                    .HasColumnType("datetimeoffset")
+                  .IsRequired(false); // Allows NULL in DB
+
+            builder.Property(m => m.CIN)
+              .HasColumnName("CIN")
+              .HasColumnType("nvarchar(25)");
+
+             builder.Property(m => m.IECode)
+              .HasColumnName("IECode")
+              .HasColumnType("nvarchar(25)");
                                                 
         }
     }

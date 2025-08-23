@@ -39,6 +39,10 @@ namespace Core.Application.PartyMaster.Command.CreatePartyMaster
         public byte IsInternalSupplier { get; set; }
         public byte IsInternalCustomer { get; set; }
         public byte IsStopPayment { get; set; }
+        public DateTimeOffset? GSTRegistrationDate { get; set; }
+        public DateTimeOffset? MSMERegistrationDate { get; set; }
+        public string? CIN { get; set; }
+        public string? IECode { get; set; }
         public List<PartyTypeDto>? PartyTypes { get; set; }
         public List<PartyContactDto>? PartyContacts { get; set; }
         public List<PartyAddressDto>? PartyAddresses { get; set; }

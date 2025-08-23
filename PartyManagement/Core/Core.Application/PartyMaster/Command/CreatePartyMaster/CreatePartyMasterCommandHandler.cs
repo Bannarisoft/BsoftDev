@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.Exceptions;
 using Core.Application.Common.Interfaces.IPartyMaster;
+using Core.Domain.Entities;
 using Core.Domain.Events;
 using MediatR;
 
@@ -14,15 +15,18 @@ namespace Core.Application.PartyMaster.Command.CreatePartyMaster
     {
         private readonly IPartyMasterCommandRepository _partyMasterCommandRepository;
         private readonly IPartyMasterQueryRepository _ipartyMasterQueryRepository;
+
+        private readonly IPartyActivityLogCommandRepository _ipartyActivityLogCommandRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
 
-        public CreatePartyMasterCommandHandler(IPartyMasterCommandRepository partyMasterCommandRepository, IMapper mapper, IMediator mediator, IPartyMasterQueryRepository ipartyMasterQueryRepository)
+        public CreatePartyMasterCommandHandler(IPartyMasterCommandRepository partyMasterCommandRepository, IMapper mapper, IMediator mediator, IPartyMasterQueryRepository ipartyMasterQueryRepository, IPartyActivityLogCommandRepository ipartyActivityLogCommandRepository)
         {
             _partyMasterCommandRepository = partyMasterCommandRepository;
             _mapper = mapper;
             _mediator = mediator;
             _ipartyMasterQueryRepository = ipartyMasterQueryRepository;
+            _ipartyActivityLogCommandRepository = ipartyActivityLogCommandRepository;
         }
 
         public async Task<int> Handle(CreatePartyMasterCommand request, CancellationToken cancellationToken)
@@ -154,8 +158,20 @@ namespace Core.Application.PartyMaster.Command.CreatePartyMaster
 
             await _mediator.Publish(domainEvent, cancellationToken);
 
-            return result > 0 ? result : throw new ExceptionRules("PartyMaster creation failed.");
-        }
+            if (result > 0)
+            {
+
+                // ✅ Insert into PartyActivityLog immediately
+                await _partyMasterCommandRepository.LogChange(partyMasterEntity.Id, "PartyMaster", "PartyName", "", partyMasterEntity.PartyName ?? " ", "Insert");  
+
+            }
+            else
+            {
+                throw new ExceptionRules("PartyMaster creation failed.");
+            }
+
+            return result;
+            }
         
          private void EnsureDirectoryExists(string path)
         {
