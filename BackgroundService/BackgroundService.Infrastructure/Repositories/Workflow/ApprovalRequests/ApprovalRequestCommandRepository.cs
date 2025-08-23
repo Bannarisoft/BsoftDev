@@ -26,14 +26,14 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequest
             _ipAddressService = ipAddressService;
         }
 
-        public async Task<int> Approve(ApprovalRequest approvalRequest,CancellationToken ct)
+        public async Task<int> Approve(ApprovalRequest approvalRequest,string ApprovalRequestLines,CancellationToken ct)
         {
                 var p = new DynamicParameters();
         p.Add("@HeaderId", approvalRequest.Id, DbType.Int32);
-        p.Add("@JsonUpdates", approvalRequest.ApprovalRequestLines, DbType.String);
-        p.Add("@Approved", MiscEnumEntity.Approved, DbType.Int32);
-        p.Add("@Rejected", MiscEnumEntity.Rejected, DbType.Int32);
-        p.Add("@Pending", MiscEnumEntity.Pending, DbType.Int32);
+        p.Add("@JsonUpdates", ApprovalRequestLines, DbType.String);
+        p.Add("@Approved", MiscEnumEntity.Approved, DbType.String);
+        p.Add("@Rejected", MiscEnumEntity.Rejected, DbType.String);
+        p.Add("@Pending", MiscEnumEntity.Pending, DbType.String);
         p.Add("@ModifiedBy", _ipAddressService.GetUserId(), DbType.Int32);
         p.Add("@NewHeaderStatusId", dbType: DbType.Int32, direction: ParameterDirection.Output);
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AutoMapper;
 using BackgroundService.Application.Interfaces.IMiscMaster;
@@ -48,27 +49,28 @@ namespace BackgroundService.Application.Workflow.ApprovalRequests.Commands.Appro
             var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);
 
             var ApprovalReq = _imapper.Map<ApprovalRequest>(request);
-           var isPending = await _approvalRequestQuery.IsAnyApprovalPending(ApprovalReq.Id,cancellationToken);
-            if (isPending)
-            {
-                ApprovalReq.StatusId = statusPending.Id;
-            }
-            else
-            {
-                ApprovalReq.StatusId = request.IsApproved == 1 ? statusApproved.Id : statusRejected.Id;
-            }
+        //    var isPending = await _approvalRequestQuery.IsAnyApprovalPending(ApprovalReq.Id,cancellationToken);
+        //     if (isPending)
+        //     {
+        //         ApprovalReq.StatusId = statusPending.Id;
+        //     }
+        //     else
+        //     {
+        //         ApprovalReq.StatusId = request.IsApproved == 1 ? statusApproved.Id : statusRejected.Id;
+        //     }
             
             ApprovalReq.ModifiedIP = currentIp;
             ApprovalReq.ModifiedDate = currentTime;
             ApprovalReq.ModifiedBy = userId;
             ApprovalReq.ModifiedByName = username;
 
-            foreach (var approval in ApprovalReq.ApprovalRequestLines)
+            var LineStatus =  _imapper.Map<List<ApproveLineStatusDto>>(request.ApprovalRequestLine);
+            foreach (var line in LineStatus)
             {
-                approval.StatusId = request.IsApproved == 1 ? statusApproved.Id : statusRejected.Id;
+                line.NewStatusId = line.IsApproved  == 1 ? statusApproved.Id : statusRejected.Id;
             }
             
-                var result = await _approvalRequestCommand.Approve(ApprovalReq,cancellationToken);
+                var result = await _approvalRequestCommand.Approve(ApprovalReq,JsonSerializer.Serialize(LineStatus),cancellationToken);
                 
 
 
