@@ -22,30 +22,6 @@ namespace PurchaseManagement.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Core.Domain.Entities.IndentDepartmentMapping", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("DepartmentId")
-                        .HasColumnType("int")
-                        .HasColumnName("DepartmentId");
-
-                    b.Property<int>("IndentHeaderId")
-                        .HasColumnType("int")
-                        .HasColumnName("IndentHeaderId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IndentHeaderId");
-
-                    b.ToTable("IndentDepartmentMapping", "Purchase");
-                });
-
             modelBuilder.Entity("Core.Domain.Entities.IndentDetail", b =>
                 {
                     b.Property<int>("Id")
@@ -54,6 +30,10 @@ namespace PurchaseManagement.Infrastructure.Migrations
                         .HasColumnName("Id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal?>("ApprovedQuantity")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("ApprovedQuantity");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
@@ -147,6 +127,10 @@ namespace PurchaseManagement.Infrastructure.Migrations
                     b.Property<string>("CreatedIP")
                         .IsRequired()
                         .HasColumnType("varchar(20)");
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int")
+                        .HasColumnName("DepartmentId");
 
                     b.Property<DateOnly>("IndentDate")
                         .HasColumnType("date")
@@ -378,17 +362,6 @@ namespace PurchaseManagement.Infrastructure.Migrations
                     b.ToTable("MiscTypeMaster", "Purchase");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.IndentDepartmentMapping", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.IndentHeader", "IndentHeader")
-                        .WithMany("IndentDepartmentMappings")
-                        .HasForeignKey("IndentHeaderId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("IndentHeader");
-                });
-
             modelBuilder.Entity("Core.Domain.Entities.IndentDetail", b =>
                 {
                     b.HasOne("Core.Domain.Entities.IndentHeader", "IndentHeader")
@@ -424,8 +397,6 @@ namespace PurchaseManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.IndentHeader", b =>
                 {
-                    b.Navigation("IndentDepartmentMappings");
-
                     b.Navigation("IndentDetails");
                 });
 

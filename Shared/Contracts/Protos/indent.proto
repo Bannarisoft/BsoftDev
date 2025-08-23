@@ -26,17 +26,13 @@ message IndentDto {
     string IndentDate = 3;
     int32 IndentTypeId = 4;
     int32 UnitId = 5;
-    string Purpose = 6;
+    int32 DepartmentId = 6;
+    string Purpose = 7;
 
-    repeated IndentDetailDto indent_details = 7;
-    repeated IndentDepartmentMappingDto indent_department_mappings = 8;
+    repeated IndentDetailDto indent_details = 8;
 }
 
-message IndentDepartmentMappingDto {
-  int32 Id = 1;
-  int32 IndentHeaderId = 2;
-  int32 DepartmentId = 3;
-}
+
 
 message IndentResponse {
     IndentDto indent = 1;

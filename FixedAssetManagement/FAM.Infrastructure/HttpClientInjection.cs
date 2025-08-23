@@ -2,7 +2,6 @@
 using Contracts.Interfaces.External.IUser;
 using Contracts.Interfaces.External.IWorkflow;
 using FAM.Infrastructure.GrpcClients;
-using GrpcServices.BackgroundService;
 using GrpcServices.UserManagement;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -120,31 +119,7 @@ namespace FAM.Infrastructure
 
             services.AddScoped<ICountryGrpcClient,CountryGrpcClient>();
 
-             // ✅ Register Workflow gRPC Client
-            services.AddGrpcClient<ApprovalRequestStatusAllService.ApprovalRequestStatusAllServiceClient>(options =>
-            {
-                options.Address = new Uri(backGroundServiceUrl);
-            })
-            .ConfigurePrimaryHttpMessageHandler(() => GrpcHttpHandler)
-            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
-            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
-            services.AddScoped<IWorkflowGrpcClient, WorkflowGrpcClient>();
-
-            services.AddGrpcClient<ApprovalRequestByApproverService.ApprovalRequestByApproverServiceClient>(options =>
-            {
-                options.Address = new Uri(backGroundServiceUrl);
-            })
-            .ConfigurePrimaryHttpMessageHandler(() => GrpcHttpHandler)
-            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
-            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
-
-            services.AddGrpcClient<ApprovedApprovalRequestService.ApprovedApprovalRequestServiceClient>(options =>
-            {
-                options.Address = new Uri(backGroundServiceUrl);
-            })
-            .ConfigurePrimaryHttpMessageHandler(() => GrpcHttpHandler)
-            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
-            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+            
             
 
             return services;

@@ -37,12 +37,13 @@ namespace Core.Application.PurchaseIndents.Queries.GetPendingIndentById
             var Indent = _mapper.Map<PendingIndentByIdDto>(result);
 
             var workflowResponse = await _workflowGrpcClient.GetApprovalRequestLineStatusAsync(MiscEnumEntity.PurchaseIndent);
+            var workflowApproverResponse = await _workflowGrpcClient.GetApproverListAsync(MiscEnumEntity.PurchaseIndent);
 
              var ApproverStatusLookup = workflowResponse.ToDictionary(d => d.ModuleLineTransactionId, d => d.Status);
-             var ApproverLookup = workflowResponse.ToDictionary(d => d.ModuleLineTransactionId, d => d.ApproverValue);
-             var ApproveRequestLineLookup = workflowResponse.ToDictionary(d => d.ModuleLineTransactionId, d => d.ApprovalRequestLineId);
+             var ApproverLookup = workflowApproverResponse.ToDictionary(d => d.ModuleLineTransactionId, d => d.ApproverValue);
+             var ApproveRequestLineLookup = workflowApproverResponse.ToDictionary(d => d.ModuleLineTransactionId, d => d.ApprovalRequestLineId);
 
-             Indent.ApprovalRequestHeaderId = workflowResponse.FirstOrDefault().ApprovalRequestId;
+             Indent.ApprovalRequestHeaderId = workflowApproverResponse.Where(d => d.ModuleLineTransactionId == Indent.IndentDetails.FirstOrDefault().Id).FirstOrDefault().ApprovalRequestId;
 
             foreach (var dto in Indent.IndentDetails)
             {

@@ -15,6 +15,7 @@ namespace Core.Domain.Entities
         public decimal TotalEstimatedCost { get; set; }
         public int PRConsumptionDays { get; set; }
         public string Remark { get; set; }
+        public decimal? ApprovedQuantity { get; set; }
         public IndentHeader IndentHeader { get; set; }
         
     }

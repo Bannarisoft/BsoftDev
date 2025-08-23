@@ -61,6 +61,7 @@ namespace SagaOrchestrator.Infrastructure
                 x.AddSagaStateMachine<WorkOrderNotificationState, NotificationWorkOrder>()
                     .InMemoryRepository();
                 x.AddSagaStateMachine<ApprovalRequestStateMachine, ApprovalRequestState>().InMemoryRepository();
+                x.AddSagaStateMachine<ApprovedRejectedStateMachine, ApprovedRejectedState>().InMemoryRepository();
 
                 x.AddConsumer<UserCreatedEventConsumer>();
                 x.AddConsumer<AssetCreatedEventConsumer>();

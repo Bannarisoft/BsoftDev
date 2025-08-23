@@ -49,6 +49,7 @@
   <Protobuf Include="..\..\Shared\Contracts\Protos\allapprovalrequeststatus.proto" GrpcServices="Client" />
   <Protobuf Include="..\..\Shared\Contracts\Protos\approvalrequestlinestatus.proto" GrpcServices="Client" />
   <Protobuf Include="..\..\Shared\Contracts\Protos\allusers.proto" GrpcServices="Client" />
+  <Protobuf Include="..\..\Shared\Contracts\Protos\getapprover.proto" GrpcServices="Client" />
 </ItemGroup>
 
   <PropertyGroup>

@@ -72,7 +72,7 @@ namespace Core.Application.PurchaseIndents.Command.CreatePurchaseIndent
                     ModuleTypeName = MiscEnumEntity.PurchaseIndent,
                     ModuleTransactionId = result.Id,
                     UnitId = request.UnitId,
-                    DepartmentId = 2,
+                    DepartmentId = request.DepartmentId,
                     Payload = serializedPayload
                 };
 

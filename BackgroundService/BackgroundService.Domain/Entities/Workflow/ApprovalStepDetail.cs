@@ -21,6 +21,7 @@ namespace BackgroundService.Domain.Entities.Workflow
 
         public ICollection<ApprovalRequest> ApprovalRequest { get; set; }
         public ICollection<ApprovalRule> ApprovalRules { get; set; }
+        public ICollection<ApprovalStepDepartmentMapping> ApprovalStepDepartmentMappings { get; set; }
         
         
         

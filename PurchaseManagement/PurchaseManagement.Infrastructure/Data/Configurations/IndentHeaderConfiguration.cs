@@ -60,6 +60,11 @@ namespace PurchaseManagement.Infrastructure.Data.Configurations
                 .HasColumnType("varchar(max)")  
                 .IsRequired();
 
+                builder.Property(m => m.DepartmentId)
+                   .HasColumnName("DepartmentId")
+                   .HasColumnType("int")
+                   .IsRequired();
+
 
             builder.Property(b => b.IsActive)
                     .HasColumnName("IsActive")
