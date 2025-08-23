@@ -13,6 +13,8 @@ namespace BackgroundService.Domain.Entities.Workflow
         public int StepOrder { get; set; }
         public byte StopOnFirstMatch { get; set; }
         public int ApprovalStepId { get; set; }
+        public required string Binding { get; set; }
+        public required string Value { get; set; }
         public WorkflowType WorkflowType { get; set; }
         public MiscMaster ApprovalStep { get; set; }
         public ICollection<ApprovalStepUnitMapping> ApprovalStepUnitMappings { get; set; }
@@ -20,7 +22,6 @@ namespace BackgroundService.Domain.Entities.Workflow
         public ICollection<ApprovalRequest> ApprovalRequest { get; set; }
         public ICollection<ApprovalRule> ApprovalRules { get; set; }
         
-        public ICollection<ApprovalTarget> ApprovalTargets { get; set; }
         
         
     }

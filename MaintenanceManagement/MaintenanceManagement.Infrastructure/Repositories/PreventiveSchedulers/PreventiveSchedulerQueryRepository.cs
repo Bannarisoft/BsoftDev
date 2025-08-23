@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
+using Core.Domain.Common;
 using Core.Domain.Entities;
 using Dapper;
 using MaintenanceManagement.Infrastructure.Migrations;
@@ -53,7 +54,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             return (nextDate, reminderDate);
         }
 
-        public async Task<(IEnumerable<dynamic> PreventiveSchedulerList, int)> GetAllPreventiveSchedulerAsync(int PageNumber, int PageSize, string? SearchTerm,List<int> departmentIds)
+        public async Task<(IEnumerable<dynamic> PreventiveSchedulerList, int)> GetAllPreventiveSchedulerAsync(int PageNumber, int PageSize, string? SearchTerm, List<int> departmentIds)
         {
             var UnitId = _ipAddressService.GetUnitId();
             var query = $@"
@@ -237,7 +238,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             return count > 0;
         }
 
-          public async Task<bool> NotFoundDetailAsync(int id)
+        public async Task<bool> NotFoundDetailAsync(int id)
         {
             var query = "SELECT COUNT(1) FROM [Maintenance].[PreventiveSchedulerDetail] WHERE Id = @Id AND IsDeleted = 0";
 
@@ -319,7 +320,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                             )
                             OR
                             -- Inactive: include ONLY if WO exists AND status is allowed
-                            (PS.IsActive = 0 AND PSD.IsActive = 0
+                            ((PS.IsActive = 0 OR PSD.IsActive = 0)
                                 AND WO.Id IS NOT NULL
                                 AND MISC.Code IN @StatusCodes
                             )
@@ -370,7 +371,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                             )
                             OR
                             -- Inactive schedules: must have WO and allowed status
-                            (PS.IsActive = 0 AND PSD.IsActive = 0
+                            ((PS.IsActive = 0 OR PSD.IsActive = 0)
                                 AND WO.Id IS NOT NULL
                                 AND MISC.Code IN @StatusCodes
                             )
@@ -710,7 +711,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
             return PreventiveSchedulerResponse.FirstOrDefault()!;
         }
-         public async Task<List<Core.Domain.Entities.MachineMaster>> GetUnMappedMachineIdByCode(int Id)
+        public async Task<List<Core.Domain.Entities.MachineMaster>> GetUnMappedMachineIdByCode(int Id)
         {
             // var statusCodes = new[] { StatusOpen.Code, GetStatusId.Status, WorkOrderHold.Code };
 
@@ -721,10 +722,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 FROM [Maintenance].[PreventiveSchedulerDetail]
                 WHERE PreventiveSchedulerHeaderId = @Id
             )
-            SELECT MachineId, IsActive
+            SELECT L.MachineId, L.IsActive
             INTO #notActiveMachine
-            FROM LatestMachineStatus
-            WHERE rn = 1 AND IsActive = 0 or IsDeleted=1;
+            FROM LatestMachineStatus L
+            LEFT JOIN Maintenance.WorkOrder WO ON WO.PreventiveScheduleId = L.Id
+			LEFT JOIN [Maintenance].[MiscMaster] MM ON MM.Id = WO.StatusId
+            WHERE rn = 1 AND L.IsActive = 0 or L.IsDeleted=1 or MM.Code=@Status;
 
             -- Step 2: Get machines not in PreventiveSchedulerDetail (unmapped)
             SELECT M.Id, M.MachineCode, M.MachineName  
@@ -746,12 +749,72 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
             var parameters = new
             {
-                Id
-                // StatusCodes = statusCodes,
-              //  DoneStatus = MaintenanceStatusUpdate.Code
+                Id,
+                Status = MaintenanceStatusCancelled.Code,
+                //  DoneStatus = MaintenanceStatusUpdate.Code
             };
             var machines = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineMaster>(query, parameters);
             return machines.ToList();
+        }
+        public async Task<bool> OneTimeSchedulerValidate(int preventiveSchedulerId, CancellationToken ct)
+        {
+            const string sql = $@"
+                   SELECT COUNT(*)
+        FROM Maintenance.PreventiveSchedulerDetail AS PSD
+        WHERE PSD.PreventiveSchedulerHeaderId = @preventiveSchedulerId
+          AND PSD.IsDeleted = 0
+          AND EXISTS (
+              SELECT 1
+              FROM Maintenance.WorkOrder AS WO
+              WHERE WO.PreventiveScheduleId = PSD.Id
+          );
+            ";
+
+
+            var cmd = new CommandDefinition(
+         commandText: sql,
+         parameters: new { preventiveSchedulerId },
+         cancellationToken: ct
+     );
+
+            var count = await _dbConnection.ExecuteScalarAsync<int>(cmd);
+            return count > 0;
+        }
+          public async Task<PreventiveSchedulerHeader> OnetimeFrequencyValidation(int id, CancellationToken ct)
+        {
+
+                       const string sql = @"
+                   SELECT
+                       PS.Id,
+                       PS.FrequencyTypeId,
+                       MISC.Id,
+                       MISC.Code
+                   FROM Maintenance.PreventiveSchedulerHeader AS PS
+                   INNER JOIN Maintenance.MiscMaster AS MISC ON MISC.Id = PS.FrequencyTypeId
+                   WHERE PS.IsDeleted = 0 AND PS.Id = @PreventiveScheduleId;
+               ";
+
+               var cmd = new CommandDefinition(
+                   commandText: sql,
+                   parameters: new { PreventiveScheduleId = id },
+                   cancellationToken: ct
+               );
+
+               var rows = await _dbConnection.QueryAsync<
+                   PreventiveSchedulerHeader,
+                   Core.Domain.Entities.MiscMaster,
+                   PreventiveSchedulerHeader
+               >(
+                   cmd,
+                   map: (header, misc) =>
+                   {
+                       header.MiscFrequencyType = misc;  
+                       return header;
+                   },
+                   splitOn: "Id"  
+               );
+
+               return rows.FirstOrDefault();
         }
     }
 }

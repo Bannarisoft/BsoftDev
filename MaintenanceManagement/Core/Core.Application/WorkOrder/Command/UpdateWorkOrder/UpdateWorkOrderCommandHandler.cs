@@ -3,6 +3,7 @@ using Contracts.Events.Maintenance;
 using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
+using Core.Application.Common.Interfaces.IPreventiveSchedulerLog;
 using Core.Application.Common.Interfaces.IWorkOrder;
 using Core.Domain.Common;
 using Core.Domain.Events;
@@ -10,6 +11,7 @@ using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Serilog;
 
 namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
@@ -27,10 +29,11 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
         private readonly ICompanyGrpcClient _companyGrpcClient; 
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ITimeZoneService _timeZoneService;
+        private readonly IPreventiveScheduleLogService _preventiveScheduleLogService;
 
         public UpdateWorkOrderCommandHandler(IWorkOrderCommandRepository workOrderRepository, IMapper mapper, IWorkOrderQueryRepository workOrderQueryRepository,
         IMediator mediator, IEventPublisher eventPublisher, ILogger<UpdateWorkOrderCommandHandler> logger, ILogQueryService logQueryService,
-        IUnitGrpcClient unitGrpcClient, ICompanyGrpcClient companyGrpcClient, IHttpContextAccessor httpContextAccessor, ITimeZoneService timeZoneService)
+        IUnitGrpcClient unitGrpcClient, ICompanyGrpcClient companyGrpcClient, IHttpContextAccessor httpContextAccessor, ITimeZoneService timeZoneService, IPreventiveScheduleLogService preventiveScheduleLogService)
         {
             _workOrderRepository = workOrderRepository;
             _mapper = mapper;
@@ -43,10 +46,12 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
             _companyGrpcClient = companyGrpcClient;
             _httpContextAccessor = httpContextAccessor;
             _timeZoneService = timeZoneService;
+            _preventiveScheduleLogService = preventiveScheduleLogService;
         }
 
         public async Task<ApiResponseDTO<bool>> Handle(UpdateWorkOrderCommand request, CancellationToken cancellationToken)
         {
+            await _preventiveScheduleLogService.CaptureLogs(null,request.WorkOrder.PreventiveScheduleId,"Work Order Update",JsonConvert.SerializeObject(request));
             var token = _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].ToString();
             var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
             var systemTimeZone = TimeZoneInfo.FindSystemTimeZoneById(systemTimeZoneId);

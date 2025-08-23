@@ -125,6 +125,7 @@ namespace Core.Domain.Common
             public const string Code = "Hold";
         }
         public const string System = "System";
+        public const string Every = "Every";
 
 
     }

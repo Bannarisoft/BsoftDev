@@ -220,15 +220,44 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequest
         public async Task<List<ApprovalRequestLine>> GetApprovalRequestLineByWorkFlowTypeAsync(string WorkFlowType)
         {
              const string query = @"
-            SELECT ARL.Id,ARL.ModuleLineTransactionId,ARL.ApproverBinding,ARL.ApproverValue,MM.Id,MM.Code FROM [AppData].[ApprovalRequest] AR
-            INNER JOIN [AppData].[ApprovalRequestLine] ARL ON AR.Id =ARL.ApprovalRequestId
-            INNER JOIN [AppData].[MiscMaster] MM ON MM.Id = ARL.StatusId
-            WHERE MM.Code=@Status AND AR.WorkflowType=@WorkflowType";
+            WITH ranked AS (
+                SELECT
+                    ARL.Id,
+                    ARL.ApprovalRequestId,
+                    ARL.ModuleLineTransactionId,
+                    ARL.ApproverBinding,
+                    ARL.ApproverValue,
+                    MM.Id            AS StatusId,
+                    MM.Code          AS StatusCode,
+                    ASD.StepOrder,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY ARL.ModuleLineTransactionId
+                        ORDER BY ASD.StepOrder ASC, ARL.Id ASC
+                    ) AS rn
+                FROM [AppData].[ApprovalRequest]       AR
+                INNER JOIN [AppData].[ApprovalRequestLine] ARL ON AR.Id = ARL.ApprovalRequestId
+                INNER JOIN [AppData].[MiscMaster]      MM ON MM.Id = ARL.StatusId
+                INNER JOIN [AppData].[ApprovalStepDetail] ASD ON ASD.Id = AR.ApprovalStepDetailId
+                WHERE
+                    MM.Code = @Status
+                    AND AR.WorkflowType = @WorkflowType
+            )
+            SELECT
+                Id,
+                ApprovalRequestId,
+                ModuleLineTransactionId,
+                ApproverBinding,
+                ApproverValue,
+                StatusId,
+                StatusCode,
+                StepOrder
+            FROM ranked
+            WHERE rn = 1;";
 
                var parameters = new
             {
-                Status = MiscEnumEntity.Pending,
-                WorkflowType = WorkFlowType
+                WorkflowType = WorkFlowType,
+                Status = MiscEnumEntity.Pending
             };
 
             var ApprovalRequest = await _dbConnection.QueryAsync<ApprovalRequestLine, Domain.Entities.Notification.MiscMaster, ApprovalRequestLine>(
