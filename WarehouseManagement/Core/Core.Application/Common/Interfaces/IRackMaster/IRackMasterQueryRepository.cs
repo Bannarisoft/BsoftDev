@@ -12,7 +12,9 @@ namespace Core.Application.Common.Interfaces.IRackMaster
         Task<(List<RackMasterDto>, int)> GetAllAsync(int PageNumber, int PageSize, string SearchTerm);
         Task<RackMasterDto> GetByIdAsync(int id);
         Task<bool> RackSlotAlreadyExistsAsync(int warehouseId, int? floorId, int? aisleId, int? rackLevelId, int? id = null);
+
+        Task<List<GetRackMasterAutoCompleteDto>> GetRackMasterAutoCompletes(string searchPattern);
         
-        Task<List<GetRackMasterAutoCompleteDto>>  GetRackMasterAutoCompletes(string searchPattern);
+         Task<List<RackMasterDto>> GetRackAsync(); 
     }
 }

@@ -137,9 +137,9 @@ namespace WarehouseManagement.Infrastructure.Repositories.RackMaster
             return count > 0;
         }
 
-           public async Task<List<GetRackMasterAutoCompleteDto>> GetRackMasterAutoCompletes(string searchPattern)
-                {
-                    const string sql = @"
+        public async Task<List<GetRackMasterAutoCompleteDto>> GetRackMasterAutoCompletes(string searchPattern)
+        {
+            const string sql = @"
                     SELECT 
                         r.Id,
                         r.RackCode,
@@ -151,16 +151,25 @@ namespace WarehouseManagement.Infrastructure.Repositories.RackMaster
                         OR (r.RackName IS NOT NULL AND r.RackName LIKE '%' + @Term + '%'))
                     ORDER BY r.RackCode, r.RackName;";
 
-                    var rows = await _dbConnection.QueryAsync<GetRackMasterAutoCompleteDto>(sql, new
-                    {
-                        Term = (searchPattern ?? string.Empty).Trim(),
-                      
-                    });
+            var rows = await _dbConnection.QueryAsync<GetRackMasterAutoCompleteDto>(sql, new
+            {
+                Term = (searchPattern ?? string.Empty).Trim(),
 
-                    return rows.ToList();
-                }
-        
-        
+            });
+
+            return rows.ToList();
+        }
+               
+               
+        public async Task<List<RackMasterDto>> GetRackAsync()
+                {
+                    const string sql = @"SELECT Id, RackCode, RackName 
+                                        FROM Warehouse.RackMaster
+                                        WHERE IsDeleted = 0";
+
+                    var items = (await _dbConnection.QueryAsync<RackMasterDto>(sql)).ToList();
+                    return items;
+                }  
 
     }
 }
