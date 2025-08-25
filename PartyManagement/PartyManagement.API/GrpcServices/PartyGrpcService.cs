@@ -40,26 +40,4 @@ public sealed class PartyGrpcService : PartyProto.PartyService.PartyServiceBase
             PartyName = p.PartyName ?? string.Empty
         };
     }
-
-    // ✅ new:
-    public override async Task<PartyProto.PartyResponse> GetPartiesByIds(
-        PartyProto.GetPartiesByIdsRequest request, ServerCallContext context)
-    {
-        if (request.Ids == null || request.Ids.Count == 0)
-            return new PartyProto.PartyResponse();
-
-        var data = await _repo.GetByIdsAsync(request.Ids.Select(i => (int)i));
-
-        var resp = new PartyProto.PartyResponse();
-        foreach (var p in data)
-        {
-            resp.Items.Add(new PartyProto.PartyDto
-            {
-                Id        = p.Id,
-                PartyCode = p.PartyCode ?? string.Empty,
-                PartyName = p.PartyName ?? string.Empty
-            });
-        }
-        return resp;
-    }
 }
