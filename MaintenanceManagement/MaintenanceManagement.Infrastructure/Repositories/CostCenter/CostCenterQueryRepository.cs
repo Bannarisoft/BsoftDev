@@ -86,7 +86,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.CostCenter
             const string query = @"
              SELECT Id, CostCenterName 
             FROM Maintenance.CostCenter 
-            WHERE IsDeleted = 0  AND UnitId = @UnitId
+            WHERE IsDeleted = 0  AND UnitId = @UnitId And IsActive = 1
             AND CostCenterName LIKE @SearchPattern";
             var parameters = new
             {

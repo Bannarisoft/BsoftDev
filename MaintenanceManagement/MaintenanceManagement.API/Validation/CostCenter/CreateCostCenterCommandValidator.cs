@@ -87,12 +87,20 @@ namespace MaintenanceManagement.API.Validation.CostCenter
                             .WithMessage($"{nameof(CreateCostCenterCommand.CostCenterName)} {rule.Error}");
                         break;
 
-                     case "AlreadyExists":
-                            RuleFor(x => x.CostCenterCode)
-                           .MustAsync(async (CostCenterCode, cancellation) => !await _iCostCenterCommandRepository.ExistsByCodeAsync(CostCenterCode))
-                           .WithName("CostCenter Code")
-                           .WithMessage($"{rule.Error}");
-                            break;                    
+                    //  case "AlreadyExists":
+                    //         RuleFor(x => x.CostCenterCode)
+                    //        .MustAsync(async (CostCenterCode, cancellation) => !await _iCostCenterCommandRepository.ExistsByCodeAsync(CostCenterCode))
+                    //        .WithName("CostCenter Code")
+                    //        .WithMessage($"{rule.Error}");
+                    //         break; 
+                    case "AlreadyExists":
+                            RuleFor(x => new { x.CostCenterCode, x.CostCenterName, x.UnitId })
+                                .MustAsync(async (x, cancellation) =>
+                                    !await _iCostCenterCommandRepository
+                                        .ExistsByCodeOrNameAndUnitAsync(x.CostCenterCode ?? string.Empty , x.CostCenterName?? string.Empty, x.UnitId))
+                                .WithName("CostCenter")
+                                .WithMessage("CostCenterCode or CostCenterName already exists in this Unit.");
+                            break;                   
                     default:
                         // Handle unknown rule (log or throw)
                         Log.Information("Warning: Unknown rule '{Rule}' encountered.", rule.Rule);

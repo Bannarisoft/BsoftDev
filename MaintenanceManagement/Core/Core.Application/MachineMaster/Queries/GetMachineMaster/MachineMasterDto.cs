@@ -24,6 +24,9 @@ namespace Core.Application.MachineMaster.Queries.GetMachineMaster
         public int LineNo { get; set; }
         public Status IsActive { get; set; }
         public byte IsProductionMachine { get; set; }
+        public int DepartmentId { get; set; }
+        public string? ProductionDepartmentName { get; set; }
+        public string? SpecificationName { get; set; }
 
         
     }

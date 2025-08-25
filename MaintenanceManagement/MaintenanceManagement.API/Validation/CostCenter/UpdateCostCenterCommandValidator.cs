@@ -74,13 +74,14 @@ namespace MaintenanceManagement.API.Validation.CostCenter
                             .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
                             .WithMessage($"{nameof(UpdateCostCenterCommand.CostCenterName)} {rule.Error}");
                         break;
-                  case "AlreadyExists":
-                        RuleFor(x => x.CostCenterName)
-                            .MustAsync(async (x, CostCenterName, cancellation) => 
-                                !await _iCostCenterCommandRepository.IsNameDuplicateAsync(CostCenterName, x.Id))
-                            .WithName("CostCenter Name")
-                            .WithMessage($"{rule.Error}");
-                        break;
+                case "AlreadyExists":
+                    RuleFor(x => x.CostCenterName)
+                        .MustAsync(async (model, costCenterName, cancellation) =>
+                            !await _iCostCenterCommandRepository.IsNameDuplicateAsync(
+                                costCenterName, model.Id, model.UnitId))
+                        .WithName("CostCenter Name")
+                        .WithMessage("CostCenter Name already exists in this Unit.");
+                    break;
                     case "RecordNotFound":
                         RuleFor(x => x.Id)
                             .MustAsync(async (id, cancellation) => 
