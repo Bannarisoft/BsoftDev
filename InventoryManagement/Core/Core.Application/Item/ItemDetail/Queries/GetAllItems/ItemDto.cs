@@ -116,6 +116,12 @@ namespace Core.Application.Item.ItemDetail.Queries.GetAllItems
         public int SupplierId { get; set; }
         public int UnitId { get; set; }
         public string? SupplierPartNo { get; set; }
+        public int? LeadTime { get; set; }
+        public int? MOQ { get; set; }
+        public int? MOQUomId { get; set; }
+        public decimal? PackageValue { get; set; }
+        public int? PackageUomId { get; set; }
+        public bool? DefaultSupplier { get; set; }
     }
     public class ItemSupplierDetailDto : ItemSupplierDto
     {
