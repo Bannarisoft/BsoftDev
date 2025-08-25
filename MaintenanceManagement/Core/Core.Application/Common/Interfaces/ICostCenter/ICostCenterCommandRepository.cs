@@ -9,9 +9,10 @@ namespace Core.Application.Common.Interfaces.ICostCenter
     {
         Task<int> CreateAsync(Core.Domain.Entities.CostCenter costCenter);
         Task<bool> ExistsByCodeAsync(string? costCenterCode);
-        Task<int> UpdateAsync(int Id,Core.Domain.Entities.CostCenter costCenter);
-        Task<int> DeleteAsync(int Id,Core.Domain.Entities.CostCenter costCenter);
-        Task<bool> IsNameDuplicateAsync(string? name, int excludeId);
+        Task<int> UpdateAsync(int Id, Core.Domain.Entities.CostCenter costCenter);
+        Task<int> DeleteAsync(int Id, Core.Domain.Entities.CostCenter costCenter);
+        Task<bool> IsNameDuplicateAsync(string? name, int excludeId, int unitId);
+        Task<bool> ExistsByCodeOrNameAndUnitAsync(string code, string name, int unitId);
       
     }
 }
