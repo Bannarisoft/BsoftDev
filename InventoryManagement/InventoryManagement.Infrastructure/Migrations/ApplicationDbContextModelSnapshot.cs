@@ -797,9 +797,33 @@ namespace InventoryManagement.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool?>("DefaultSupplier")
+                        .HasColumnType("bit")
+                        .HasColumnName("DefaultSupplier");
+
                     b.Property<int>("ItemId")
                         .HasColumnType("int")
                         .HasColumnName("ItemId");
+
+                    b.Property<int?>("LeadTime")
+                        .HasColumnType("int")
+                        .HasColumnName("LeadTime");
+
+                    b.Property<int?>("MOQ")
+                        .HasColumnType("int")
+                        .HasColumnName("MOQ");
+
+                    b.Property<int?>("MOQUomId")
+                        .HasColumnType("int")
+                        .HasColumnName("MOQUomId");
+
+                    b.Property<int?>("PackageUomId")
+                        .HasColumnType("int")
+                        .HasColumnName("PackageUomId");
+
+                    b.Property<decimal?>("PackageValue")
+                        .HasColumnType("decimal(18, 3)")
+                        .HasColumnName("PackageValue");
 
                     b.Property<int>("SupplierId")
                         .HasColumnType("int")
@@ -1006,6 +1030,139 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ItemGroup", "Inventory");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.PutAway.PutAwayRule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ItemCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ItemGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemCategoryId");
+
+                    b.HasIndex("ItemGroupId");
+
+                    b.HasIndex("ItemId");
+
+                    b.HasIndex("UnitId", "WarehouseId", "ItemGroupId", "ItemCategoryId", "ItemId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_PutAwayRule_Scope")
+                        .HasFilter("[ItemId] IS NOT NULL");
+
+                    b.ToTable("PutAwayRule", "Inventory");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.PutAway.PutAwayStrategy", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int>("PriorityId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PutAwayRuleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StorageTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TargetId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PriorityId");
+
+                    b.HasIndex("StorageTypeId");
+
+                    b.HasIndex("PutAwayRuleId", "PriorityId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_PutAwayStrategy_PriorityPerRule")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("PutAwayStrategy", "Inventory");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
@@ -1624,6 +1781,59 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.Navigation("NewItem");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.Item.PutAway.PutAwayRule", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Item.ItemCategory", "ItemCategory")
+                        .WithMany("PutAwayRuleCategory")
+                        .HasForeignKey("ItemCategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.Item.ItemGroup", "ItemGroup")
+                        .WithMany("PutAwayRuleGroup")
+                        .HasForeignKey("ItemGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.Item.ItemDetail.ItemMaster", "ItemMaster")
+                        .WithMany("PutAwayRules")
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ItemCategory");
+
+                    b.Navigation("ItemGroup");
+
+                    b.Navigation("ItemMaster");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.PutAway.PutAwayStrategy", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscPriority")
+                        .WithMany("PutAwayStrategyPriority")
+                        .HasForeignKey("PriorityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.Item.PutAway.PutAwayRule", "PutAwayRule")
+                        .WithMany("Strategies")
+                        .HasForeignKey("PutAwayRuleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscStorageTypeId")
+                        .WithMany("PutAwayStrategyStorageType")
+                        .HasForeignKey("StorageTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("MiscPriority");
+
+                    b.Navigation("MiscStorageTypeId");
+
+                    b.Navigation("PutAwayRule");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
                 {
                     b.HasOne("Core.Domain.Entities.MiscTypeMaster", "MiscTypeMaster")
@@ -1696,6 +1906,8 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.Navigation("ChildCategories");
 
                     b.Navigation("ItemMasterCategory");
+
+                    b.Navigation("PutAwayRuleCategory");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Item.ItemDetail.ItemMaster", b =>
@@ -1709,6 +1921,8 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.Navigation("Manufacture");
 
                     b.Navigation("Purchase");
+
+                    b.Navigation("PutAwayRules");
 
                     b.Navigation("Quality");
 
@@ -1731,6 +1945,13 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.Navigation("ItemCategory");
 
                     b.Navigation("ItemMasterGroup");
+
+                    b.Navigation("PutAwayRuleGroup");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.PutAway.PutAwayRule", b =>
+                {
+                    b.Navigation("Strategies");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
@@ -1756,6 +1977,10 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.Navigation("ItemMasterStatus");
 
                     b.Navigation("ItemQualityCertificateType");
+
+                    b.Navigation("PutAwayStrategyPriority");
+
+                    b.Navigation("PutAwayStrategyStorageType");
 
                     b.Navigation("TypeHSNs");
 

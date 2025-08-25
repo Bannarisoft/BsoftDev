@@ -31,7 +31,6 @@ namespace WarehouseManagement.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllWarehouseMasterAsync([FromQuery] int PageNumber, [FromQuery] int PageSize, [FromQuery] string? SearchTerm = null)
         {
-
             var rackmaster = await Mediator.Send(
                 new GetAllRackMasterQuery
                 {

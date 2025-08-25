@@ -10,6 +10,7 @@ using Core.Application.Common.Interfaces.Item.ItemDetail;
 using Core.Application.Common.Interfaces.Item.ItemDetail.Commands;
 using Core.Application.Common.Interfaces.Item.ItemDetail.Queries;
 using Core.Application.Common.Interfaces.Item.ItemGroup;
+using Core.Application.Common.Interfaces.Item.PutAway;
 using Core.Application.Common.Interfaces.Item.Templates;
 using Core.Application.Common.Interfaces.IUOM;
 using Core.Application.Common.Interfaces.IUOMConversion;
@@ -66,6 +67,8 @@ namespace InventoryManagement.Infrastructure
                     maxRetryDelay: TimeSpan.FromSeconds(30), // Delay between retries
                     errorNumbersToAdd: null); // Add specific SQL error numbers to retry on (optional)
             }));
+
+            
 
             // Register IDbConnection for Dapper
             services.AddTransient<IDbConnection>(sp => new SqlConnection(connectionString));
@@ -144,7 +147,8 @@ namespace InventoryManagement.Infrastructure
             services.AddScoped<IItemVariantValueQueryRepository, ItemVariantValueQueryRepository>();
             services.AddScoped<IItemQueryRepository, ItemQueryRepository>();
             services.AddScoped<ITemplateRepository,TemplateRepository>();
-            
+            services.AddScoped<IPutAwayRuleCommandRepository,PutAwayRuleCommandRepository>();
+            services.AddScoped<IPutAwayRuleQueryRepository,PutAwayRuleQueryRepository>();           
 
 
             // Miscellaneous services

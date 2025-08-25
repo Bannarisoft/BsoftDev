@@ -4,6 +4,7 @@ using Core.Application.Common.Interfaces.Item.ItemDetail.Commands;
 using Core.Application.Common.Interfaces.Item.ItemDetail.Queries;
 using Core.Application.Item.ItemDetail.Commands.CreateItem;
 using Core.Application.Item.ItemDetail.Queries.GetAllItems;
+using Core.Domain.Common;
 using Core.Domain.Events;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -21,7 +22,7 @@ namespace Core.Application.Item.ItemAggregate.Handlers
         private readonly IItemInventoryCommandRepository _inventoryRepo;
         private readonly IItemQualityCommandRepository _qualityRepo;
         private readonly IItemSupplierCommandRepository _supplierRepo;
-        private readonly IItemManufactureCommandRepository _manuRepo;
+        private readonly IItemManufactureCommandRepository _manufactureRepo;
         private readonly IItemUomCommandRepository _uomRepo;
         private readonly IItemQueryRepository _itemQueryRepository;
         private readonly IItemVariantValueCommandRepository _variantCmd;
@@ -36,7 +37,7 @@ namespace Core.Application.Item.ItemAggregate.Handlers
             IItemInventoryCommandRepository inventoryRepo,
             IItemQualityCommandRepository qualityRepo,
             IItemSupplierCommandRepository supplierRepo,
-            IItemManufactureCommandRepository manuRepo,
+            IItemManufactureCommandRepository manufactureRepo,
             IItemUomCommandRepository uomRepo,
             IItemQueryRepository itemQueryRepository,
             ILogger<CreateItemCommandHandler> logger,
@@ -51,7 +52,7 @@ namespace Core.Application.Item.ItemAggregate.Handlers
             _inventoryRepo = inventoryRepo;
             _qualityRepo = qualityRepo;
             _supplierRepo = supplierRepo;
-            _manuRepo = manuRepo;
+            _manufactureRepo = manufactureRepo;
             _uomRepo = uomRepo;
             _itemQueryRepository = itemQueryRepository;
             _logger = logger;
@@ -79,6 +80,7 @@ namespace Core.Application.Item.ItemAggregate.Handlers
                     // 1) base
                     var item = _mapper.Map<Core.Domain.Entities.Item.ItemDetail.ItemMaster>(p);
                     item.ItemCode = itemCode;
+                    item.IsActive = BaseEntity.Status.Active;
                     var newId = await _itemRepo.CreateAsync(item, ct);
 
                     // 2) tabs
@@ -100,7 +102,7 @@ namespace Core.Application.Item.ItemAggregate.Handlers
 
                     // 3) collections
                     if (p.Suppliers.Count > 0) await _supplierRepo.UpdateAsync(newId, p.Suppliers, ct);
-                    if (p.Manufacture.Count > 0) await _manuRepo.UpdateAsync(newId, p.Manufacture, ct);
+                    if (p.Manufacture.Count > 0) await _manufactureRepo.UpdateAsync(newId, p.Manufacture, ct);
                     if (p.Uoms.Count > 0) await _uomRepo.UpdateAsync(newId, p.Uoms, ct);
 
                     // 4) template variant values (persist payload as the template)
@@ -170,7 +172,7 @@ namespace Core.Application.Item.ItemAggregate.Handlers
                                     MaintainStock = item.MaintainStock,
                                     HasVariants = false,
                                     ParentItemId = newId,
-                                    IsActive = item.IsActive,
+                                    IsActive = BaseEntity.Status.Active ,
                                     IsDeleted = item.IsDeleted
                                 };
 
@@ -193,7 +195,7 @@ namespace Core.Application.Item.ItemAggregate.Handlers
                                     cq.ItemId = childId; await _qualityRepo.CreateAsync(cq, ct);
                                 }
                                 if (p.Suppliers is { Count: > 0 }) await _supplierRepo.UpdateAsync(childId, p.Suppliers, ct);
-                                if (p.Manufacture is { Count: > 0 }) await _manuRepo.UpdateAsync(childId, p.Manufacture, ct);
+                                if (p.Manufacture is { Count: > 0 }) await _manufactureRepo.UpdateAsync(childId, p.Manufacture, ct);
                                 if (p.Uoms is { Count: > 0 }) await _uomRepo.UpdateAsync(childId, p.Uoms, ct);
 
                                 // IMPORTANT: instead of inserting child variant rows,

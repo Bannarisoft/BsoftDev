@@ -291,6 +291,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Dashboard
             dto.OpenWorkOrder = await multi.ReadFirstAsync<int>();
             dto.InProgressWorkOrder = await multi.ReadFirstAsync<int>();
             dto.ClosedWorkOrder = await multi.ReadFirstAsync<int>();
+            dto.OverDueWorkOrder = await multi.ReadFirstAsync<int>();
             dto.TopConsumptions = (await multi.ReadAsync<ConsumptionDto>()).ToList();
             return dto;
         }

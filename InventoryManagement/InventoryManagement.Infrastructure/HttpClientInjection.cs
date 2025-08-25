@@ -1,8 +1,12 @@
 
 using Contracts.Interfaces.External.IParty;
 using Contracts.Interfaces.External.IUser;
-using GrpcServices.PartyManagement;
+using Contracts.Interfaces.External.IWarehouse;
+using GrpcServices.Party.Party;
 using GrpcServices.UserManagement;
+using GrpcServices.Warehouse.Bin;
+using GrpcServices.Warehouse.Rack;
+using GrpcServices.Warehouse.Warehouse;
 using InventoryManagement.Infrastructure.GrpcClients;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +24,7 @@ namespace InventoryManagement.Infrastructure
         {
             var userManagementUrl = configuration["GrpcSettings:UserManagementUrl"];
             var partyManagementUrl = configuration["GrpcSettings:PartyManagementUrl"];
+            var warehouseManagementUrl = configuration["GrpcSettings:WarehouseManagementUrl"];
 
             
             // ✅ Register Session gRPC Client
@@ -72,6 +77,46 @@ namespace InventoryManagement.Infrastructure
             .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
 
             services.AddScoped<ICountryGrpcClient,CountryGrpcClient>();
+             //Rack grpc
+            services.AddGrpcClient<RackService.RackServiceClient>(options =>
+            {
+                options.Address = new Uri(warehouseManagementUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            })
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+
+            services.AddScoped<IRackGrpcClient, RackGrpcClient>();
+             //Bin grpc
+            services.AddGrpcClient<BinService.BinServiceClient>(options =>
+            {
+                options.Address = new Uri(warehouseManagementUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            })
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+
+            services.AddScoped<IBinGrpcClient, BinGrpcClient>();
+             //Warehouse grpc
+            services.AddGrpcClient<WarehouseService.WarehouseServiceClient>(options =>
+            {
+                options.Address = new Uri(warehouseManagementUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            })
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+            services.AddScoped<IWarehouseGrpcClient, WarehouseGrpcClient>();
+            
+
 
             return services;
         }

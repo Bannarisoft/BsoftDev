@@ -64,6 +64,7 @@ app.UseMiddleware<LoggingMiddleware>();
 app.UseAuthorization();
 app.UseEndpoints(endpoints =>
 {
+    endpoints.MapGrpcService<PartyGrpcService>().EnableGrpcWeb();    
     endpoints.MapControllers();
 });
 app.Run();

@@ -181,6 +181,24 @@ namespace PartyManagement.Infrastructure.Repositories.PartyMaster
 
                 return result.ToList();
         }
+        public async Task<List<GetPartyMasterAutoCompleteDto>> GetPartyMasterAutoComplete(string searchPattern)
+        {
+            searchPattern = searchPattern ?? string.Empty; // Prevent null issues
+
+            const string query = @"
+             SELECT Id, PartyCode,PartyName 
+            FROM Party.PartyMaster 
+            WHERE IsDeleted = 0  and IsActive=1
+            AND PartyName LIKE @SearchPattern OR PartyCode LIKE @SearchPattern";
+            var parameters = new
+            {
+                SearchPattern = $"%{searchPattern}%"
+
+            };
+
+            var partyMasters = await _dbConnection.QueryAsync<GetPartyMasterAutoCompleteDto>(query, parameters);
+            return partyMasters.ToList();
+        }
 
         
     }

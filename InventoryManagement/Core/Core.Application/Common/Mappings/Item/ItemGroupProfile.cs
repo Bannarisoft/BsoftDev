@@ -6,7 +6,6 @@ using Core.Application.Item.ItemGroup.Queries.GetItemGroup;
 using Core.Application.Item.ItemGroup.Queries.GetItemGroupAutoComplete;
 using static Core.Domain.Common.BaseEntity;
 
-
 namespace Core.Application.Common.Mappings.Item
 {
     public class ItemGroupProfile : Profile

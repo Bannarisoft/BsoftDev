@@ -54,15 +54,28 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
             await _preventiveScheduleLogService.CaptureLogs(null,request.WorkOrder.PreventiveScheduleId,"Work Order Update",JsonConvert.SerializeObject(request));
             var token = _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].ToString();
             var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
-            var systemTimeZone = TimeZoneInfo.FindSystemTimeZoneById(systemTimeZoneId);
-
-            request.WorkOrder.DownTimeStart= TimeZoneInfo.ConvertTime(request.WorkOrder.DownTimeStart.Value, systemTimeZone);
-            //request.WOSchedule.StartTime =request.WOSchedule.StartTime;
-            if (request.WorkOrder.DownTimeEnd != null)
+            TimeZoneInfo systemTimeZone;            
+            try
             {
-                request.WorkOrder.DownTimeEnd = TimeZoneInfo.ConvertTime(request.WorkOrder.DownTimeEnd.Value, systemTimeZone);
-                //request.WOSchedule.EndTime =request.WOSchedule.EndTime.Value;
-            }          
+                systemTimeZone = TimeZoneInfo.FindSystemTimeZoneById(systemTimeZoneId);
+            }
+            catch (TimeZoneNotFoundException)
+            {
+                // Common Windows ↔ IANA mismatch handling
+                if (string.Equals(systemTimeZoneId, "India Standard Time", StringComparison.OrdinalIgnoreCase))
+                    systemTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata");
+                else
+                    systemTimeZone = TimeZoneInfo.Local;
+            }
+
+            // Helper for nullable DateTimeOffset
+            static DateTimeOffset? ConvertIfHasValue(DateTimeOffset? value, TimeZoneInfo tz)
+            {
+                if (!value.HasValue || value.Value == DateTimeOffset.MinValue)
+                    return null;
+                return TimeZoneInfo.ConvertTime(value.Value, tz);
+            }
+       
             var updatedEntity = _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(request.WorkOrder);
             var updateResult = await _workOrderRepository.UpdateAsync(updatedEntity.Id, updatedEntity);
 

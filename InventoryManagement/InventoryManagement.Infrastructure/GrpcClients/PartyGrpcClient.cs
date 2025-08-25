@@ -1,57 +1,78 @@
-using Contracts.Dtos.Party;
-using Contracts.Interfaces.External.IParty;
-using Google.Protobuf.WellKnownTypes;
+
 using Grpc.Core;
-using GrpcServices.PartyManagement;
 using Microsoft.AspNetCore.Http;
+using PartyProto = GrpcServices.Party.Party;
+using PartyContractDto = Contracts.Dtos.Party.PartyDto;
+using Contracts.Interfaces.External.IParty;
 
-namespace InventoryManagement.Infrastructure.GrpcClients
+public sealed class PartyGrpcClient : IPartyGrpcClient
 {
-    public class PartyGrpcClient : IPartyGrpcClient
+    private readonly PartyProto.PartyService.PartyServiceClient _client;
+    private readonly IHttpContextAccessor _http;
+
+    public PartyGrpcClient(PartyProto.PartyService.PartyServiceClient client, IHttpContextAccessor http)
     {
-        private readonly PartyService.PartyServiceClient _client;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        _client = client;
+        _http   = http;
+    }
 
-        public PartyGrpcClient(PartyService.PartyServiceClient client, IHttpContextAccessor httpContextAccessor)
+    private Metadata BuildAuth()
+    {
+        var token = _http.HttpContext?.Request?.Headers["Authorization"].ToString();
+        if (string.IsNullOrWhiteSpace(token)) return new Metadata();
+        if (!token.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+            token = $"Bearer {token}";
+        return new Metadata { { "Authorization", token } };
+    }
+
+    public async Task<List<PartyContractDto>> GetAutoCompleteAsync(string? searchPattern = null, CancellationToken ct = default)
+    {
+        var req = new PartyProto.PartyRequest { Search = searchPattern ?? string.Empty };
+        var res = await _client.GetPartyAutoCompleteAsync(req, headers: BuildAuth(), cancellationToken: ct);
+
+        return res.Items.Select(x => new PartyContractDto
         {
-            _client = client;
-            _httpContextAccessor = httpContextAccessor; 
-        }
+            Id        = x.Id,
+            PartyCode = x.PartyCode,
+            PartyName = x.PartyName
+        }).ToList();
+    }
 
-        public async Task<List<Contracts.Dtos.Party.PartyDto>> GetAllPartyAsync()
+    public async Task<PartyContractDto?> GetByIdAsync(int id, CancellationToken ct = default)
+    {
+        try
         {
-            var token = _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].ToString();
-
-            if (string.IsNullOrWhiteSpace(token))
-                throw new UnauthorizedAccessException("Authorization token not found.");
-
-            if (!token.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
-                token = $"Bearer {token}";
-
-            var metadata = new Metadata
+            var res = await _client.GetPartyByIdAsync(new PartyProto.GetPartyByIdRequest { Id = id },
+                                                      headers: BuildAuth(), cancellationToken: ct);
+            return new PartyContractDto
             {
-                { "Authorization", token }
+                Id        = res.Id,
+                PartyCode = res.PartyCode,
+                PartyName = res.PartyName
             };
+        }
+        catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
+        {
+            return null;
+        }
+    }
 
-            var response = await _client.GetAllPartyAsync(new Empty(), new CallOptions(metadata));
+    // ✅ new:
+    public async Task<List<PartyContractDto>> GetByIdsAsync(IEnumerable<int> ids)
+    {
+        var list = ids?.Distinct().ToList() ?? new List<int>();
+        if (list.Count == 0) return new();
 
-            return response.Parties.Select(u => new Contracts.Dtos.Party.PartyDto
-            {
-                PartyId = u.PartyId,
-                PartyCode = u.PartyCode,
-                PartyName = u.PartyName,
-                RegistrationTypeId = u.RegistrationTypeId,
-                GSTNumber = u.GSTNumber,
-                GSTStateCode = u.GSTStateCode,
-                PAN = u.Pan,
-                TAN = u.Tan,
-                MSMENO = u.Msmeno,
-                IsTDSApplicable = u.IsTDSApplicable,
-                IsTCSApplicable = u.IsTCSApplicable,
-                IsGstReverseCharge = u.IsGstReverseCharge,
-                CreditDays = u.CreditDays,
-                PartyStatus = u.PartyStatus,
-            }).ToList();
-        }        
+        var req = new PartyProto.GetPartiesByIdsRequest();
+        req.Ids.AddRange(list.Select(i => (int)i));
+
+        var res = await _client.GetPartiesByIdsAsync(req, headers: BuildAuth());
+
+        return res.Items.Select(x => new PartyContractDto
+        {
+            Id        = x.Id,
+            PartyCode = x.PartyCode,
+            PartyName = x.PartyName
+        }).ToList();
     }
 }

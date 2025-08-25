@@ -25,18 +25,20 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly ILogger<WorkOrderCommandRepository> _logger;
         private readonly ICompanyGrpcClient _companyGrpcClient;     
-        private readonly IUnitGrpcClient _unitGrpcClient;             
+        private readonly IUnitGrpcClient _unitGrpcClient;    
+        private readonly ITimeZoneService _timeZoneService;
 
         public WorkOrderCommandRepository(ApplicationDbContext applicationDbContext, IIPAddressService ipAddressService, IDbConnection dbConnection,
-        IPublishEndpoint publishEndpoint, ILogger<WorkOrderCommandRepository> logger, ICompanyGrpcClient companyGrpcClient,IUnitGrpcClient unitGrpcClient)
+        IPublishEndpoint publishEndpoint, ILogger<WorkOrderCommandRepository> logger, ICompanyGrpcClient companyGrpcClient, IUnitGrpcClient unitGrpcClient, ITimeZoneService timeZoneService)
         {
             _applicationDbContext = applicationDbContext;
             _ipAddressService = ipAddressService;
             _dbConnection = dbConnection;
             _publishEndpoint = publishEndpoint;
             _logger = logger;
-            _companyGrpcClient = companyGrpcClient;  
-            _unitGrpcClient=unitGrpcClient;                      
+            _companyGrpcClient = companyGrpcClient;
+            _unitGrpcClient = unitGrpcClient;
+            _timeZoneService = timeZoneService;
         }
         public async Task<Core.Domain.Entities.WorkOrderMaster.WorkOrder> CreateAsync(Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder, int requestTypeId, CancellationToken cancellationToken)
         {
@@ -63,6 +65,21 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
         }
         public async Task<bool> UpdateAsync(int workOrderId, Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder)
         {
+            var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
+            TimeZoneInfo systemTimeZone;            
+            try
+            {
+                systemTimeZone = TimeZoneInfo.FindSystemTimeZoneById(systemTimeZoneId);
+            }
+            catch (TimeZoneNotFoundException)
+            {
+                // Common Windows ↔ IANA mismatch handling
+                if (string.Equals(systemTimeZoneId, "India Standard Time", StringComparison.OrdinalIgnoreCase))
+                    systemTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata");
+                else
+                    systemTimeZone = TimeZoneInfo.Local;
+            }
+
             var oldUnitId = _ipAddressService.GetOldUnitId();
             var existingWorkOrder = await _applicationDbContext.WorkOrder
                   .Include(cf => cf.WorkOrderItems)
@@ -71,7 +88,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                   .Include(cf => cf.WorkOrderCheckLists)
                   .FirstOrDefaultAsync(u => u.Id == workOrderId);
 
-            if (existingWorkOrder == null)
+            if (existingWorkOrder == null)  
                 return false;
 
             _applicationDbContext.WorkOrderActivity.RemoveRange(
@@ -98,8 +115,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             existingWorkOrder.ModifiedBy = _ipAddressService.GetUserId();
             existingWorkOrder.ModifiedByName = _ipAddressService.GetUserName();
             existingWorkOrder.ModifiedIP =  _ipAddressService.GetSystemIPAddress();
-            existingWorkOrder.ModifiedDate = DateTime.UtcNow;
-
+            existingWorkOrder.ModifiedDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, systemTimeZone);
+            
 
            /*   // ✅ Update TotalManPower and TotalSpentHours if status is "Closed"
             var closedStatusId = await _applicationDbContext.MiscMaster

@@ -10,8 +10,7 @@ using MediatR;
 namespace Core.Application.WarehouseMaster.Queries.GetWareMasterAutoComplete
 {
     public class GetWarehouseMasterAutoCompleteQueryHandler : IRequestHandler<GetWarehouseMasterAutoCompleteQuery, List<GetWarehouseAutoCompleteDto>>
-    {
-         
+    {        
 
          private readonly  IWarehouseMasterQueryRepository _warehouseMasterQueryRepository;
           private readonly IMediator _mediator;
