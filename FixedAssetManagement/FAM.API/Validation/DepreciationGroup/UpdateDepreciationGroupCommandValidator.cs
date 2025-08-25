@@ -66,10 +66,10 @@ namespace FAM.API.Validation.DepreciationGroup
                             .WithMessage($"{nameof(UpdateDepreciationGroupCommand.Code)} {rule.Error} {depreciationGroupCodeMaxLength}");                    
                         RuleFor(x => x.ResidualValue)
                             .InclusiveBetween(1,100)
-                            .WithMessage($"{nameof(CreateDepreciationGroupCommand.ResidualValue)} {rule.Error} 100");   
+                            .WithMessage($"{nameof(UpdateDepreciationGroupCommand.ResidualValue)} {rule.Error} 100");   
                         RuleFor(x => x.UsefulLife)
                             .InclusiveBetween(1, 100)
-                            .WithMessage($"{nameof(CreateDepreciationGroupCommand.UsefulLife)} {rule.Error} 100");   
+                            .WithMessage($"{nameof(UpdateDepreciationGroupCommand.UsefulLife)} {rule.Error} 100");   
                         break;
                      case "UniqueCombination":
                         RuleFor(x => x)

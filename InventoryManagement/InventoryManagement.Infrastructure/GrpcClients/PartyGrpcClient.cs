@@ -56,23 +56,4 @@ public sealed class PartyGrpcClient : IPartyGrpcClient
             return null;
         }
     }
-
-    // ✅ new:
-    public async Task<List<PartyContractDto>> GetByIdsAsync(IEnumerable<int> ids)
-    {
-        var list = ids?.Distinct().ToList() ?? new List<int>();
-        if (list.Count == 0) return new();
-
-        var req = new PartyProto.GetPartiesByIdsRequest();
-        req.Ids.AddRange(list.Select(i => (int)i));
-
-        var res = await _client.GetPartiesByIdsAsync(req, headers: BuildAuth());
-
-        return res.Items.Select(x => new PartyContractDto
-        {
-            Id        = x.Id,
-            PartyCode = x.PartyCode,
-            PartyName = x.PartyName
-        }).ToList();
-    }
 }

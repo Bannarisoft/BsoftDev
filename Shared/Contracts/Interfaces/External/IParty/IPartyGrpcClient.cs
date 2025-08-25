@@ -8,7 +8,6 @@ namespace Contracts.Interfaces.External.IParty
     public interface IPartyGrpcClient
     {
         Task<List<PartyDto>> GetAutoCompleteAsync(string? searchPattern, CancellationToken ct = default);
-        Task<PartyDto?> GetByIdAsync(int id, CancellationToken ct = default);
-        Task<List<PartyDto>> GetByIdsAsync(IEnumerable<int> ids);
+        Task<PartyDto?> GetByIdAsync(int id, CancellationToken ct = default);        
     }
 }
