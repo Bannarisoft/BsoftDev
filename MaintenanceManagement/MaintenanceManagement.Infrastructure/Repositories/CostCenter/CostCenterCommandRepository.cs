@@ -55,7 +55,16 @@ namespace MaintenanceManagement.Infrastructure.Repositories.CostCenter
         {
              if (string.IsNullOrWhiteSpace(costCenterCode))
              return false; // Return false if null/empty
-             return await _applicationDbContext.CostCenter.AnyAsync(c => c.CostCenterCode == costCenterCode);
+             return await _applicationDbContext.CostCenter.AnyAsync(c => c.CostCenterCode == costCenterCode );
+        }
+
+        public async Task<bool> ExistsByCodeOrNameAndUnitAsync(string code, string name, int unitId)
+        {
+            return await _applicationDbContext.CostCenter
+                .AnyAsync(x =>
+                    (x.CostCenterCode == code ||
+                    x.CostCenterName == name) &&
+                    x.UnitId == unitId);
         }
 
       
@@ -90,10 +99,10 @@ namespace MaintenanceManagement.Infrastructure.Repositories.CostCenter
         return 1; // Indicate success
         }
 
-        public async Task<bool> IsNameDuplicateAsync(string? name, int excludeId)
+        public async Task<bool> IsNameDuplicateAsync(string? name, int excludeId, int unitId)
         {
             return await _applicationDbContext.CostCenter
-                .AnyAsync(cc => cc.CostCenterName == name && cc.Id != excludeId);
+                .AnyAsync(cc => cc.CostCenterName == name && cc.Id != excludeId && cc.UnitId == unitId);
         }
     }
 }

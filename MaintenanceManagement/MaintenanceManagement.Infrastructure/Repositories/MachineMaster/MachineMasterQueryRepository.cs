@@ -43,7 +43,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
                     mm.AssetId,
                     mm.[LineNo],
                     mm.IsActive,
-                    mm.IsProductionMachine
+                    mm.IsProductionMachine,
+                    mg.DepartmentId
                 FROM Maintenance.MachineMaster mm
                 LEFT JOIN Maintenance.MachineGroup mg ON mm.MachineGroupId = mg.Id
                 WHERE 
@@ -91,7 +92,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
                 MG.DepartmentId
                 FROM Maintenance.MachineMaster M
                 INNER JOIN Maintenance.MachineGroup MG ON M.MachineGroupId = MG.Id 
-                WHERE M.IsDeleted = 0 
+                WHERE M.IsDeleted = 0  and M.IsActive=1
                 AND M.UnitId = @UnitId 
                 AND (M.MachineName LIKE @SearchPattern OR M.MachineCode LIKE @SearchPattern)";
 

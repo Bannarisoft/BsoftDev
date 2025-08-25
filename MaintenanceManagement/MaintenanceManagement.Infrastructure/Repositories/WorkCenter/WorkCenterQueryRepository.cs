@@ -82,7 +82,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkCenter
             const string query = @"
              SELECT Id, WorkCenterName 
             FROM Maintenance.WorkCenter 
-            WHERE IsDeleted = 0 AND UnitId = @UnitId
+            WHERE IsDeleted = 0 AND UnitId = @UnitId And IsActive = 1
             AND WorkCenterName LIKE @SearchPattern";
             var parameters = new
             {
