@@ -6,6 +6,7 @@ using WarehouseManagement.Infrastructure;
 using WarehouseManagement.API.Validation.Common;
 using MediatR;
 using Core.Application.Common.Behaviors;
+using Warehouse.Api.GrpcServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +42,11 @@ builder.Services.AddHttpContextAccessor();
 // Register gRPC
 builder.Services.AddGrpc();
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+builder.Services.AddGrpc(opt =>
+{
+    opt.EnableDetailedErrors = true;   
+    
+});
 
 
 var app = builder.Build();
@@ -64,6 +70,9 @@ app.UseMiddleware<LoggingMiddleware>();
 app.UseAuthorization();
 app.UseEndpoints(endpoints =>
 {
+    endpoints.MapGrpcService<RackGrpcService>().EnableGrpcWeb();    
+    endpoints.MapGrpcService<WarehouseGrpcService>().EnableGrpcWeb();        
+    endpoints.MapGrpcService<BinGrpcService>().EnableGrpcWeb();     
     endpoints.MapControllers();
 });
 app.Run();

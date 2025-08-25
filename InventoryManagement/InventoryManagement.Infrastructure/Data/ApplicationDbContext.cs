@@ -16,6 +16,7 @@ using InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail.Var
 using InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail.Templates;
 using Core.Domain.Entities.item.ItemDetail.Templates;
 using Core.Domain.Entities.Item.ItemDetail.Templates;
+using Core.Domain.Entities.Item.PutAway;
 
 namespace InventoryManagement.Infrastructure.Data
 {
@@ -55,6 +56,9 @@ namespace InventoryManagement.Infrastructure.Data
         public DbSet<ItemUOM> ItemUOMs { get; set; } 
         public DbSet<InspectionParameter> InspectionParameter { get; set; } 
         public DbSet<InspectionTemplate> InspectionTemplate { get; set; } 
+        
+        public DbSet<PutAwayRule> PutAwayRule { get; set; } 
+        public DbSet<PutAwayStrategy> PutAwayStrategy { get; set; } 
         //End  Item related DbSets
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -82,6 +86,8 @@ namespace InventoryManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new ItemLogConfiguration());
             modelBuilder.ApplyConfiguration(new InspectionParameterConfiguration());
             modelBuilder.ApplyConfiguration(new InspectionTemplateConfiguration());
+            modelBuilder.ApplyConfiguration(new PutAwayRuleConfiguration());
+            modelBuilder.ApplyConfiguration(new PutAwayStrategyConfiguration());
 
 
             base.OnModelCreating(modelBuilder);

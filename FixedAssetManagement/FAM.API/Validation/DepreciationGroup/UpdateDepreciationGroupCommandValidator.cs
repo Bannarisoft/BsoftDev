@@ -67,10 +67,10 @@ namespace FAM.API.Validation.DepreciationGroup
                         break;          
                     case "NumericOnly":       
                         RuleFor(x => x.ResidualValue)
-                        .InclusiveBetween(1, int.MaxValue)
+                        .InclusiveBetween(1,100)
                         .WithMessage($"{nameof(UpdateDepreciationGroupCommand.ResidualValue)} {rule.Error}");
                         RuleFor(x => x.UsefulLife)
-                        .InclusiveBetween(1, int.MaxValue)
+                        .InclusiveBetween(1, 100)
                         .WithMessage($"{nameof(UpdateDepreciationGroupCommand.UsefulLife)} {rule.Error}");
                         break;
                      case "UniqueCombination":

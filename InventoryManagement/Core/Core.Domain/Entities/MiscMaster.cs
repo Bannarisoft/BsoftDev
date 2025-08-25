@@ -6,6 +6,7 @@ using Core.Domain.Common;
 using Core.Domain.Entities.Budget;
 using Core.Domain.Entities.Item.ItemDetail;
 using Core.Domain.Entities.Item.ItemDetail.Variant;
+using Core.Domain.Entities.Item.PutAway;
 
 namespace Core.Domain.Entities
 {
@@ -32,7 +33,7 @@ namespace Core.Domain.Entities
         public ICollection<ItemQuality>? ItemQualityCertificateType { get; set; }
         public ICollection<ItemVariantValue>? ItemAttribute { get; set; }
         public ICollection<ItemVariantValue>? ItemAttributeBasedOn { get; set; }
-        
-        
+        public ICollection<PutAwayStrategy>? PutAwayStrategyStorageType { get; set; }       
+        public ICollection<PutAwayStrategy>? PutAwayStrategyPriority { get; set; } 
     }
 }

@@ -48,6 +48,9 @@
     <Protobuf Include="..\..\Shared\Contracts\Protos\alldepartment.proto" GrpcServices="Client" />
     <Protobuf Include="..\..\Shared\Contracts\Protos\country.proto" GrpcServices="Client" />
     <Protobuf Include="..\..\Shared\Contracts\Protos\party.proto" GrpcServices="Client" /> 
+    <Protobuf Include="..\..\Shared\Contracts\Protos\rack.proto" GrpcServices="Client"/>
+    <Protobuf Include="..\..\Shared\Contracts\Protos\bin.proto" GrpcServices="Client"/>
+    <Protobuf Include="..\..\Shared\Contracts\Protos\warehouse.proto" GrpcServices="Client"/>
 </ItemGroup>
 
   <PropertyGroup>

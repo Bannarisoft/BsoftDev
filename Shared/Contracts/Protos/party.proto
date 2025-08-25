@@ -1,30 +1,24 @@
+// party.proto
 syntax = "proto3";
-
-import "google/protobuf/empty.proto";
-
-option csharp_namespace = "GrpcServices.PartyManagement";
+option csharp_namespace = "GrpcServices.Party.Party";
+package party.party;
 
 service PartyService {
-    rpc GetAllParty (google.protobuf.Empty) returns (PartyListResponse);
+  rpc GetPartyAutoComplete (PartyRequest) returns (PartyResponse);
+  rpc GetPartyById         (GetPartyByIdRequest) returns (PartyDto);  
+  rpc GetPartiesByIds      (GetPartiesByIdsRequest) returns (PartyResponse);
 }
+
+message PartyRequest { string search = 1; }
+message GetPartyByIdRequest { int32 id = 1; }
+
+// ✅ new:
+message GetPartiesByIdsRequest { repeated int32 ids = 1; }
+
+message PartyResponse { repeated PartyDto items = 1; }
 
 message PartyDto {
-    int32 partyId = 1;
-    string partyCode = 2;
-    string partyName = 3;
-    int32 registrationTypeId = 4;
-    string gSTNumber = 5;
-    string gSTStateCode = 6;
-    string pan = 7;
-    string tan = 8;
-    string msmeno = 9;
-    int32 isTDSApplicable = 10;
-    int32 isTCSApplicable = 11;
-    int32 isGstReverseCharge = 12;    
-    int32 creditDays = 13;    
-    string partyStatus = 14;
-}
-
-message PartyListResponse {
-    repeated PartyDto parties = 1;
+  int32 id = 1;
+  string partyCode = 2;
+  string partyName = 3;
 }
