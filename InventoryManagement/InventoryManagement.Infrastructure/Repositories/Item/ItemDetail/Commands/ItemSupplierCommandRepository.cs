@@ -34,10 +34,16 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Comman
                 .Where(r => r is not null && r.SupplierId > 0 && r.UnitId > 0)
                 .Select(r => new ItemSupplier
                 {
-                    ItemId         = itemId,
-                    SupplierId     = r.SupplierId,
-                    UnitId         = r.UnitId,
-                    SupplierPartNo = string.IsNullOrWhiteSpace(r.SupplierPartNo) ? null : r.SupplierPartNo.Trim()
+                    ItemId = itemId,
+                    SupplierId = r.SupplierId,
+                    UnitId = r.UnitId,
+                    SupplierPartNo = string.IsNullOrWhiteSpace(r.SupplierPartNo) ? null : r.SupplierPartNo.Trim(),
+                    LeadTime = r.LeadTime,
+                    MOQ = r.MOQ,
+                    MOQUomId = r.MOQUomId,
+                    PackageValue = r.PackageValue,
+                    PackageUomId = r.PackageUomId,
+                    DefaultSupplier=r.DefaultSupplier
                 })
                 .ToList();
 
@@ -69,7 +75,36 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Comman
                         ));
                         cur.SupplierPartNo = inc.SupplierPartNo;
                     }
-
+                    changes.Add(new PropertyChange(
+                        $"Supplier({cur.SupplierId},{cur.UnitId}).LeadTime",
+                        cur.LeadTime, 
+                        inc.LeadTime  
+                    ));
+                    changes.Add(new PropertyChange(
+                        $"Supplier({cur.SupplierId},{cur.UnitId}).MOQ",
+                        cur.MOQ,    
+                        inc.MOQ     
+                    ));
+                    changes.Add(new PropertyChange(
+                        $"Supplier({cur.SupplierId},{cur.UnitId}).MOQUomId",
+                        cur.MOQUomId,    
+                        inc.MOQUomId     
+                    ));
+                    changes.Add(new PropertyChange(
+                        $"Supplier({cur.SupplierId},{cur.UnitId}).PackageValue",
+                        cur.PackageValue,    
+                        inc.PackageValue     
+                    ));
+                    changes.Add(new PropertyChange(
+                        $"Supplier({cur.SupplierId},{cur.UnitId}).PackageUomId",
+                        cur.PackageUomId,    
+                        inc.PackageUomId     
+                    ));
+                    changes.Add(new PropertyChange(
+                        $"Supplier({cur.SupplierId},{cur.UnitId}).DefaultSupplier",
+                        cur.DefaultSupplier, 
+                        inc.DefaultSupplier  
+                    ));
                     if (changes.Count > 0)
                         TryAddUpdateLog(nameof(ItemSupplier), itemId, changes);
                 }
@@ -104,8 +139,6 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Comman
                     }
                 }
             }
-
-            // Note: SaveChanges is handled by UoW outside.
         }
     }
 }

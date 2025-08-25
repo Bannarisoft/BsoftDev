@@ -3,6 +3,7 @@ using Core.Application.Item.ItemDetail.Commands.DeleteItemImage;
 using Core.Application.Item.ItemDetail.Commands.UpdateItem;
 using Core.Application.Item.ItemDetail.Commands.UploadItemImage;
 using Core.Application.Item.ItemDetail.Queries.GetAllItems;
+using Core.Application.Item.ItemDetail.Queries.GetItemAutoComplete;
 using Core.Application.Item.ItemDetail.Queries.GetItemById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -10,16 +11,16 @@ using Microsoft.AspNetCore.Mvc;
 namespace InventoryManagement.API.Controllers.Item
 {
     [ApiController]
-     [Route("api/[controller]")]
+    [Route("api/[controller]")]
     public sealed class ItemMasterController : ControllerBase
     {
         private readonly IMediator _mediator;
         public ItemMasterController(IMediator mediator) => _mediator = mediator;
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? search = null, [FromQuery] bool onlyActive = true,int? itemGroupId = null,int? itemCategoryId = null)
+        public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? search = null, [FromQuery] bool onlyActive = true, int? itemGroupId = null, int? itemCategoryId = null)
         {
-            var (items, total) = await _mediator.Send(new GetAllItemsQuery { PageNumber = pageNumber, PageSize = pageSize, SearchTerm = search, OnlyActive = onlyActive,  ItemGroupId     = itemGroupId,  ItemCategoryId  = itemCategoryId });
+            var (items, total) = await _mediator.Send(new GetAllItemsQuery { PageNumber = pageNumber, PageSize = pageSize, SearchTerm = search, OnlyActive = onlyActive, ItemGroupId = itemGroupId, ItemCategoryId = itemCategoryId });
             return Ok(new { StatusCode = StatusCodes.Status200OK, data = items, totalCount = total, pageNumber, pageSize });
         }
 
@@ -57,7 +58,7 @@ namespace InventoryManagement.API.Controllers.Item
                 message = "Item updated successfully.",
                 data = new { cmd.Payload.Id }
             });
-        }      
+        }
         [HttpPost("upload-logo")]
         public async Task<IActionResult> UploadLogo([FromForm] UploadFileCommand command, CancellationToken ct)
         {
@@ -80,7 +81,7 @@ namespace InventoryManagement.API.Controllers.Item
                 data = dto,
                 errors = ""
             });
-        }        
+        }
         [HttpDelete("delete-logo")]
         public async Task<IActionResult> DeleteLogo([FromBody] DeleteFileCommand command, CancellationToken ct)
         {
@@ -94,6 +95,17 @@ namespace InventoryManagement.API.Controllers.Item
                 data = result,
                 errors = ""
             });
+        }
+        [HttpGet("autocomplete")]
+        [ProducesResponseType(typeof(List<GetItemAutoCompleteDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<GetItemAutoCompleteDto>>> Get(
+            [FromQuery] string? searchPattern,
+            CancellationToken ct)
+        {
+            var items = await _mediator.Send(
+                new GetItemAutoCompleteQuery { SearchPattern = searchPattern },
+                ct);
+            return Ok(new { StatusCode = StatusCodes.Status200OK, data = items });            
         }
     }
 }

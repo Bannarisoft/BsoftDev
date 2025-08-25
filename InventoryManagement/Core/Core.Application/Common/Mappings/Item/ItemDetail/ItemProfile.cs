@@ -1,5 +1,6 @@
 using AutoMapper;
 using Core.Application.Item.ItemDetail.Queries.GetAllItems;
+using Core.Application.Item.ItemDetail.Queries.GetItemAutoComplete;
 using Core.Domain.Entities.Item.ItemDetail;
 using Core.Domain.Entities.Item.ItemDetail.Variant;
 
@@ -39,26 +40,26 @@ namespace Core.Application.Common.Mappings.Item.ItemDetail
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
 
             CreateMap<ItemPurchaseDto, ItemPurchase>()
-                .ForMember(d => d.Id,     o => o.Ignore())   // <- IMPORTANT
+                .ForMember(d => d.Id, o => o.Ignore())   // <- IMPORTANT
                 .ForMember(d => d.ItemId, o => o.Ignore())   // <- IMPORTANT
-                .ForMember(d => d.Item,   o => o.Ignore())
+                .ForMember(d => d.Item, o => o.Ignore())
                 .ForMember(d => d.PurchaseUOM, o => o.Ignore());
 
-           CreateMap<ItemInventoryDto, ItemInventory>()
-                .ForMember(d => d.Id,     o => o.Ignore())
-                .ForMember(d => d.ItemId, o => o.Ignore())
-                .ForMember(d => d.Item,   o => o.Ignore())
-                .ForMember(d => d.WeightUOM, o => o.Ignore())
-                .ForMember(d => d.MiscDefaultMaterialRequestType, o => o.Ignore())
-                .ForMember(d => d.MiscValuationMethod, o => o.Ignore())
-                .ForMember(d => d.MiscRequestType, o => o.Ignore());
+            CreateMap<ItemInventoryDto, ItemInventory>()
+                 .ForMember(d => d.Id, o => o.Ignore())
+                 .ForMember(d => d.ItemId, o => o.Ignore())
+                 .ForMember(d => d.Item, o => o.Ignore())
+                 .ForMember(d => d.WeightUOM, o => o.Ignore())
+                 .ForMember(d => d.MiscDefaultMaterialRequestType, o => o.Ignore())
+                 .ForMember(d => d.MiscValuationMethod, o => o.Ignore())
+                 .ForMember(d => d.MiscRequestType, o => o.Ignore());
 
 
-           CreateMap<ItemQualityDto, ItemQuality>()
-                .ForMember(d => d.Id,     o => o.Ignore())
-                .ForMember(d => d.ItemId, o => o.Ignore())
-                .ForMember(d => d.Item,   o => o.Ignore())
-                .ForMember(d => d.MiscCertificateType, o => o.Ignore()); // nav ignored
+            CreateMap<ItemQualityDto, ItemQuality>()
+                 .ForMember(d => d.Id, o => o.Ignore())
+                 .ForMember(d => d.ItemId, o => o.Ignore())
+                 .ForMember(d => d.Item, o => o.Ignore())
+                 .ForMember(d => d.MiscCertificateType, o => o.Ignore()); // nav ignored
 
 
             CreateMap<ItemUomDto, ItemUOM>()
@@ -82,6 +83,11 @@ namespace Core.Application.Common.Mappings.Item.ItemDetail
             CreateMap<ItemVariantValue, VariantValueDto>()
                 .ForMember(d => d.AttributeId, o => o.MapFrom(s => s.AttributeId))
                 .ForMember(d => d.OptionValue, o => o.MapFrom(s => s.OptionValue));
+                
+            CreateMap<ItemMaster, GetItemAutoCompleteDto>()
+                .ForMember(d => d.Id,       o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.ItemCode, o => o.MapFrom(s => s.ItemCode))
+                .ForMember(d => d.ItemName, o => o.MapFrom(s => s.ItemName));
         }
     }
 }

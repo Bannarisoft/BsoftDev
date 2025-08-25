@@ -25,10 +25,10 @@ namespace Core.Application.Item.ItemGroup.Queries.GetItemGroupAutoComplete
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetAll",
-                actionCode: "GetNotificationConfigAutoCompleteQueryHandler",        
+                actionCode: "GetItemGroupAutoCompleteQueryHandler",        
                 actionName: itemGroup.Count.ToString(),
-                details: $"Notification Config details was fetched.",
-                module:"NotificationConfig"
+                details: $"ItemGroup details was fetched.",
+                module:"ItemGroup"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
             return itemGroup;

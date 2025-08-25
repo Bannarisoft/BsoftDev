@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using Core.Application.Common.Interfaces;
 using InventoryManagement.Infrastructure.Data;
@@ -8,9 +9,19 @@ public abstract class ItemLogRepositoryBase
 {
     protected readonly ApplicationDbContext _db;
     private readonly IIPAddressService _ipAddressService;
-    public record PropertyChange(string Property, string? OldValue, string? NewValue);
 
-    // Properties we don't want to log (keys/audit/rowversion etc.)
+    // ✅ Record with two constructors:
+    //    - (string?, string?) for callers that already pass strings
+    //    - (object?, object?) convenience ctor that stringifies via ToValueString(...)
+    public record PropertyChange(string Property, string? OldValue, string? NewValue)
+    {
+        public PropertyChange(string property, object? oldValue, object? newValue)
+            : this(property,
+                   ItemLogRepositoryBase.ToValueString(oldValue),
+                   ItemLogRepositoryBase.ToValueString(newValue))
+        { }
+    }
+
     private static readonly HashSet<string> IgnoredProps = new(StringComparer.OrdinalIgnoreCase)
     {
         "Id", "ItemId",
@@ -18,10 +29,11 @@ public abstract class ItemLogRepositoryBase
         "ModifiedBy", "ModifiedByName", "ModifiedDate", "ModifiedIP",
         "RowVersion", "Timestamp"
     };
-   
+
     protected ItemLogRepositoryBase(ApplicationDbContext db, IIPAddressService ipAddressService)
     {
-        _db = db;_ipAddressService = ipAddressService;
+        _db = db;
+        _ipAddressService = ipAddressService;
     }
 
     // ---------- value formatting helpers ----------
@@ -29,25 +41,17 @@ public abstract class ItemLogRepositoryBase
     {
         if (value is null) return null;
 
-        switch (value)
+        return value switch
         {
-            case DateTime dt:
-                return dt.ToString("yyyy-MM-dd HH:mm:ss.fffffff zzz", CultureInfo.InvariantCulture);
-            case DateTimeOffset dto:
-                return dto.ToString("yyyy-MM-dd HH:mm:ss.fffffff zzz", CultureInfo.InvariantCulture);
-            case decimal dec:
-                return dec.ToString(CultureInfo.InvariantCulture);
-            case double d:
-                return d.ToString(CultureInfo.InvariantCulture);
-            case float f:
-                return f.ToString(CultureInfo.InvariantCulture);
-            case bool b:
-                return b ? "true" : "false";
-            case Enum e:
-                return e.ToString(); // by name
-            default:
-                return Convert.ToString(value, CultureInfo.InvariantCulture);
-        }
+            DateTime dt        => dt.ToString("yyyy-MM-dd HH:mm:ss.fffffff zzz", CultureInfo.InvariantCulture),
+            DateTimeOffset dto => dto.ToString("yyyy-MM-dd HH:mm:ss.fffffff zzz", CultureInfo.InvariantCulture),
+            decimal dec        => dec.ToString(CultureInfo.InvariantCulture),
+            double d           => d.ToString(CultureInfo.InvariantCulture),
+            float f            => f.ToString(CultureInfo.InvariantCulture),
+            bool b             => b ? "true" : "false",
+            Enum e             => e.ToString(),
+            _                  => Convert.ToString(value, CultureInfo.InvariantCulture)
+        };
     }
 
     private static bool IsIgnored(string propName) => IgnoredProps.Contains(propName);
@@ -59,7 +63,6 @@ public abstract class ItemLogRepositoryBase
 
         foreach (var p in entry.Properties)
         {
-            // Only consider props EF marked as modified and that we don't ignore
             if (!p.IsModified) continue;
             if (IsIgnored(p.Metadata.Name)) continue;
 
@@ -73,9 +76,6 @@ public abstract class ItemLogRepositoryBase
         return changes;
     }
 
-    /// <summary>
-    /// Use this when you had to attach/replace a detached entity (AsNoTracking retrieval).
-    /// </summary>
     protected List<PropertyChange> DiffByReflection<T>(T original, T updated)
     {
         var changes = new List<PropertyChange>();
@@ -99,52 +99,33 @@ public abstract class ItemLogRepositoryBase
     }
 
     // ---------- logging helpers ----------
-    /// <summary>
-    /// Adds Update logs only if there are real changes (returns true if log entries were added).
-    /// DO NOT call SaveChanges here; let the UoW handle it.
-    /// </summary>
     protected bool TryAddUpdateLog(string entityName, int entityId, IEnumerable<PropertyChange> changes)
     {
         if (changes is null) return false;
 
-        // Filter out any accidentals where old==new
         var material = changes
             .Where(c => !string.Equals(c.OldValue, c.NewValue, StringComparison.Ordinal))
             .ToList();
 
-        if (material.Count == 0)
-            return false;
+        if (material.Count == 0) return false;
 
         foreach (var c in material)
         {
             _db.ItemLog.Add(new Core.Domain.Entities.Item.ItemDetail.ItemLog
             {
-                EntityName = entityName,
-                EntityId = entityId,
-                Action = "Update",
+                EntityName   = entityName,
+                EntityId     = entityId,
+                Action       = "Update",
                 PropertyName = c.Property,
-                OldValue = c.OldValue,
-                NewValue = c.NewValue,
-                CreatedBy = _ipAddressService.GetUserId(),
-                CreatedDate = DateTime.UtcNow,
-                CreatedByName = _ipAddressService.GetUserName(),
-                CreatedIP = _ipAddressService.GetSystemIPAddress()
+                OldValue     = c.OldValue,
+                NewValue     = c.NewValue,
+                CreatedBy    = _ipAddressService.GetUserId(),
+                CreatedDate  = DateTime.UtcNow,
+                CreatedByName= _ipAddressService.GetUserName(),
+                CreatedIP    = _ipAddressService.GetSystemIPAddress()
             });
         }
 
         return true;
     }
-
-    /* protected void AddInsertLog(string entityName, int entityId)
-    {
-        _db.ItemLog.Add(new Core.Domain.Entities.Item.ItemDetail.ItemLog
-        {
-            EntityName = entityName,
-            EntityId = entityId,
-            Action = "Insert",
-            PropertyName = "*",
-            OldValue = null,
-            NewValue = null
-        });
-    } */
 }

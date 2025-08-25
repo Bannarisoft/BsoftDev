@@ -4,6 +4,7 @@ using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.Item.ItemDetail.Queries;
 using Core.Application.Item.ItemDetail.Queries.GetAllItems;
+using Core.Application.Item.ItemDetail.Queries.GetItemAutoComplete;
 using Core.Domain.Common;
 using Core.Domain.Entities.Item.ItemDetail.Variant;
 using Dapper;
@@ -151,7 +152,13 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Querie
                         {
                             SupplierId = s.SupplierId,
                             UnitId = s.UnitId,
-                            SupplierPartNo = s.SupplierPartNo
+                            SupplierPartNo = s.SupplierPartNo,
+                            MOQ = s.MOQ,
+                            MOQUomId = s.MOQUomId,
+                            PackageValue = s.PackageValue,
+                            PackageUomId = s.PackageUomId,
+                            DefaultSupplier = s.DefaultSupplier,
+                            LeadTime = s.LeadTime
                         })
                         .ToList(),
 
@@ -328,6 +335,22 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemDetail.Querie
                 .Select(x => x.ItemName)
                 .Take(take)
                 .ToListAsync(ct); */
+        }
+
+        public async Task<List<GetItemAutoCompleteDto>> GetItemAutoCompleteAsync(string searchPattern)
+        {
+            searchPattern = searchPattern ?? string.Empty;
+            const string query = @"
+             SELECT Id, ItemName,ItemCode,ParentItemId
+            FROM Inventory.ItemMaster             
+            WHERE IsDeleted = 0 
+            AND ItemName LIKE @SearchPattern";
+            var parameters = new
+            {
+                SearchPattern = $"%{searchPattern}%"
+            };
+            var items = await _dbConnection.QueryAsync<GetItemAutoCompleteDto>(query, parameters);
+            return items.ToList();
         }
     }
 }

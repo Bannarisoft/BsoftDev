@@ -11,17 +11,17 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
         public void Configure(EntityTypeBuilder<ItemSupplier> b)
         {
             b.ToTable("ItemSupplier", "Inventory");
-            
+
             b.HasKey(x => x.Id);
             b.Property(x => x.Id)
              .HasColumnName("Id")
              .HasColumnType("int")
-             .UseIdentityColumn();   
+             .UseIdentityColumn();
 
             b.Property(x => x.ItemId)
              .HasColumnName("ItemId")
              .HasColumnType("int")
-             .IsRequired();            
+             .IsRequired();
             b.HasOne(x => x.Item)
              .WithMany(i => i.Suppliers)
              .HasForeignKey(x => x.ItemId)
@@ -40,7 +40,37 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item.ItemDetail
             b.Property(x => x.SupplierPartNo)
              .HasColumnName("SupplierPartNo")
              .HasColumnType("varchar(100)")
-             .IsRequired(false);          
+             .IsRequired(false);
+
+            b.Property(x => x.LeadTime)
+             .HasColumnName("LeadTime")
+             .HasColumnType("int")
+             .IsRequired(false);
+
+            b.Property(x => x.MOQ)
+             .HasColumnName("MOQ")
+             .HasColumnType("int")
+             .IsRequired(false);
+
+            b.Property(x => x.MOQUomId)
+             .HasColumnName("MOQUomId")
+             .HasColumnType("int")
+             .IsRequired(false);
+
+            b.Property(x => x.PackageValue)
+             .HasColumnName("PackageValue")
+             .HasColumnType("decimal(18, 3)")
+             .IsRequired(false);
+
+            b.Property(x => x.PackageUomId)
+             .HasColumnName("PackageUomId")
+             .HasColumnType("int")
+             .IsRequired(false);
+
+            b.Property(x => x.DefaultSupplier)
+             .HasColumnName("DefaultSupplier")
+             .HasColumnType("bit")
+             .IsRequired(false);        
         }
     }
 }
