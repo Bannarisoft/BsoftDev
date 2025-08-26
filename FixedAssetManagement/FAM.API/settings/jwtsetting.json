@@ -1,9 +1,9 @@
 {
-    "JwtSettings": {
-        "SecretKey": "YourStrongRandomGeneratedSecretKeyAtLeast32BytesLong", 
-        "EncryptionKey": "LwddQEY16gHNdcMrCErtBYyf72mi1wcIR3hZQZ6rzZY=",
-        "Issuer": "http://localhost:5174",
-        "Audience": "http://localhost:5174/api",
-        "ExpiryMinutes": 1440
-      }   
+  "JwtSettings": {
+    "SecretKey": "5n6FzPQ8i1M+93fDd9VmtQv5s0RUkV6a7hO2NHR6d7LJ3cs6j2QKeP+QJnbZr0yF", 
+    "EncryptionKey": "LwddQEY16gHNdcMrCErtBYyf72mi1wcIR3hZQZ6rzZY=",
+    "Issuer": "bsoft-auth",
+    "Audience": "bsoft-api",
+    "ExpiryMinutes": 1440
+    }   
 }

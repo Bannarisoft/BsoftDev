@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: background-service
+  labels:
+    app: background
+    app.kubernetes.io/name: background
+    app.kubernetes.io/component: worker
+spec:
+  selector:
+    app: background
+  type: NodePort
+  ports:
+    - name: http
+      protocol: TCP
+      port: 5011 # Internal cluster port
+      targetPort: 5011 # Container port
+      nodePort: 30511 # Exposed via Minikube: <minikube-ip>:30511
+    - name: grpc
+      protocol: TCP
+      port: 7111
+      targetPort: 7111
+      nodePort: 31511 # Exposed via Minikube: <minikube-ip>:31511

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: fixedasset-service
+  labels:
+    app: fixedasset
+    app.kubernetes.io/name: fixedasset
+    app.kubernetes.io/component: web-api
+spec:
+  selector:
+    app: fixedasset
+  type: NodePort
+  ports:
+    - name: http
+      protocol: TCP
+      port: 5194 # Cluster-internal port
+      targetPort: 5194 # Container port (must match deployment)
+      nodePort: 30594 # Access externally via <minikube-ip>:30593
+    - name: grpc
+      protocol: TCP
+      port: 7039
+      targetPort: 7039
+      nodePort: 30739 # Access externally via <minikube-ip>:30743

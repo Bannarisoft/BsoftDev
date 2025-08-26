@@ -1,0 +1,369 @@
+name: CI/CD Deploy to Development (Kubernetes + Docker on Linux)
+
+on:
+  push:
+    branches:
+      - dev
+      - feature/*
+
+jobs:
+  build-test-deploy:
+    name: Build, Test, and Deploy Microservices
+    environment: Development
+    runs-on: [self-hosted, Linux, X64]
+
+    env:
+      EMAIL_TO: ${{ secrets.EMAIL_TO }}
+      EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+      SMTP_HOST: ${{ secrets.SMTP_HOST }}
+      SMTP_PORT: ${{ secrets.SMTP_PORT }}
+      EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+      KUBECONFIG: ${{ github.workspace }}/kubeconfig
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      KUBE_NS: default
+
+    steps:
+      - name: ✅ Checkout Code
+        uses: actions/checkout@v3
+
+      - name: 🛡️ Setup Kubeconfig (Base64 Decode)
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > "${{ env.KUBECONFIG }}"
+          export KUBECONFIG="${{ env.KUBECONFIG }}"
+
+      - name: 🔐 Docker Hub Login
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ env.DOCKER_USERNAME }}" --password-stdin
+
+      - name: 🔐 Decode certificate.pfx from secret
+        run: |
+          if [ -n "${{ secrets.PFX_CERT_BASE64 }}" ]; then
+            mkdir -p Certs
+            echo "${{ secrets.PFX_CERT_BASE64 }}" | base64 -d > Certs/certificate.pfx
+            echo "✅ certificate.pfx created"
+          else
+            echo "⚠️ PFX_CERT_BASE64 is empty or not configured"
+          fi
+
+      - name: 🔨 Build .NET Solutions
+        run: |
+          for sln in \
+            UserManagement/UserManagement.sln \
+            MaintenanceManagement/MaintenanceManagement.sln \
+            FixedAssetManagement/FixedAssetManagement.sln \
+            BackgroundService/BackgroundService.sln \
+            SagaOrchestrator/SagaOrchestrator.sln; do
+            echo "Building $sln"
+            dotnet build "$sln" -c Release || exit 1
+          done
+
+      - name: 🧪 Run Unit Tests
+        run: |
+          find . -type f -name "*.Tests.csproj" | while read test; do
+            echo "🧪 Testing: $test"
+            dotnet test "$test" -c Release --no-build --verbosity normal || exit 1
+          done
+
+      - name: 🧪 Docker Version Check
+        run: |
+          docker version || exit 1
+          docker buildx version || echo "🟡 buildx not installed, skipping..."
+
+      - name: 🐳 Build Docker Images
+        run: |
+          docker build -t docker.io/${{ env.DOCKER_USERNAME }}/usermanagement:dev -f ./UserManagement/Dockerfile .
+          docker build -t docker.io/${{ env.DOCKER_USERNAME }}/maintenance:dev -f ./MaintenanceManagement/Dockerfile .
+          docker build -t docker.io/${{ env.DOCKER_USERNAME }}/fixedasset:dev -f ./FixedAssetManagement/Dockerfile .
+          docker build -t docker.io/${{ env.DOCKER_USERNAME }}/background:dev -f ./BackgroundService/Dockerfile .
+          docker build -t docker.io/${{ env.DOCKER_USERNAME }}/saga:dev -f ./SagaOrchestrator/Dockerfile .
+
+      - name: 📤 Push Docker Images to Docker Hub
+        run: |
+          docker push docker.io/${{ env.DOCKER_USERNAME }}/usermanagement:dev
+          docker push docker.io/${{ env.DOCKER_USERNAME }}/maintenance:dev
+          docker push docker.io/${{ env.DOCKER_USERNAME }}/fixedasset:dev
+          docker push docker.io/${{ env.DOCKER_USERNAME }}/background:dev
+          docker push docker.io/${{ env.DOCKER_USERNAME }}/saga:dev
+
+      - name: 🐰 Deploy RabbitMQ (with endpoint + TCP prechecks)
+        run: |
+          set -e
+          export KUBECONFIG="${{ env.KUBECONFIG }}"
+          NS="${{ env.KUBE_NS }}"
+
+          kubectl apply -n "$NS" -f k8s/rabbitmq/ --validate=false
+          kubectl rollout status -n "$NS" deployment/rabbitmq --timeout=300s
+          kubectl wait -n "$NS" --for=condition=ready pod -l app=rabbitmq --timeout=180s
+
+          echo "👉 Endpoints:"
+          kubectl get endpoints -n "$NS" rabbitmq -o wide
+
+          echo "👉 Smoke TCP to FQDN (avoid BusyBox nslookup NXDOMAIN noise):"
+          kubectl delete pod/rmq-netcheck -n "$NS" --ignore-not-found
+          set +e
+          kubectl run rmq-netcheck -n "$NS" \
+            --image=busybox:1.36 \
+            --restart=Never \
+            --attach \
+            --rm \
+            -- sh -c "nc -zvw 2 rabbitmq.${NS}.svc.cluster.local 5672 && echo OK"
+          STATUS=$?
+          set -e
+          test $STATUS -eq 0 || { echo '❌ Cannot reach rabbitmq.'"${NS}"'.svc.cluster.local:5672'; exit 1; }
+
+      - name: 🚢 Deploy Microservices (with Rollback + better diagnostics)
+        run: |
+          set -euo pipefail
+          export KUBECONFIG="${{ env.KUBECONFIG }}"
+          NS="${{ env.KUBE_NS }}"
+
+          mkdir -p artifacts
+          : > artifacts/rollback-log.txt
+
+          # Helper: capture rich debug for a service on failure
+          debug_dump() {
+            local svc="$1"
+            {
+              echo "===== DEBUG for $svc (namespace=$NS) ====="
+              echo "Pods:"
+              kubectl get pods -n "$NS" -l app="$svc" -o wide || true
+              echo "----- DESCRIBE deployment/$svc-deployment -----"
+              kubectl describe deployment -n "$NS" "$svc-deployment" || true
+              echo "----- DESCRIBE pods (events) -----"
+              kubectl describe pods -n "$NS" -l app="$svc" || true
+
+              # init container logs (common name: wait-for-rabbitmq)
+              echo "----- INIT LOGS (wait-for-rabbitmq) -----"
+              for p in $(kubectl get pods -n "$NS" -l app="$svc" -o jsonpath='{.items[*].metadata.name}'); do
+                echo "--- pod: $p"
+                kubectl logs -n "$NS" "$p" -c wait-for-rabbitmq --tail=200 || true
+              done
+
+              # main container last lines
+              echo "----- MAIN CONTAINER LOGS (last 100) -----"
+              kubectl logs -n "$NS" -l app="$svc" --tail=100 --all-containers=false || true
+              echo
+            } >> artifacts/rollback-log.txt 2>&1
+          }
+
+          for svc in usermanagement maintenance fixedasset background saga; do
+            echo "🚀 Deploying $svc"
+
+            # Validate manifests before apply
+            if ! kubectl apply --dry-run=server -n "$NS" -f "k8s/$svc" > /dev/null; then
+              echo "❌ $svc dry-run validation failed" | tee -a artifacts/rollback-log.txt
+              continue
+            fi
+
+            # Delete service (optional)
+            kubectl delete -n "$NS" svc "$svc-service" --ignore-not-found
+
+            # Patch & annotate if deployment exists
+            if kubectl get deployment -n "$NS" "$svc-deployment" > /dev/null 2>&1; then
+              ts=$(date +%s)
+              kubectl patch -n "$NS" deployment "$svc-deployment" \
+                -p "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"ci-timestamp\":\"$ts\"}}}}}"
+
+              kubectl annotate -n "$NS" deployment "$svc-deployment" \
+                "kubernetes.io/change-cause=CI/CD deploy at $(date)" --overwrite
+            else
+              echo "⚠️ Deployment $svc-deployment not found, skipping patch/annotate" | tee -a artifacts/rollback-log.txt
+            fi
+
+            # Apply manifests
+            if ! kubectl apply -n "$NS" -f "k8s/$svc"; then
+              echo "❌ Failed to apply $svc deployment" | tee -a artifacts/rollback-log.txt
+              debug_dump "$svc"
+              continue
+            fi
+
+            echo "⏳ Waiting for rollout of $svc-deployment..."
+            sleep 5
+
+            # Give it ample time (init waits + image pull): 10 minutes
+            if ! kubectl rollout status -n "$NS" deployment/"$svc-deployment" --timeout=600s; then
+              echo "❌ Rollout timeout for $svc" | tee -a artifacts/rollback-log.txt
+              debug_dump "$svc"
+
+              echo "🔁 Rolling back $svc-deployment..."
+              kubectl rollout undo -n "$NS" deployment/"$svc-deployment" || true
+              echo "🔁 Rollback triggered for $svc" | tee -a artifacts/rollback-log.txt
+              continue
+            fi
+
+            echo "✅ $svc deployment succeeded"
+            kubectl rollout history -n "$NS" deployment/"$svc-deployment" > "artifacts/$svc-revision-history.txt"
+          done
+
+      - name: 📤 Upload Rollback Logs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rollback-logs
+          path: artifacts/rollback-log.txt
+
+      - name: 🔗 Output Service URLs with Health Check & Save Summary
+        id: healthcheck
+        run: |
+          mkdir -p artifacts
+          ip="103.231.9.150"
+          declare -A ports=(
+            [usermanagement]=30574
+            [maintenance]=30593
+            [fixedasset]=30594
+            [background]=30511
+            [saga]=30592
+          )
+
+          echo "Service Health Summary - $(date)" > artifacts/health-summary.txt
+          echo "----------------------------------" >> artifacts/health-summary.txt
+
+          for svc in "${!ports[@]}"; do
+            url="http://$ip:${ports[$svc]}/health"
+            status=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 "$url") || status="000"
+            if [[ "$status" == "200" || "$status" == "302" ]]; then
+              echo "✅ $svc (${ports[$svc]}): $status OK" | tee -a artifacts/health-summary.txt
+            else
+              echo "❌ $svc (${ports[$svc]}): $status" | tee -a artifacts/health-summary.txt
+            fi
+          done
+
+      - name: 📤 Upload Health Summary
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: health-summary
+          path: artifacts/health-summary.txt
+
+      - name: 📧 Send Email via Zimbra SMTP
+        if: always()
+        shell: bash
+        run: |
+          TO="${{ secrets.EMAIL_TO }}"
+          FROM="${{ secrets.EMAIL_FROM }}"
+          USER="${{ secrets.EMAIL_USERNAME }}"
+          PASS="${{ secrets.EMAIL_PASSWORD }}"
+          HOST="${{ secrets.SMTP_HOST }}"
+          PORT="${{ secrets.SMTP_PORT }}"
+
+          cat <<EOF > ~/.msmtprc
+          defaults
+          auth on
+          tls on
+          tls_certcheck off
+          logfile ~/.msmtp.log
+
+          account default
+          host ${HOST}
+          port ${PORT}
+          from ${FROM}
+          user ${USER}
+          password ${PASS}
+          EOF
+
+          chmod 600 ~/.msmtprc
+
+          HEALTH_FILE="${{ github.workspace }}/artifacts/health-summary.txt"
+          ROLLBACK_FILE="${{ github.workspace }}/artifacts/rollback-log.txt"
+          if [[ -f "$HEALTH_FILE" ]]; then
+            HEALTH_RESULTS=$(cat "$HEALTH_FILE")
+          else
+            HEALTH_RESULTS="Health summary not available. Possibly skipped due to earlier failure."
+          fi
+           if [[ -s "$ROLLBACK_FILE" ]]; then
+            ROLLBACK_DETAILS=$(cat "$ROLLBACK_FILE")
+          else
+            ROLLBACK_DETAILS="✅ No rollback triggered."
+          fi
+
+          EMAIL_BODY="Subject: 🔔 CI/CD Deployment - ${{ job.status }}
+          To: ${TO}
+          Project: BSOFT
+          Environment: Development
+          Status: ${{ job.status }}
+
+          Rollback Details:
+          $ROLLBACK_DETAILS
+
+          Health Check Summary:
+          $HEALTH_RESULTS
+
+          Time: $(date)
+          "
+          echo -e "$EMAIL_BODY" | msmtp ${TO}
+
+      - name: 📢 Send Slack Notification
+        if: always()
+        shell: bash
+        run: |
+          STATUS="${{ job.status }}"
+          COLOR="#36a64f" # Green for success
+
+          if [ "$STATUS" == "failure" ]; then
+            COLOR="#ff0000"
+          elif [ "$STATUS" == "cancelled" ]; then
+            COLOR="#cccc00"
+          fi
+
+          # Load rollback details
+          ROLLBACK_FILE="${{ github.workspace }}/artifacts/rollback-log.txt"
+          if [[ -f "$ROLLBACK_FILE" && -s "$ROLLBACK_FILE" ]]; then
+            ROLLBACK_MSG=$(cat "$ROLLBACK_FILE")
+          else
+            ROLLBACK_MSG="✅ No rollback triggered."
+          fi
+
+          # Load health check summary
+          HEALTH_FILE="${{ github.workspace }}/artifacts/health-summary.txt"
+          if [[ -f "$HEALTH_FILE" && -s "$HEALTH_FILE" ]]; then
+            HEALTH_MSG=$(cat "$HEALTH_FILE")
+          else
+            HEALTH_MSG="⚠️ Health summary not available."
+          fi
+
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{
+              \"attachments\": [
+                {
+                  \"color\": \"$COLOR\",
+                  \"title\": \"🚀 BSOFT CI/CD - $STATUS\",
+                  \"fields\": [
+                    {
+                      \"title\": \"Branch\",
+                      \"value\": \"${GITHUB_REF#refs/heads/}\",
+                      \"short\": true
+                    },
+                    {
+                      \"title\": \"Environment\",
+                      \"value\": \"Development\",
+                      \"short\": true
+                    },
+                    {
+                      \"title\": \"Rollback Info\",
+                      \"value\": \"$(echo "$ROLLBACK_MSG" | sed ':a;N;$!ba;s/\"/\\\"/g;s/\n/\\n/g')\"
+                    },
+                    {
+                      \"title\": \"Health Check\",
+                      \"value\": \"$(echo "$HEALTH_MSG" | sed ':a;N;$!ba;s/\"/\\\"/g;s/\n/\\n/g')\"
+                    }
+                  ],
+                  \"footer\": \"GitHub Actions\",
+                  \"ts\": $(date +%s),
+                  \"actions\": [
+                    {
+                      \"type\": \"button\",
+                      \"text\": \"🔍 View Workflow Run\",
+                      \"url\": \"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
+                    }
+                  ]
+                }
+              ]
+            }" \
+            ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: 🧼 Docker Cleanup
+        if: always()
+        run: |
+          docker system prune -af
+          docker builder prune -af

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: usermanagement-service
+  labels:
+    app: usermanagement
+    app.kubernetes.io/name: usermanagement
+    app.kubernetes.io/component: web-api
+spec:
+  selector:
+    app: usermanagement
+  type: NodePort
+  ports:
+    - name: http
+      protocol: TCP
+      port: 5174         # service port
+      targetPort: http   # matches containerPort name
+      nodePort: 30574    # must be 30000-32767
+    - name: grpc
+      protocol: TCP
+      port: 7031
+      targetPort: grpc
+      nodePort: 30731
