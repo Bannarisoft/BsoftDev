@@ -198,7 +198,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
                 WOStatus.Code AS WorkOrderStatus,WO.WorkOrderDocNo,CASE 
                 WHEN DATEDIFF(DAY, PSD.ActualWorkOrderDate,GETDATE()) < 1 THEN 'NA'
                 ELSE CAST(DATEDIFF(DAY, PSD.ActualWorkOrderDate,GETDATE()) AS VARCHAR)
-                END AS PendingDays
+                END AS PendingDays,PSH.UnitId
                 from [Maintenance].[PreventiveSchedulerHeader] PSH
                 Inner Join [Maintenance].[MachineGroup] MG ON PSH.MachineGroupId=MG.Id
                 Inner Join [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId=PSH.Id
@@ -213,7 +213,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
                 {{(FromDueDate.HasValue ? "AND PSD.ActualWorkOrderDate >= @FromDueDate" : "")}}
                 {{(ToDueDate.HasValue ? "AND PSD.ActualWorkOrderDate <= @ToDueDate" : "")}}
                 group by PSH.Id,PSH.DepartmentId,MG.GroupName,MISC.description,A.ActivityName,ActivityType.Code,PSD.ActualWorkOrderDate,PSD.LastMaintenanceActivityDate,
-                MM.MachineName,PSH.PreventiveSchedulerName,MM.MachineCode,WOStatus.Code,WO.WorkOrderDocNo,MG.DepartmentId 
+                MM.MachineName,PSH.PreventiveSchedulerName,MM.MachineCode,WOStatus.Code,WO.WorkOrderDocNo,MG.DepartmentId,PSH.UnitId 
                 
                 ORDER BY PSH.Id desc
             """;

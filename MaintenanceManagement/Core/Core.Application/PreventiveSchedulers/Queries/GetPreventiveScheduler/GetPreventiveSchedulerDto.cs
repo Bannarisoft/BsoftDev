@@ -37,5 +37,6 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetPreventiveScheduler
         public string? FrequencyType { get; set; }
         public string? FrequencyUnitId { get; set; }
         public string? FrequencyUnit { get; set; }
+        public int ProductionDepartmentId { get; set; }
     }
 }

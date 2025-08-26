@@ -23,5 +23,6 @@ namespace Core.Application.Reports.ScheduleReport
         public int ProductionDepartmentId { get; set; }
         public string ProductionDepartmentName { get; set; }
         public string PendingDays { get; set; }
+        public int UnitId { get; set; }
     }
 }

@@ -91,6 +91,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     PS.[ModifiedIP],
                     MG.Id AS MachineGroupId,
                     MG.GroupName AS MachineGroup,
+                    MG.DepartmentId AS ProductionDepartmentId,
                     MC.Id AS CategoryId,
                     MC.Code AS CategoryName ,
                     Schedule.Id AS ScheduleId,
@@ -727,7 +728,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             FROM LatestMachineStatus L
             LEFT JOIN Maintenance.WorkOrder WO ON WO.PreventiveScheduleId = L.Id
 			LEFT JOIN [Maintenance].[MiscMaster] MM ON MM.Id = WO.StatusId
-            WHERE rn = 1 AND L.IsActive = 0 or L.IsDeleted=1 or MM.Code=@Status;
+            WHERE rn = 1 AND (L.IsActive = 0 or L.IsDeleted=1 or MM.Code=@Status);
 
             -- Step 2: Get machines not in PreventiveSchedulerDetail (unmapped)
             SELECT M.Id, M.MachineCode, M.MachineName  
