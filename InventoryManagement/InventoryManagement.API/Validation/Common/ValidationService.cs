@@ -87,8 +87,7 @@ namespace InventoryManagement.API.Validation.Common
             services.AddScoped<IValidator<CreateTemplateCommand>, CreateTemplateCommandValidator>();
             services.AddScoped<IValidator<TemplateParamDto>, TemplateParamDtoValidator>();
 
-            services.AddScoped<IValidator<CreatePutAwayRuleCommand>, CreatePutAwayRuleCommandValidator>();            
-            services.AddScoped<IValidator<DeletePutAwayRuleCommand>, DeletePutAwayRuleCommandValidator>();      
+            services.AddScoped<IValidator<CreatePutAwayRuleCommand>, CreatePutAwayRuleCommandValidator>();                           
         }
     }
 }
