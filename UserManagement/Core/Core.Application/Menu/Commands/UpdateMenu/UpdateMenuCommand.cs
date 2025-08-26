@@ -16,6 +16,7 @@ namespace Core.Application.Menu.Commands.UpdateMenu
         public string MenuUrl { get; set; }
         public int ParentId { get; set; }
         public int SortOrder { get; set; }
+        public string? Type { get; set; }
         public byte IsActive { get; set; }
     }
 }
