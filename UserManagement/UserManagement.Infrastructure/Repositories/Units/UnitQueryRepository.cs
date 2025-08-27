@@ -9,7 +9,7 @@ using Core.Application.Common.Interfaces;
 
 namespace UserManagement.Infrastructure.Repositories.Units
 {
-    public class UnitQueryRepository : IUnitQueryRepository
+    public class UnitQueryRepository : IUnitQueryRepository,IUnitGrpcQuery
     {
         private readonly IDbConnection _dbConnection;  
 
@@ -169,10 +169,36 @@ namespace UserManagement.Infrastructure.Repositories.Units
                   });
                  return result.ToList();
              }
-  
 
-                  
+        public async Task<List<Unit>> GetUserUnitsAsync(int UserId)
+        {
+             var query = $$"""
 
+                SELECT 
+            C.Id, 
+            C.UnitName, 
+            C.ShortName,
+            C.CompanyId,
+            C.DivisionId,
+            C.UnitHeadName,
+            C.CINNO,
+            C.IsActive,
+            C.OldUnitId
+             FROM AppData.Unit C
+             Inner join [AppSecurity].[UserUnit] UU on UU.UnitId = C.Id where IsDeleted = 0 
+              WHERE C.IsDeleted = 0 AND UU.UserId = @UserId and UU.IsActive = 1
+               
+            """;
+            
+            
+            var parameters = new
+                       {
+                          UserId
+                       };
+              var unit = await _dbConnection.QueryMultipleAsync(query, parameters);
+             var unitslits = (await unit.ReadAsync<Unit>()).ToList();
+            return unitslits;
+        }
     }
 
     }

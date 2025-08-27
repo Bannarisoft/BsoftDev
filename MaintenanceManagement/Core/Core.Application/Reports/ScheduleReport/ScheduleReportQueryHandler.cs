@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IReports;
 using MediatR;
 
@@ -16,12 +17,17 @@ namespace Core.Application.Reports.ScheduleReport
         private readonly IMapper _mapper;
         private readonly IDepartmentGrpcClient _departmentGrpcClient;
         private readonly IDepartmentAllGrpcClient _departmentAllGrpcClient;
-        public ScheduleReportQueryHandler(IReportRepository reportQueryRepository, IMapper mapper, IDepartmentGrpcClient departmentGrpcClient, IDepartmentAllGrpcClient departmentAllGrpcClient)
+        private readonly IUnitGrpcClient _unitGrpcClient;
+        private readonly IIPAddressService _ipAddressService;
+        public ScheduleReportQueryHandler(IReportRepository reportQueryRepository, IMapper mapper, IDepartmentGrpcClient departmentGrpcClient,
+        IDepartmentAllGrpcClient departmentAllGrpcClient, IUnitGrpcClient unitGrpcClient, IIPAddressService ipAddressService)
         {
             _reportQueryRepository = reportQueryRepository;
             _mapper = mapper;
             _departmentGrpcClient = departmentGrpcClient;
             _departmentAllGrpcClient = departmentAllGrpcClient;
+            _unitGrpcClient = unitGrpcClient;
+            _ipAddressService = ipAddressService;
         }
         public async Task<ApiResponseDTO<List<ScheduleReportDto>>> Handle(ScheduleReportQuery request, CancellationToken cancellationToken)
         {
@@ -34,6 +40,9 @@ namespace Core.Application.Reports.ScheduleReport
 
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+
+           var units = await _unitGrpcClient.GetUserUnitAsync(_ipAddressService.GetUserId());
+           var unitsLookup = units.ToDictionary(d => d.UnitId, d => d.UnitName);
             // var PreventiveSchedulerDictionary = new Dictionary<int, ScheduleReportDto>();
 
 
@@ -55,14 +64,15 @@ namespace Core.Application.Reports.ScheduleReport
                 {
                     dto.DepartmentName = departmentName;
                 }
-               if (ProductiondepartmentLookup.TryGetValue(dto.ProductionDepartmentId, out var ProductiondepartmentName))
-               {
-                   dto.ProductionDepartmentName = ProductiondepartmentName;
-               }
-        }
+                if (ProductiondepartmentLookup.TryGetValue(dto.ProductionDepartmentId, out var ProductiondepartmentName))
+                {
+                    dto.ProductionDepartmentName = ProductiondepartmentName;
+                }
+            }
 
                 var filteredPreventiveSchedulers = preventiveSchedulerList
             .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+            .Where(p => unitsLookup.ContainsKey(p.UnitId))
             .ToList();
 
 
