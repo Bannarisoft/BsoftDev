@@ -14,6 +14,7 @@ namespace Core.Application.PurchaseIndents.Command.CreatePurchaseIndent
         public int UnitId { get; set; }
         public string Purpose { get; set; }
         public int DepartmentId { get; set; }
+        public byte IsDraft { get; set; }
         public ICollection<IndentDetailDto> IndentDetails { get; set; }
     }
 }

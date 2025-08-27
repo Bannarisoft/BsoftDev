@@ -43,10 +43,20 @@ namespace Core.Application.PurchaseIndents.Command.CreatePurchaseIndent
 
             var IndentNumber = await _purchaseIndentQuery.GeneratePurchaseIndentNumberAsync(request.UnitId);
             Indent.IndentNumber = IndentNumber;
+
+             var StatusMisc = await _miscMasterQueryRepository.GetMiscMasterByName(MiscEnumEntity.Status, MiscEnumEntity.Draft);
+            var StatusPending = await _miscMasterQueryRepository.GetMiscMasterByName(MiscEnumEntity.Status, MiscEnumEntity.Pending);
+
+            Indent.StatusId = request.IsDraft == 1 ? StatusMisc.Id : StatusPending.Id;
+
+            foreach (var item in Indent.IndentDetails)
+            {
+                item.StatusId = request.IsDraft == 1 ? StatusMisc.Id : StatusPending.Id;
+            }
             
             var result = await _purchaseIndentCommand.CreateAsync(Indent);
 
-            var StatusMisc = await _miscMasterQueryRepository.GetMiscMasterByName(MiscEnumEntity.Status, MiscEnumEntity.Open);
+           
 
             var indentReverseMap = _imapper.Map<IndentReverseMapDto>(result);
 
@@ -58,12 +68,12 @@ namespace Core.Application.PurchaseIndents.Command.CreatePurchaseIndent
                 ActionType = "Created",
                 ActionRemarks = "Indent Created",
                 NewData = serializedPayload,
-                StatusId = StatusMisc.Id
+                StatusId = request.IsDraft == 1 ? StatusMisc.Id : StatusPending.Id
             };
 
                 await _logServiceCommand.CreateAsync(IndentLog);
 
-            if (result.Id > 0)
+            if (result.Id > 0 && request.IsDraft ==0)
             {
                 var correlationId = Guid.NewGuid();
                 var @event = new TransactionCreatedEvent
@@ -71,8 +81,6 @@ namespace Core.Application.PurchaseIndents.Command.CreatePurchaseIndent
                     CorrelationId = correlationId,
                     ModuleTypeName = MiscEnumEntity.PurchaseIndent,
                     ModuleTransactionId = result.Id,
-                    UnitId = request.UnitId,
-                    DepartmentId = request.DepartmentId,
                     Payload = serializedPayload
                 };
 

@@ -32,7 +32,7 @@ namespace Core.Application.PurchaseIndents.Queries.GetPendingIndent
         {
 
 
-            var (Indent, TotalCount) = await _purchaseIndentQuery.GetAllPurchaseIndentAsync(request.PageNumber, request.PageSize, request.SearchTerm);
+            var (Indent, TotalCount) = await _purchaseIndentQuery.GetPendingPurchaseIndentAsync(request.PageNumber, request.PageSize, request.SearchTerm);
             var IndentDto = _mapper.Map<List<PendingIndentDto>>(Indent);
 
             var Units = await _unitGrpcClient.GetAllUnitAsync();
@@ -50,26 +50,26 @@ namespace Core.Application.PurchaseIndents.Queries.GetPendingIndent
         .Where(p => UnitLookup.ContainsKey(p.UnitId))
         .ToList();
 
-            var workflowResponse = await _workflowGrpcClient.GetAllApprovalRequestStatusAsync(MiscEnumEntity.PurchaseIndent);
-            var workflowLookup = workflowResponse.ToDictionary(d => d.ModuleTransactionId, d => d.CurrentStatus);
+            // var workflowResponse = await _workflowGrpcClient.GetAllApprovalRequestStatusAsync(MiscEnumEntity.PurchaseIndent);
+            // var workflowLookup = workflowResponse.ToDictionary(d => d.ModuleTransactionId, d => d.CurrentStatus);
 
-            foreach (var statusMap in FilteredIndent)
-            {
-                if (workflowLookup.TryGetValue(statusMap.Id, out var Status))
-                {
-                    statusMap.Status = Status;
-                }
-            }
+            // foreach (var statusMap in FilteredIndent)
+            // {
+            //     if (workflowLookup.TryGetValue(statusMap.Id, out var Status))
+            //     {
+            //         statusMap.Status = Status;
+            //     }
+            // }
 
-            var FilteredIndentByPending = FilteredIndent
-        .Where(p => workflowLookup.ContainsKey(p.Id))
-        .ToList();
+        //     var FilteredIndentByPending = FilteredIndent
+        // .Where(p => workflowLookup.ContainsKey(p.Id))
+        // .ToList();
 
             return new ApiResponseDTO<List<PendingIndentDto>>
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = FilteredIndentByPending,
+                Data = FilteredIndent ?? new List<PendingIndentDto>(),
                 TotalCount = TotalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize
