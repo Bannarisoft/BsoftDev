@@ -3,6 +3,7 @@ using System.Data;
 using BackgroundService.Application.DTO;
 using BackgroundService.Application.Interfaces.Notification;
 using Dapper;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackgroundService.Infrastructure.Services.Notification
 {
@@ -10,7 +11,7 @@ namespace BackgroundService.Infrastructure.Services.Notification
     {
         private readonly IDbConnection _dbConnection;
 
-        public NotificationUserResolver(IDbConnection dbConnection)
+        public NotificationUserResolver([FromKeyedServices("Notification")] IDbConnection dbConnection)
         {
             _dbConnection = dbConnection;
         }
