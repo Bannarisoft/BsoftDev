@@ -5,13 +5,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using BackgroundService.Application.Interfaces.IHangfire;
 using Dapper;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackgroundService.Infrastructure.Repositories.HangFire
 {
     public class HangfireQueryRepository : IHangfireQuery
     {
         private readonly IDbConnection _dbConnection;
-        public HangfireQueryRepository(IDbConnection dbConnection)
+        public HangfireQueryRepository([FromKeyedServices("Hangfire")] IDbConnection dbConnection)
         {
             _dbConnection = dbConnection;
         }
