@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 using BackgroundService.Application.Workflow.Common.Interfaces.IWorkflowType;
 using BackgroundService.Domain.Entities.Workflow;
 using Dapper;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackgroundService.Infrastructure.Repositories.Workflow.WorkflowTypes
 {
     public class WorkflowTypeQueryRepository : IWorkflowTypeQuery
     {
         private readonly IDbConnection _dbConnection;
-        public WorkflowTypeQueryRepository(IDbConnection dbConnection)
+        public WorkflowTypeQueryRepository([FromKeyedServices("Notification")] IDbConnection dbConnection)
         {
             _dbConnection = dbConnection;
         }

@@ -7,13 +7,14 @@ using BackgroundService.Application.Workflow.Common.Interfaces.IApprovalStepDeta
 using BackgroundService.Domain.Entities.Notification;
 using BackgroundService.Domain.Entities.Workflow;
 using Dapper;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalStepDetails
 {
     public class ApprovalStepDetailQueryRepository : IApprovalStepDetailQuery
     {
         private readonly IDbConnection _dbConnection;
-        public ApprovalStepDetailQueryRepository(IDbConnection dbConnection)
+        public ApprovalStepDetailQueryRepository([FromKeyedServices("Notification")] IDbConnection dbConnection)
         {
             _dbConnection = dbConnection;
         }

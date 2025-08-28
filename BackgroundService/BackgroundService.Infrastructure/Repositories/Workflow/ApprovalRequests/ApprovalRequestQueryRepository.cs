@@ -9,6 +9,7 @@ using BackgroundService.Domain.Common;
 using BackgroundService.Domain.Entities.Notification;
 using BackgroundService.Domain.Entities.Workflow;
 using Dapper;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequests
 {
@@ -16,7 +17,7 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequest
     {
         private readonly IDbConnection _dbConnection;
         private readonly IIPAddressService _ipaddressService;
-        public ApprovalRequestQueryRepository(IDbConnection dbConnection, IIPAddressService ipaddressService)
+        public ApprovalRequestQueryRepository([FromKeyedServices("Notification")] IDbConnection dbConnection, IIPAddressService ipaddressService)
         {
             _dbConnection = dbConnection;
             _ipaddressService = ipaddressService;

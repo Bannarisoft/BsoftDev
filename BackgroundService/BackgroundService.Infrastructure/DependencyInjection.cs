@@ -87,16 +87,16 @@ namespace BackgroundService.Infrastructure
 
             services.AddTransient<IHangfireDbConnectionFactory>(sp => new HangfireDbConnectionFactory(HangfireConnectionString));
             services.AddTransient<INotificationDbConnectionFactory>(sp => new NotificationDbConnectionFactory(NotificationConnectionString));
-            services.AddScoped<IDbConnection>(sp =>
-            {
-                var factory = sp.GetRequiredService<INotificationDbConnectionFactory>();
-                return factory.CreateConnection();
-            });
-             services.AddScoped<IDbConnection>(sp =>
-            {
-                var factory = sp.GetRequiredService<IHangfireDbConnectionFactory>();
-                return factory.CreateConnection();
-            });
+            // services.AddScoped<IDbConnection>(sp =>
+            // {
+            //     var factory = sp.GetRequiredService<INotificationDbConnectionFactory>();
+            //     return factory.CreateConnection();
+            // });
+            services.AddKeyedScoped<IDbConnection>("Hangfire",
+                (sp, key) => sp.GetRequiredService<IHangfireDbConnectionFactory>().CreateConnection());
+
+            services.AddKeyedScoped<IDbConnection>("Notification",
+              (sp, key) => sp.GetRequiredService<INotificationDbConnectionFactory>().CreateConnection());
 
               // MongoDB Context
             services.AddSingleton<IMongoClient>(sp =>

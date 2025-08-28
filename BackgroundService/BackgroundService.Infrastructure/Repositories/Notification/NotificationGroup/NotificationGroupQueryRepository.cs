@@ -7,6 +7,7 @@ using BackgroundService.Application.Notification.Common.Interfaces;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationGroup;
 using BackgroundService.Application.Notification.NotificationGroup.Queries.GetAllNotificationGroup;
 using Dapper;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackgroundService.Infrastructure.Repositories.Notification.NotificationGroup
 {
@@ -14,7 +15,7 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
     {
         private readonly IDbConnection _dbConnection;
         private readonly IIPAddressService _ipAddressService;
-        public NotificationGroupQueryRepository(IDbConnection dbConnection, IIPAddressService iPAddressService)
+        public NotificationGroupQueryRepository([FromKeyedServices("Notification")] IDbConnection dbConnection, IIPAddressService iPAddressService)
         {
             _dbConnection = dbConnection;
             _ipAddressService = iPAddressService;
