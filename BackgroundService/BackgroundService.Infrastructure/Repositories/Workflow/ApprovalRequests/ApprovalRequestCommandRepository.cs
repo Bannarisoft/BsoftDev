@@ -11,6 +11,7 @@ using BackgroundService.Infrastructure.Data.Notification;
 using Contracts.Events.Workflow;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequests
 {
@@ -21,7 +22,7 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequest
         private readonly IIPAddressService _ipAddressService;
         private readonly IEventPublisher _eventPublisher;
 
-        public ApprovalRequestCommandRepository(NotificationDbContext notificationDbContext, IDbConnection dbConnection, IIPAddressService ipAddressService,
+        public ApprovalRequestCommandRepository(NotificationDbContext notificationDbContext,[FromKeyedServices("Notification")] IDbConnection dbConnection, IIPAddressService ipAddressService,
         IEventPublisher eventPublisher)
         {
             _notificationDbContext = notificationDbContext;
