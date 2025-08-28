@@ -90,10 +90,10 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 return null;
 
             foreach (var updated in preventiveSchedulerDetail)
-          {
+            {
                 var detail = existingPreventiveScheduler.FirstOrDefault(x => x.Id == updated.Id);
-                  if (detail == null)
-                 continue;
+                if (detail == null)
+                    continue;
 
                 detail.WorkOrderCreationStartDate = updated.WorkOrderCreationStartDate;
                 detail.ActualWorkOrderDate = updated.ActualWorkOrderDate;
@@ -107,6 +107,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 detail.IsDownTimeRequired = updated.IsDownTimeRequired;
                 detail.ReminderMaterialReqDays = updated.ReminderMaterialReqDays;
                 detail.ReminderWorkOrderDays = updated.ReminderWorkOrderDays;
+                detail.HangfireJobId = updated.HangfireJobId;
             }
             await _applicationDbContext.SaveChangesAsync();
            
@@ -169,10 +170,6 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(lastMaintenanceDate.Value.DateTime, existingPreventiveScheduler.FrequencyInterval, miscdetail.Code ?? "", existingPreventiveScheduler.ReminderWorkOrderDays);
                     var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(lastMaintenanceDate.Value.DateTime, existingPreventiveScheduler.FrequencyInterval, miscdetail.Code ?? "", existingPreventiveScheduler.ReminderMaterialReqDays);
 
-                    
-
-                    // existingPreventiveScheduler.IsActive = Status.Inactive;
-                    // _applicationDbContext.PreventiveSchedulerDtl.Update(existingPreventiveScheduler);
 
                     existingPreventiveScheduler.Id = 0;
                     existingPreventiveScheduler.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate);
@@ -253,7 +250,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 existingPreventiveScheduler.ActualWorkOrderDate = RescheduleDate;
                 existingPreventiveScheduler.WorkOrderCreationStartDate = RescheduleDate;
                 
-                _backgroundServiceClient.RemoveHangFireJob(existingPreventiveScheduler.HangfireJobId,token);
+                // _backgroundServiceClient.RemoveHangFireJob(existingPreventiveScheduler.HangfireJobId,token);
 
                 // var delay = existingPreventiveScheduler.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today;
                 var targetDateTime = existingPreventiveScheduler.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue);

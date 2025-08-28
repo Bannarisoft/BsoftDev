@@ -60,10 +60,10 @@ namespace Core.Application.Consumers.PreventiveScheduler.Update
                             detail.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate);
                             detail.MaterialReqStartDays = DateOnly.FromDateTime(ItemReminderDate);
 
-                            if (!string.IsNullOrEmpty(detail.HangfireJobId))
-                            {
-                                _backgroundServiceClient.RemoveHangFireJob(detail.HangfireJobId, context.Message.token);
-                            }
+                            // if (!string.IsNullOrEmpty(detail.HangfireJobId))
+                            // {
+                            //     _backgroundServiceClient.RemoveHangFireJob(detail.HangfireJobId, context.Message.token);
+                            // }
 
                             // var delay = detail.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today;
                             var targetDateTime = detail.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue);
