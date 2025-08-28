@@ -35,12 +35,14 @@ namespace SagaOrchestrator.Application.StateMachines.Workflow
                      {
                          context.Saga.IndentId = context.Data.IndentId;
                          context.Saga.ApprovedQty = context.Data.ApprovedQty;
+                         context.Saga.Status = context.Data.Status;
                      })
                      .Send(new Uri("queue:approved-rejected-task-queue"), context => new UpdateIndentDetailCommand
                      {
                          CorrelationId = context.Saga.CorrelationId,
                          IndentId = context.Saga.IndentId,
-                         ApprovedQty = context.Saga.ApprovedQty
+                         ApprovedQty = context.Saga.ApprovedQty,
+                         Status = context.Saga.Status
                      })
                      .TransitionTo(ApprovedRejectedRequest)
 

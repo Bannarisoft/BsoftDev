@@ -15,6 +15,7 @@ namespace Core.Application.PurchaseIndents.Command.UpdatePurchaseIndent
         public string Purpose { get; set; }
         public int DepartmentId { get; set; }
         public byte IsActive { get; set; }
+        public byte IsDraft { get; set; }
         public ICollection<IndentDetailUpdateDto> IndentDetails { get; set; }
     }
 }

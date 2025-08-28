@@ -73,16 +73,29 @@ namespace BackgroundService.Application.Workflow.ApprovalRequests.Commands.Appro
                 var result = await _approvalRequestCommand.Approve(ApprovalReq,JsonSerializer.Serialize(LineStatus),cancellationToken);
                 
 
+                var (lineStatus,headerStatus) = await _approvalRequestQuery.GetApprovalRequestById(request.Id);
 
+                var lineStatusMap = _imapper.Map<List<LineStatusDto>>(lineStatus);
+                var headerStatusMap = _imapper.Map<HeaderStatusDto>(headerStatus);
             
                 var ApprovalReqLine = _imapper.Map<List<UpdateApprovedQtyDto>>(request.ApprovalRequestLine);
+
+                var ApproverStatusLookup = lineStatusMap.ToDictionary(d => d.ModuleLineTransactionId, d => d.Status);
+                foreach (var item in ApprovalReqLine)
+                {
+                    if (ApproverStatusLookup.TryGetValue(item.IndentDetailId, out var Status))
+                      {
+                          item.Status = Status;
+                      }
+                }
                 
                 var correlationId = Guid.NewGuid();
                 var @event = new ApprovedRejectedEvent
                 {
                     CorrelationId = correlationId,
                     IndentId = request.ModuleTransactionId,
-                    ApprovedQty = ApprovalReqLine
+                    ApprovedQty = ApprovalReqLine,
+                    Status = headerStatusMap.StatusCode
                 };
 
                 await _eventPublisher.SaveEventAsync(@event);

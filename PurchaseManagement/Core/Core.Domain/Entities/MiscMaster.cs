@@ -14,6 +14,8 @@ namespace Core.Domain.Entities
         public int SortOrder { get; set; }
         public MiscTypeMaster? MiscTypeMaster { get; set; }
         public ICollection<IndentHeader> IndentType { get; set; }
+        public ICollection<IndentHeader> StatusHeader { get; set; }
+        public ICollection<IndentDetail> StatusDetail { get; set; }
         
 
     }

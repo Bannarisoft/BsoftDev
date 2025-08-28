@@ -24,24 +24,24 @@ namespace PurchaseManagement.Infrastructure.Data.Configurations
                 v => v == IsDelete.Deleted,
                 v => v ? IsDelete.Deleted : IsDelete.NotDeleted
             );
-            
-              builder.ToTable("IndentHeader", "Purchase");
+
+            builder.ToTable("IndentHeader", "Purchase");
 
             builder.HasKey(t => t.Id);
             builder.Property(t => t.Id)
                 .HasColumnName("Id")
                 .HasColumnType("int")
                 .IsRequired();
-            
 
-            builder.Property(m => m.IndentNumber) 
+
+            builder.Property(m => m.IndentNumber)
                 .HasColumnName("IndentNumber")
-                .HasColumnType("varchar(250)")  
+                .HasColumnType("varchar(250)")
                 .IsRequired();
 
             builder.Property(m => m.IndentDate)
                    .HasColumnName("IndentDate")
-                   .HasColumnType("date")  
+                   .HasColumnType("date")
                    .IsRequired();
 
 
@@ -55,15 +55,20 @@ namespace PurchaseManagement.Infrastructure.Data.Configurations
                    .HasColumnType("int")
                    .IsRequired();
 
-                    builder.Property(m => m.Purpose) 
-                .HasColumnName("Purpose")
-                .HasColumnType("varchar(max)")  
-                .IsRequired();
+            builder.Property(m => m.Purpose)
+        .HasColumnName("Purpose")
+        .HasColumnType("varchar(max)")
+        .IsRequired();
 
-                builder.Property(m => m.DepartmentId)
-                   .HasColumnName("DepartmentId")
-                   .HasColumnType("int")
-                   .IsRequired();
+            builder.Property(m => m.DepartmentId)
+               .HasColumnName("DepartmentId")
+               .HasColumnType("int")
+               .IsRequired();
+
+            builder.Property(m => m.StatusId)
+            .HasColumnName("StatusId")
+            .HasColumnType("int")
+            .IsRequired();
 
 
             builder.Property(b => b.IsActive)
@@ -93,11 +98,16 @@ namespace PurchaseManagement.Infrastructure.Data.Configurations
             builder.Property(b => b.ModifiedIP)
                     .HasColumnType("varchar(20)");
 
-                builder.HasOne(m => m.IndentType)
-                .WithMany(t => t.IndentType)
-                .HasForeignKey(m => m.IndentTypeId) 
-                .HasPrincipalKey(t => t.Id)  
-                .OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(m => m.IndentType)
+            .WithMany(t => t.IndentType)
+            .HasForeignKey(m => m.IndentTypeId)
+            .HasPrincipalKey(t => t.Id)
+            .OnDelete(DeleteBehavior.Restrict);
+                
+                builder.HasOne(ac => ac.Status)
+                .WithMany(am => am.StatusHeader)
+                .HasForeignKey(ac => ac.StatusId)
+                .OnDelete(DeleteBehavior.NoAction);
            
         }
     }

@@ -15,7 +15,7 @@ namespace Core.Application.PurchaseIndents.Queries.GetPendingIndent
         public int UnitId { get; set; }
         public string UnitName { get; set; }
         public string Purpose { get; set; }
-        public string Status { get; set; }
+        // public string Status { get; set; }
         public byte IsActive { get; set; }
         public int CreatedBy { get; set; }
         public DateTimeOffset CreatedDate { get; set; }

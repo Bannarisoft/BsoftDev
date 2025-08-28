@@ -16,7 +16,9 @@ namespace Core.Domain.Entities
         public int PRConsumptionDays { get; set; }
         public string Remark { get; set; }
         public decimal? ApprovedQuantity { get; set; }
+        public int StatusId { get; set; }
         public IndentHeader IndentHeader { get; set; }
+        public MiscMaster Status { get; set; }
         
     }
 }

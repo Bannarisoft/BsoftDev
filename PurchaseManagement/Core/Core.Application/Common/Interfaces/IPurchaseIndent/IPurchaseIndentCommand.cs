@@ -10,7 +10,9 @@ namespace Core.Application.Common.Interfaces.IPurchaseIndent
     {
         Task<IndentHeader> CreateAsync(IndentHeader indentHeader);
         Task<bool> UpdateAsync(IndentHeader indentHeader, string request);
-        Task<bool> DeleteAsync(int id, IndentHeader indentHeader); 
+        Task<bool> DeleteAsync(int id, IndentHeader indentHeader);
         Task<List<IndentDetail>> UpdateIndentDetailAsync(List<IndentDetail> indentDetail);
+        Task<bool> RollbackStatusAsync(int id);
+        Task<bool> FinalizeStatus(IndentHeader indentHeader);
     }
 }
