@@ -21,10 +21,7 @@ namespace BackgroundService.Infrastructure.Repositories.HangFire
             SELECT j.Id
             FROM HangFire.Job j
             LEFT JOIN HangFire.[State] s ON s.JobId = j.Id AND s.Id = j.StateId
-            WHERE (
-                    JSON_VALUE(j.Arguments, '$[0]') = @arg
-                 OR JSON_VALUE(j.Arguments, '$[0]') = TRY_CONVERT(int, @arg)
-                  )
+            WHERE  TRY_CONVERT(int, JSON_VALUE(j.Arguments, '$[0]')) = @arg
               AND s.Name IN ('Scheduled','Enqueued','Processing');";
 
             var ids = (await _dbConnection.QueryAsync<int>(sql, new { arg })).ToList();

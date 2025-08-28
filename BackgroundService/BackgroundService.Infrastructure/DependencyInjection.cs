@@ -56,6 +56,7 @@ using BackgroundService.Application.Interfaces.IMiscMaster;
 using BackgroundService.Infrastructure.Repositories.MiscMaster;
 using BackgroundService.Application.Common.Interfaces.IMiscTypeMaster;
 using BackgroundService.Infrastructure.Repositories.MiscTypeMaster;
+using BackgroundService.Application.Interfaces.IHangfire;
 
 namespace BackgroundService.Infrastructure
 {
@@ -89,6 +90,11 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<IDbConnection>(sp =>
             {
                 var factory = sp.GetRequiredService<INotificationDbConnectionFactory>();
+                return factory.CreateConnection();
+            });
+             services.AddScoped<IDbConnection>(sp =>
+            {
+                var factory = sp.GetRequiredService<IHangfireDbConnectionFactory>();
                 return factory.CreateConnection();
             });
 
@@ -311,6 +317,7 @@ namespace BackgroundService.Infrastructure
                 return database.GetCollection<OutboxMessage>(collectionName);
             });
             services.AddScoped<IFileStorageService, FileStorageService>();
+            services.AddScoped<IHangfireQuery, HangfireQueryRepository>();
             return services;
         }
     }
