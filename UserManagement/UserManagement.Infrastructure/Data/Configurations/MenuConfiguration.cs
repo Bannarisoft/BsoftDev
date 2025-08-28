@@ -50,6 +50,10 @@ namespace UserManagement.Infrastructure.Data.Configurations
             builder.Property(d => d.SortOrder)
             .HasColumnType("int");
 
+            builder.Property(d => d.Type)
+            .IsRequired(false)
+            .HasColumnType("varchar(255)");
+
         builder.HasOne(m => m.Module)
                .WithMany(module => module.Menus)
                .HasForeignKey(m => m.ModuleId);

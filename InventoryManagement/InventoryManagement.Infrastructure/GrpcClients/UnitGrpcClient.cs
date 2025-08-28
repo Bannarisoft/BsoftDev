@@ -42,5 +42,10 @@ namespace InventoryManagement.Infrastructure.GrpcClients
                 UnitHeadName = u.UnitHeadName
             }).ToList();
         }
+
+        public Task<List<Contracts.Dtos.Maintenance.UnitDto>> GetUserUnitAsync(int userId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

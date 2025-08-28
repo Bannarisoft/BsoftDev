@@ -33,7 +33,7 @@ namespace UserManagement.Infrastructure.Repositories.Menu
 
         public async Task<bool> DeleteAsync(int id, Core.Domain.Entities.Menu menu)
         {
-            var existingMenu = await _applicationDbContext.Divisions.FirstOrDefaultAsync(u => u.Id == id);
+            var existingMenu = await _applicationDbContext.Menus.FirstOrDefaultAsync(u => u.Id == id);
             if (existingMenu != null)
             {
                 existingMenu.IsDeleted = IsDelete.Deleted;
@@ -55,6 +55,7 @@ namespace UserManagement.Infrastructure.Repositories.Menu
                 existingMenu.SortOrder = menu.SortOrder;
                 existingMenu.MenuIcon = menu.MenuIcon;
                 existingMenu.IsActive = menu.IsActive;
+                existingMenu.Type = menu.Type;
 
                 _applicationDbContext.Menus.Update(existingMenu);
                 return await _applicationDbContext.SaveChangesAsync() > 0;

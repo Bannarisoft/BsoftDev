@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IPurchaseIndent;
+using Core.Domain.Common;
 using Core.Domain.Entities;
 using Dapper;
 
 namespace PurchaseManagement.Infrastructure.Repositories.PurchaseIndents
 {
-    public class PurchaseIndentQueryRepository : IPurchaseIndentQuery,IPurchaseIndentGrpcQuery
+    public class PurchaseIndentQueryRepository : IPurchaseIndentQuery, IPurchaseIndentGrpcQuery
     {
         private readonly IDbConnection _dbConnection;
         private readonly IIPAddressService _ipAddressService;
@@ -27,43 +28,43 @@ namespace PurchaseManagement.Infrastructure.Repositories.PurchaseIndents
         {
 
             string unitCode;
-             var Units = await _unitGrpcClient.GetAllUnitAsync();
+            var Units = await _unitGrpcClient.GetAllUnitAsync();
             var UnitLookup = Units.ToDictionary(d => d.UnitId, d => d.ShortName);
 
-         
+
             if (UnitLookup.TryGetValue(unitId, out var ShortName))
             {
-                 unitCode = ShortName;
+                unitCode = ShortName;
             }
             else
             {
                 throw new Exception("Invalid Unit Id. Failed to generate indent number.");
             }
 
-               
-               const string sql = @"
+
+            const string sql = @"
                    SELECT MAX(CAST(RIGHT(IndentNumber, 4) AS INT))
                    FROM Purchase.IndentHeader
                    WHERE UnitId = @UnitId 
                          ";
 
-               int? maxSequence = await _dbConnection.ExecuteScalarAsync<int?>(sql, new
-               {
-                   UnitId = unitId
-               });
+            int? maxSequence = await _dbConnection.ExecuteScalarAsync<int?>(sql, new
+            {
+                UnitId = unitId
+            });
 
-                int newSequence = (maxSequence ?? 0) + 1;
+            int newSequence = (maxSequence ?? 0) + 1;
 
-               
-               string indentNumber = $"PI/{unitCode}/{newSequence:D4}";
 
-               return indentNumber;
+            string indentNumber = $"PI/{unitCode}/{newSequence:D4}";
+
+            return indentNumber;
         }
 
         public async Task<(List<IndentHeader>, int)> GetAllPurchaseIndentAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
             var UnitId = _ipAddressService.GetUnitId();
-              const string dataQuery = @" SELECT 
+            const string dataQuery = @" SELECT 
                 IH.Id, 
                 IH.IndentNumber,
                 IH.IndentDate,
@@ -81,7 +82,7 @@ namespace PurchaseManagement.Infrastructure.Repositories.PurchaseIndents
                 ORDER BY IH.Id desc
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
             ";
-              const string countQuery = @"
+            const string countQuery = @"
               SELECT COUNT(*) 
                FROM [Purchase].[IndentHeader] IH
             INNER JOIN [Purchase].[MiscMaster] IndentType on IH.IndentTypeId=IndentType.Id
@@ -104,18 +105,18 @@ namespace PurchaseManagement.Infrastructure.Repositories.PurchaseIndents
                 dataQuery,
                 (indentHeader, indentType) =>
                 {
-                     indentHeader.IndentType = new Core.Domain.Entities.MiscMaster
-                     {
-                         Id = indentType.Id,
-                         Code = indentType.Code
-                     };
-                    
-                     return indentHeader;
+                    indentHeader.IndentType = new Core.Domain.Entities.MiscMaster
+                    {
+                        Id = indentType.Id,
+                        Code = indentType.Code
+                    };
+
+                    return indentHeader;
                 },
                 parameters,
-                splitOn: "Id"                
+                splitOn: "Id"
                 );
-            
+
             var totalCount = await _dbConnection.ExecuteScalarAsync<int>(countQuery, parameters);
 
             return (Indent.ToList(), totalCount);
@@ -123,7 +124,7 @@ namespace PurchaseManagement.Infrastructure.Repositories.PurchaseIndents
 
         public async Task<IndentHeader> GetByIdAsync(int id)
         {
-             const string query = @"
+            const string query = @"
                 SELECT 
                 IH.Id, 
                 IH.IndentNumber,
@@ -134,34 +135,56 @@ namespace PurchaseManagement.Infrastructure.Repositories.PurchaseIndents
                 IH.Purpose,
                 IH.IsActive,
                 ID.Id,ID.IndentHeaderId,ID.ItemId,
-                ID.QuantityRequired,ID.RequiredDate,ID.TotalEstimatedCost,ID.PRConsumptionDays,ID.Remark,ID.IsActive
+                ID.QuantityRequired,ID.RequiredDate,ID.TotalEstimatedCost,ID.PRConsumptionDays,ID.Remark,ID.IsActive,HeaderStatus.Id,HeaderStatus.Code,
+                LineStatus.Id,LineStatus.Code
             FROM [Purchase].[IndentHeader] IH
             INNER JOIN [Purchase].[IndentDetail] ID on ID.IndentHeaderId=IH.Id
+            INNER JOIN [Purchase].[MiscMaster] HeaderStatus on IH.StatusId=HeaderStatus.Id
+            INNER JOIN [Purchase].[MiscMaster] LineStatus on ID.StatusId=LineStatus.Id
             WHERE IH.IsDeleted = 0 
               AND IH.IsActive = 1 AND IH.Id = @Id;";
 
-              var IndentDictionary = new Dictionary<int, IndentHeader>();
+            var IndentDictionary = new Dictionary<int, IndentHeader>();
 
-            var IndentResponse = await _dbConnection.QueryAsync<IndentHeader, IndentDetail, IndentHeader>(
+            var IndentResponse = await _dbConnection.QueryAsync<IndentHeader, IndentDetail,Core.Domain.Entities.MiscMaster,Core.Domain.Entities.MiscMaster, IndentHeader>(
                 query,
-                (indentHeader, indentDetail) =>
+                (indentHeader, indentDetail,headerStatus,lineStatus) =>
                 {
                     if (!IndentDictionary.TryGetValue(indentHeader.Id, out var existingIndentHeader))
                     {
                         existingIndentHeader = indentHeader;
                         existingIndentHeader.IndentDetails = new List<IndentDetail>();
+                        indentHeader.Status = new Core.Domain.Entities.MiscMaster
+                         {
+                             Id = headerStatus.Id,
+                             Code = headerStatus.Code
+                         };
+                         
                         IndentDictionary[indentHeader.Id] = existingIndentHeader;
                     }
-                     if (!existingIndentHeader.IndentDetails!
-                        .Any(a => a.Id == indentDetail.Id))
-                    {
-                        existingIndentHeader.IndentDetails.Add(indentDetail);
-                    }
+                     if (indentDetail is not null)
+                     {
+                         indentDetail.Status = lineStatus is null
+                             ? null
+                             : new Core.Domain.Entities.MiscMaster
+                             {
+                                 Id   = lineStatus.Id,
+                                 Code = lineStatus.Code
+                             };
+
+                          if (!existingIndentHeader.IndentDetails!
+                                .Any(a => a.Id == indentDetail.Id))
+                             {
+
+                                 existingIndentHeader.IndentDetails.Add(indentDetail);
+                             }
+                     }
+                   
 
                     return existingIndentHeader;
                 },
                 new { id },
-                splitOn: "Id"
+                splitOn: "Id,Id,Id"
                 );
 
             return IndentResponse.FirstOrDefault()!;
@@ -169,7 +192,7 @@ namespace PurchaseManagement.Infrastructure.Repositories.PurchaseIndents
 
         public async Task<IndentHeader> GetByIdGrpcAsync(int id)
         {
-             const string query = @"
+            const string query = @"
                 SELECT 
                 IH.Id, 
                 IH.IndentNumber,
@@ -186,7 +209,7 @@ namespace PurchaseManagement.Infrastructure.Repositories.PurchaseIndents
             WHERE IH.IsDeleted = 0 
               AND IH.IsActive = 1 AND IH.Id = @Id;";
 
-              var IndentDictionary = new Dictionary<int, IndentHeader>();
+            var IndentDictionary = new Dictionary<int, IndentHeader>();
 
             var IndentResponse = await _dbConnection.QueryAsync<IndentHeader, IndentDetail, IndentHeader>(
                 query,
@@ -198,8 +221,8 @@ namespace PurchaseManagement.Infrastructure.Repositories.PurchaseIndents
                         existingIndentHeader.IndentDetails = new List<IndentDetail>();
                         IndentDictionary[indentHeader.Id] = existingIndentHeader;
                     }
-                     if (!existingIndentHeader.IndentDetails!
-                        .Any(a => a.Id == indentDetail.Id))
+                    if (!existingIndentHeader.IndentDetails!
+                       .Any(a => a.Id == indentDetail.Id))
                     {
                         existingIndentHeader.IndentDetails.Add(indentDetail);
                     }
@@ -214,14 +237,78 @@ namespace PurchaseManagement.Infrastructure.Repositories.PurchaseIndents
             return IndentResponse.FirstOrDefault()!;
         }
 
-     
+
 
         public async Task<bool> NotFoundAsync(int id)
         {
-             var query = "SELECT COUNT(1) FROM [Purchase].[IndentHeader]  WHERE Id = @Id AND IsDeleted = 0";
-             
-                var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
-                return count > 0;
+            var query = "SELECT COUNT(1) FROM [Purchase].[IndentHeader]  WHERE Id = @Id AND IsDeleted = 0";
+
+            var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
+            return count > 0;
+        }
+        
+        public async Task<(List<IndentHeader>, int)> GetPendingPurchaseIndentAsync(int PageNumber, int PageSize, string? SearchTerm)
+        {
+            var UnitId = _ipAddressService.GetUnitId();
+              const string dataQuery = @" SELECT 
+                IH.Id, 
+                IH.IndentNumber,
+                IH.IndentDate,
+                IH.IndentTypeId,
+                IH.UnitId,
+                IH.DepartmentId,
+                IH.Purpose,
+                IH.IsActive,IH.CreatedDate,IH.CreatedBy,IH.CreatedByName,IH.ModifiedBy,IH.ModifiedDate,IH.ModifiedByName,IndentType.Id,IndentType.Code
+            FROM [Purchase].[IndentHeader] IH
+            INNER JOIN [Purchase].[MiscMaster] IndentType on IH.IndentTypeId=IndentType.Id
+            INNER JOIN [Purchase].[MiscMaster] IndentStatus on IH.StatusId=IndentStatus.Id
+            WHERE 
+            IH.IsDeleted = 0
+                AND (@Search IS NULL OR IndentType.Code LIKE @Search OR IH.IndentNumber LIKE @Search)
+                AND  IH.UnitId=@UnitId AND IndentStatus.Code = @Pending
+                ORDER BY IH.Id desc
+                OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+            ";
+              const string countQuery = @"
+              SELECT COUNT(*) 
+               FROM [Purchase].[IndentHeader] IH
+            INNER JOIN [Purchase].[MiscMaster] IndentType on IH.IndentTypeId=IndentType.Id
+            INNER JOIN [Purchase].[MiscMaster] IndentStatus on IH.StatusId=IndentStatus.Id
+            WHERE 
+            IH.IsDeleted = 0
+                AND (@Search IS NULL OR IndentType.Code LIKE @Search OR IH.IndentNumber LIKE @Search)
+                AND  IH.UnitId=@UnitId AND IndentStatus.Code = @Pending;
+          ";
+
+
+            var parameters = new
+            {
+                Search = string.IsNullOrEmpty(SearchTerm) ? null : $"%{SearchTerm}%",
+                Offset = (PageNumber - 1) * PageSize,
+                PageSize,
+                UnitId,
+                Pending = MiscEnumEntity.Pending
+            };
+
+            var Indent = await _dbConnection.QueryAsync<IndentHeader, Core.Domain.Entities.MiscMaster, IndentHeader>(
+                dataQuery,
+                (indentHeader, indentType) =>
+                {
+                     indentHeader.IndentType = new Core.Domain.Entities.MiscMaster
+                     {
+                         Id = indentType.Id,
+                         Code = indentType.Code
+                     };
+                    
+                     return indentHeader;
+                },
+                parameters,
+                splitOn: "Id"                
+                );
+            
+            var totalCount = await _dbConnection.ExecuteScalarAsync<int>(countQuery, parameters);
+
+            return (Indent.ToList(), totalCount);
         }
     }
 }

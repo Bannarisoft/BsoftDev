@@ -143,10 +143,13 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
         {
             await _preventiveScheduleLogService.CaptureLogs(null,Id,"Create Next Schedule",JsonConvert.SerializeObject(Id));
             var existingPreventiveScheduler = await _applicationDbContext.PreventiveSchedulerDtl
-            .FirstOrDefaultAsync(u =>
-                u.Id == Id &&
-                u.IsActive == Status.Active &&
-                u.IsDeleted == IsDelete.NotDeleted);
+            .AsNoTracking()
+            .Where(d => d.Id == Id &&
+                    d.IsActive == Status.Active &&
+                    d.IsDeleted == IsDelete.NotDeleted &&
+                    d.PreventiveScheduler.IsActive == Status.Active &&
+                    d.PreventiveScheduler.IsDeleted == IsDelete.NotDeleted)
+        .FirstOrDefaultAsync();
 
             
             if (existingPreventiveScheduler != null)

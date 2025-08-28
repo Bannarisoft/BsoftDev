@@ -99,6 +99,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapGrpcService<StatesGrpcService>().EnableGrpcWeb();
     endpoints.MapGrpcService<CountryGrpcService>().EnableGrpcWeb();
     endpoints.MapGrpcService<UserAllGrpcService>().EnableGrpcWeb();
+    endpoints.MapGrpcService<UserUnitGrpcService>().EnableGrpcWeb();
     endpoints.MapControllers();
 });
 

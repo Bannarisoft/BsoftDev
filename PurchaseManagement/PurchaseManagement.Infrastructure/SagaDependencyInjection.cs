@@ -29,6 +29,7 @@ namespace PurchaseManagement.Infrastructure
             {
                 x.SetKebabCaseEndpointNameFormatter();
                 x.AddConsumer<ApprovedRejectedConsumer>();
+                x.AddConsumer<RollbackTransactionConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
@@ -38,9 +39,13 @@ namespace PurchaseManagement.Infrastructure
                         h.Password("guest");
                     });
 
-                     cfg.ReceiveEndpoint("approved-rejected-task-queue", e =>
+                    cfg.ReceiveEndpoint("approved-rejected-task-queue", e =>
+                   {
+                       e.ConfigureConsumer<ApprovedRejectedConsumer>(context);
+                   });
+                      cfg.ReceiveEndpoint("approval-request-rollback-queue", e =>
                     {
-                        e.ConfigureConsumer<ApprovedRejectedConsumer>(context);
+                        e.ConfigureConsumer<RollbackTransactionConsumer>(context);
                     });
                 });
 

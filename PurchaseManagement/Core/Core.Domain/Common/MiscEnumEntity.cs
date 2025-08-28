@@ -14,5 +14,6 @@ namespace Core.Domain.Common
         public const string Deleted = "Deleted";
         public const string PurchaseIndent = "Purchase Indent";
         public const string Pending = "Pending";
+        public const string Draft = "Draft";
     }
 }

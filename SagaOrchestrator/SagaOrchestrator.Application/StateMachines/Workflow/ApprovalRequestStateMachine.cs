@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Contracts.Commands.Purchase;
 using Contracts.Commands.Workflow;
 using Contracts.Events.Workflow;
 using MassTransit;
@@ -34,8 +35,6 @@ namespace SagaOrchestrator.Application.StateMachines.Workflow
                       {
                           context.Saga.ModuleTypeName = context.Data.ModuleTypeName;
                           context.Saga.ModuleTransactionId = context.Data.ModuleTransactionId;
-                          context.Saga.UnitId = context.Data.UnitId;
-                          context.Saga.DepartmentId = context.Data.DepartmentId;
                           context.Saga.Payload = context.Data.Payload;
                       })
                       .Send(new Uri("queue:approval-request-task-queue"), context => new CreateApprovalRequestCommand
@@ -43,8 +42,6 @@ namespace SagaOrchestrator.Application.StateMachines.Workflow
                           CorrelationId = context.Saga.CorrelationId,
                           ModuleTypeName = context.Saga.ModuleTypeName,
                           ModuleTransactionId = context.Saga.ModuleTransactionId,
-                          UnitId = context.Saga.UnitId,
-                          DepartmentId = context.Saga.DepartmentId,
                           Payload = context.Saga.Payload
                       })
                       .TransitionTo(CreatingApprovalRequest)
@@ -52,20 +49,21 @@ namespace SagaOrchestrator.Application.StateMachines.Workflow
               );
             During(CreatingApprovalRequest,
             When(ApprovalRequestCreated)
-                .Finalize()
+                .Finalize(),
 
-            //  When(ApprovalRequestFailed)
-            //  .ThenAsync(async ctx =>
-            //  {
+             When(ApprovalRequestFailed)
+             .ThenAsync(async ctx =>
+             {
 
-            //     //  await ctx.Send(new Uri("queue:approval-request-rollback-queue"), new RollBackScheduleWorkOrderCommand
-            //     //  {
-            //     //      CorrelationId = ctx.Data.CorrelationId,
-            //     //      Reason = ctx.Data.Reason,
-            //     //      rollbackHeaders = ctx.Data.rollbackHeaders
-            //     //  });
-            //  })
-            //  .TransitionTo(Failed)
+                 await ctx.Send(new Uri("queue:approval-request-rollback-queue"), new RollbackTransactionCommand
+                 {
+                     CorrelationId = ctx.Data.CorrelationId,
+                     Reason = ctx.Data.Reason,
+                     ModuleTransactionId = ctx.Data.ModuleTransactionId,
+                     ModuleTypeName = ctx.Data.ModuleTypeName
+                 });
+             })
+             .TransitionTo(Failed)
         );
 
             SetCompletedWhenFinalized();

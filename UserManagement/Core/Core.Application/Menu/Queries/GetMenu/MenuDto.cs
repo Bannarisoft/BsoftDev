@@ -17,5 +17,6 @@ namespace Core.Application.Menu.Queries.GetMenu
         public string ParentName { get; set; }
         public int SortOrder { get; set; }
         public string CreatedAt { get; set; }
+        public string? Type { get; set; }
     }
 }

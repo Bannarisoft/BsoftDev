@@ -5,6 +5,7 @@ using GrpcServices.Background;
 using GrpcServices.FixedAssetManagement;
 using GrpcServices.HangfireDelete;
 using GrpcServices.UserManagement;
+using GrpcServices.UserManagement.UserUnit;
 using MaintenanceManagement.Infrastructure.GrpcClients;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -155,6 +156,17 @@ namespace MaintenanceManagement.Infrastructure
             .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
             .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
             services.AddScoped<IDepartmentAllGrpcClient, DepartmentAllGrpcClient>();
+
+               services.AddGrpcClient<UserUnitService.UserUnitServiceClient>(options =>
+            {
+                options.Address = new Uri(userManagementUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            })
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
             return services;
         }
     }

@@ -57,6 +57,7 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetPreventiveScheduler
 
                 var filteredPreventiveSchedulers = preventiveSchedulerList
             .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+            .Where(p => departmentLookup.ContainsKey(p.ProductionDepartmentId))
             .ToList();
           
 
