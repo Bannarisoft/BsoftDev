@@ -30,15 +30,15 @@ namespace MaintenanceManagement.Tests.UnitTests.Handlers.Queries.CostCenter
 
             repoQuery.Setup(r => r.GetAllCostCenterGroupAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string?>()))
                      .ReturnsAsync((
-                         new List<CostCenter>
+                         new List<Core.Domain.Entities.CostCenter>
                          {
-                             new CostCenter { Id = 1, CostCenterCode = "CC-001", CostCenterName = "Spinning", UnitId = 70, DepartmentId = 10 },
-                             new CostCenter { Id = 2, CostCenterCode = "CC-002", CostCenterName = "Winding",  UnitId = 70, DepartmentId = 20 }
+                             new Core.Domain.Entities.CostCenter { Id = 1, CostCenterCode = "CC-001", CostCenterName = "Spinning", UnitId = 70, DepartmentId = 10 },
+                             new Core.Domain.Entities.CostCenter { Id = 2, CostCenterCode = "CC-002", CostCenterName = "Winding",  UnitId = 70, DepartmentId = 20 }
                          },
                          2
                      ));
 
-            mapper.Setup(m => m.Map<List<CostCenterDto>>(It.IsAny<List<CostCenter>>()))
+            mapper.Setup(m => m.Map<List<CostCenterDto>>(It.IsAny<List<Core.Domain.Entities.CostCenter>>()))
                   .Returns(new List<CostCenterDto>
                   {
                       new CostCenterDto { Id = 1, CostCenterCode = "CC-001", CostCenterName = "Spinning", UnitId = 70, DepartmentId = 10 },
@@ -84,7 +84,7 @@ namespace MaintenanceManagement.Tests.UnitTests.Handlers.Queries.CostCenter
             result.Data[0].CostCenterCode.Should().Be("CC-001");
 
             repoQuery.Verify(r => r.GetAllCostCenterGroupAsync(1, 10, null), Times.Once);
-            mapper.Verify(m => m.Map<List<CostCenterDto>>(It.IsAny<List<CostCenter>>()), Times.Once);
+            mapper.Verify(m => m.Map<List<CostCenterDto>>(It.IsAny<List<Core.Domain.Entities.CostCenter>>()), Times.Once);
             deptGrpc.Verify(g => g.GetDepartmentAllAsync(), Times.Once);
             unitGrpc.Verify(g => g.GetAllUnitAsync(), Times.Once);
             mediator.Verify(m => m.Publish(It.IsAny<INotification>(), It.IsAny<CancellationToken>()), Times.AtMostOnce);

@@ -8,7 +8,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using MaintenanceManagement.Infrastructure.Repositories.CostCenter;
 using Core.Application.Common.Interfaces; // IIPAddressService, ITimeZoneService
 using IsDeleteEnum = Core.Domain.Common.BaseEntity.IsDelete;
-using StatusEnum   = Core.Domain.Common.BaseEntity.Status;
+using StatusEnum = Core.Domain.Common.BaseEntity.Status;
 
 namespace MaintenanceManagement.Tests.UnitTests.Services.CostCenter
 {
@@ -47,27 +47,27 @@ namespace MaintenanceManagement.Tests.UnitTests.Services.CostCenter
             return values.Length > 0 ? values[^1] : default;
         }
 
-        private static CostCenter MakeCostCenter(
+        private static Core.Domain.Entities.CostCenter MakeCostCenter(
             string code = "CC-001",
             string name = "Spinning",
             int unitId = 70,
             int deptId = 10)
         {
-            return new CostCenter
+            return new Core.Domain.Entities.CostCenter
             {
-                CostCenterCode    = code,
-                CostCenterName    = name,
-                UnitId            = unitId,
-                DepartmentId      = deptId,
+                CostCenterCode = code,
+                CostCenterName = name,
+                UnitId = unitId,
+                DepartmentId = deptId,
 
                 // required fields
                 ResponsiblePerson = "Unit Test",
-                CreatedByName     = "UnitTest",
-                CreatedIP         = "127.0.0.1",
+                CreatedByName = "UnitTest",
+                CreatedIP = "127.0.0.1",
 
-                EffectiveDate     = DateTimeOffset.UtcNow,
-                IsActive          = PickStatusValue(),
-                Remarks           = "seed"
+                EffectiveDate = DateTimeOffset.UtcNow,
+                IsActive = PickStatusValue(),
+                Remarks = "seed"
             };
         }
 
@@ -144,7 +144,7 @@ namespace MaintenanceManagement.Tests.UnitTests.Services.CostCenter
             db.CostCenter.Add(existing);
             await db.SaveChangesAsync();
 
-            var toDelete = new CostCenter { IsDeleted = PickDeletedValue() };
+            var toDelete = new Core.Domain.Entities.CostCenter { IsDeleted = PickDeletedValue() };
 
             var result = await repo.DeleteAsync(existing.Id, toDelete);
 
@@ -160,7 +160,7 @@ namespace MaintenanceManagement.Tests.UnitTests.Services.CostCenter
             using var db = CreateDb();
             var repo = new CostCenterCommandRepository(db);
 
-            var toDelete = new CostCenter { IsDeleted = PickDeletedValue() };
+            var toDelete = new Core.Domain.Entities.CostCenter { IsDeleted = PickDeletedValue() };
 
             var result = await repo.DeleteAsync(9999, toDelete);
 
@@ -189,19 +189,23 @@ namespace MaintenanceManagement.Tests.UnitTests.Services.CostCenter
             using var db = CreateDb();
             var repo = new CostCenterCommandRepository(db);
 
-            var a = MakeCostCenter(code: "CC-A", name: "Alpha");
-            var b = MakeCostCenter(code: "CC-B", name: "Beta");
+            var a = MakeCostCenter(code: "CC-A", name: "Alpha", unitId: 70);
+            var b = MakeCostCenter(code: "CC-B", name: "Beta", unitId: 70); // same unit to test unit-scoped duplicate
             db.CostCenter.AddRange(a, b);
             await db.SaveChangesAsync();
 
-            var notDuplicate = await repo.IsNameDuplicateAsync("Alpha", a.Id);
+            // Not duplicate when excluding the same record (same unit)
+            var notDuplicate = await repo.IsNameDuplicateAsync("Alpha", a.Id, a.UnitId);
             Assert.IsFalse(notDuplicate);
 
-            var duplicate = await repo.IsNameDuplicateAsync("Alpha", b.Id);
+            // Duplicate because another record with the same name exists in the same unit (exclude b.Id)
+            var duplicate = await repo.IsNameDuplicateAsync("Alpha", b.Id, a.UnitId);
             Assert.IsTrue(duplicate);
 
-            var fresh = await repo.IsNameDuplicateAsync("Gamma", 0);
+            // Fresh name -> not duplicate (same unit)
+            var fresh = await repo.IsNameDuplicateAsync("Gamma", 0, a.UnitId);
             Assert.IsFalse(fresh);
         }
+
     }
 }

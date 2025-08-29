@@ -4,8 +4,6 @@ using UserManagement.API.Validation.Common;
 using UserManagement.API.Middleware;
 using UserManagement.API.Configurations;
 using UserManagement.API.GrpcServices;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
-using System.Security.Claims;
 using MediatR;
 using Core.Application.Common.Behaviors;
 
@@ -13,12 +11,6 @@ using Core.Application.Common.Behaviors;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Kestrel: REST (5174, HTTP/1.1) + gRPC h2c (7031, HTTP/2)
-// builder.WebHost.ConfigureKestrel(options =>
-// {
-//     options.ListenAnyIP(5174, lo => lo.Protocols = HttpProtocols.Http1);
-//     options.ListenAnyIP(7031, lo => lo.Protocols = HttpProtocols.Http2); // pure h2c (no TLS)
-// });
 
 // var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";

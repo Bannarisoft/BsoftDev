@@ -9,15 +9,16 @@ metadata:
 spec:
   selector:
     app: saga
-  type: NodePort  # ✅ Makes the service accessible via <minikube_ip>:nodePort
+  type: NodePort
   ports:
     - name: http
       protocol: TCP
-      port: 5192           # Internal cluster port
-      targetPort: 5192     # Maps to containerPort in Deployment
-      nodePort: 30592      # Externally accessible on this port
+      port: 5192 # cluster port
+      targetPort: http # <-- match the container port name
+      nodePort: 30592 # external node port
     - name: grpc
       protocol: TCP
       port: 7278
-      targetPort: 7278
+      targetPort: grpc # <-- match the container port name
       nodePort: 30778
+      appProtocol: grpc # <-- optional hint for gRPC

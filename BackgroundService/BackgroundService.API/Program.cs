@@ -10,9 +10,10 @@ using MediatR;
 using BackgroundService.Application.Notification.Common.Behaviors;
 using BackgroundService.Application.Hubs;
 using BackgroundService.API.Middleware;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
-var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?? "Development";
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 
 builder.Configuration
 .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
@@ -39,14 +40,21 @@ builder.Services.AddMemoryCache();
 builder.Services.AddGrpc();
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 builder.Services.AddHttpContextAccessor();
+
+
+// ✅ Register health checks (minimal)
+builder.Services.AddHealthChecks()
+    .AddCheck("self", () => HealthCheckResult.Healthy());
+
+
 var app = builder.Build();
 
 // Enable Swagger in Development
 //if (app.Environment.IsDevelopment())
 //{
-    app.UseSwagger();
-    app.UseSwaggerUI();   
-    app.UseDeveloperExceptionPage();
+app.UseSwagger();
+app.UseSwaggerUI();
+app.UseDeveloperExceptionPage();
 //}
 
 app.UseHttpsRedirection();
@@ -57,6 +65,7 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();
 app.UseAuthorization();
+app.MapHealthChecks("/health");
 
 app.UseEndpoints(endpoints =>
 {
@@ -66,7 +75,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapGrpcService<ApprovalLineRequestStatusGrpcService>().EnableGrpcWeb();
     endpoints.MapGrpcService<ApproverListGrpcService>().EnableGrpcWeb();
     endpoints.MapControllers();
-    endpoints.MapHub<NotificationHub>("/notificationHub");    
+    endpoints.MapHub<NotificationHub>("/notificationHub");
 });
 
 // app.MapControllers();

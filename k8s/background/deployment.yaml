@@ -8,6 +8,7 @@ metadata:
     app.kubernetes.io/component: worker
 spec:
   replicas: 1
+  progressDeadlineSeconds: 180
   selector:
     matchLabels:
       app: background
@@ -24,35 +25,52 @@ spec:
         - name: background
           image: docker.io/bannarisoft/background:dev
           imagePullPolicy: Always
+
+          # Only expose HTTP since the app listens on 5011 in container
           ports:
             - name: http
               containerPort: 5011
-            - name: grpc
-              containerPort: 7111
+
+          # IMPORTANT: run in non-Development to avoid dev cert expectations
           env:
             - name: ASPNETCORE_ENVIRONMENT
-              value: "Development"
+              value: "Container"          # or "Production"
             - name: ASPNETCORE_URLS
               value: "http://+:5011"
+
+          # Pull DB / Hangfire / RabbitMQ envs from your secret
           envFrom:
             - secretRef:
                 name: background-secrets
-          livenessProbe:
+
+          # Give the app time to warm up before readiness/liveness kick in
+          startupProbe:
             httpGet:
               path: /health
               port: http
-            initialDelaySeconds: 20
-            periodSeconds: 15
+            initialDelaySeconds: 5
+            periodSeconds: 5
             timeoutSeconds: 5
-            failureThreshold: 5
+            failureThreshold: 30     # up to ~150s for cold start
+
           readinessProbe:
             httpGet:
               path: /health
               port: http
-            initialDelaySeconds: 15
+            initialDelaySeconds: 25
             periodSeconds: 10
             timeoutSeconds: 5
-            failureThreshold: 3
+            failureThreshold: 6
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 5
+
           resources:
             requests:
               memory: "256Mi"

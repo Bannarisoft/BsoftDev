@@ -36,15 +36,53 @@ jobs:
       - name: 🔐 Docker Hub Login
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ env.DOCKER_USERNAME }}" --password-stdin
 
+      # ===== SSL CERT FOR gRPC (ASP.NET Core with PFX) =====
+      # If you terminate TLS at Ingress with cert-manager, you can SKIP this block.
       - name: 🔐 Decode certificate.pfx from secret
+        shell: bash
+        env:
+          PFX_CERT_BASE64: ${{ secrets.PFX_CERT_BASE64 }}
         run: |
-          if [ -n "${{ secrets.PFX_CERT_BASE64 }}" ]; then
-            mkdir -p Certs
-            echo "${{ secrets.PFX_CERT_BASE64 }}" | base64 -d > Certs/certificate.pfx
-            echo "✅ certificate.pfx created"
-          else
-            echo "⚠️ PFX_CERT_BASE64 is empty or not configured"
+          set -euo pipefail
+
+          if [[ -z "${PFX_CERT_BASE64:-}" ]]; then
+            echo "⚠️ PFX_CERT_BASE64 is empty or not configured"; exit 1
           fi
+
+          mkdir -p Certs
+
+          # Strip CRs just in case, and avoid adding an extra newline
+          if ! printf '%s' "$PFX_CERT_BASE64" | tr -d '\r' | base64 -d > Certs/certificate.pfx; then
+            echo "❌ Base64 decode failed. Recreate the secret as a single-line Base64 string."; exit 1
+          fi
+
+          echo "✅ certificate.pfx created at Certs/certificate.pfx"
+
+      - name: 🔐 Create/Update HTTPS secret in Kubernetes (PFX + password)
+        env:
+          PFX_CERT_BASE64: ${{ secrets.PFX_CERT_BASE64 }}
+          PFX_CERT_PASSWORD: ${{ secrets.PFX_CERT_PASSWORD }}
+        if: env.PFX_CERT_BASE64 != '' # ✅ use env.* in if:
+        shell: bash
+        run: |
+          set -euo pipefail
+          export KUBECONFIG="${KUBECONFIG}"
+          NS="${KUBE_NS}"
+
+           if [[ ! -f Certs/certificate.pfx ]]; then
+            echo "❌ Certs/certificate.pfx missing (previous step failed)"; exit 1
+          fi
+          if [[ -z "${PFX_CERT_PASSWORD:-}" ]]; then
+            echo "❌ PFX_CERT_PASSWORD secret not set"; exit 1
+          fi
+
+          SEC_NAME="aspnet-https"
+          kubectl -n "$NS" delete secret "$SEC_NAME" --ignore-not-found
+          kubectl -n "$NS" create secret generic "$SEC_NAME" \
+            --from-file=tls.pfx=Certs/certificate.pfx \
+            --from-literal=Kestrel__Certificates__Default__Password="$PFX_CERT_PASSWORD"
+
+          echo "✅ Created secret $SEC_NAME in namespace $NS"
 
       - name: 🔨 Build .NET Solutions
         run: |
@@ -205,9 +243,23 @@ jobs:
 
       - name: 🔗 Output Service URLs with Health Check & Save Summary
         id: healthcheck
+        shell: bash
         run: |
+          set -euo pipefail
           mkdir -p artifacts
-          ip="103.231.9.150"
+
+          # Prefer Ingress host/IP, else node ExternalIP, else node InternalIP
+          INGRESS_IP=$(kubectl get ingress -A -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)
+          INGRESS_HOST=$(kubectl get ingress -A -o jsonpath='{.items[0].spec.rules[0].host}' 2>/dev/null || true)
+          NODE_IP=$(kubectl get nodes -o jsonpath='{range .items[*]}{.status.addresses[?(@.type=="ExternalIP")].address}{"\n"}{end}' | head -n1 || true)
+          if [[ -z "$NODE_IP" ]]; then
+            NODE_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}')
+          fi
+          if [[ -n "${INGRESS_HOST:-}" ]]; then TARGET_HOST="$INGRESS_HOST";
+          elif [[ -n "${INGRESS_IP:-}" ]]; then TARGET_HOST="$INGRESS_IP";
+          else TARGET_HOST="$NODE_IP"; fi
+          echo "🌐 Health checks will target: ${TARGET_HOST}"
+
           declare -A ports=(
             [usermanagement]=30574
             [maintenance]=30593
@@ -219,15 +271,34 @@ jobs:
           echo "Service Health Summary - $(date)" > artifacts/health-summary.txt
           echo "----------------------------------" >> artifacts/health-summary.txt
 
+          # External (NodePort/Ingress)
           for svc in "${!ports[@]}"; do
-            url="http://$ip:${ports[$svc]}/health"
-            status=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 "$url") || status="000"
-            if [[ "$status" == "200" || "$status" == "302" ]]; then
-              echo "✅ $svc (${ports[$svc]}): $status OK" | tee -a artifacts/health-summary.txt
-            else
-              echo "❌ $svc (${ports[$svc]}): $status" | tee -a artifacts/health-summary.txt
-            fi
+            url="http://${TARGET_HOST}:${ports[$svc]}/health"
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 "$url" || echo 000)
+            case "$code" in
+              200|204|301|302|307|308) echo "✅ $svc (${ports[$svc]}): $code OK" | tee -a artifacts/health-summary.txt ;;
+              *)                       echo "❌ $svc (${ports[$svc]}): $code"   | tee -a artifacts/health-summary.txt ;;
+            esac
           done
+
+          # In-cluster check via ephemeral curl pod (ClusterIP doesn’t depend on firewall/NAT)
+          echo -e "\nIn-cluster Health (ClusterIP):" | tee -a artifacts/health-summary.txt
+          kubectl delete pod/healthcheck-curl --ignore-not-found >/dev/null 2>&1 || true
+          kubectl run healthcheck-curl --image=curlimages/curl --restart=Never --command -- sleep 300
+          kubectl wait --for=condition=Ready pod/healthcheck-curl --timeout=60s
+
+          for svc in usermanagement maintenance fixedasset background saga; do
+            port=$(kubectl get svc "${svc}-service" -o jsonpath='{.spec.ports[?(@.name=="http")].port}')
+            code=$(kubectl exec healthcheck-curl -- sh -c \
+              "curl -s -o /dev/null -w '%{http_code}' --max-time 5 http://${svc}-service.default.svc.cluster.local:${port}/health" \
+              || echo 000)
+            case "$code" in
+              200|204|301|302|307|308) echo "  ✅ $svc (cluster): $code OK" | tee -a artifacts/health-summary.txt ;;
+              *)                       echo "  ❌ $svc (cluster): $code"   | tee -a artifacts/health-summary.txt ;;
+            esac
+          done
+
+          kubectl delete pod/healthcheck-curl --now --ignore-not-found >/dev/null 2>&1 || true
 
       - name: 📤 Upload Health Summary
         uses: actions/upload-artifact@v4
@@ -293,74 +364,58 @@ jobs:
           "
           echo -e "$EMAIL_BODY" | msmtp ${TO}
 
-      - name: 📢 Send Slack Notification
+      - name: 📢 Send Slack (jq)
         if: always()
         shell: bash
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         run: |
+          set -euo pipefail
+          : "${RUNNER_TEMP:=/tmp}"
+          if ! command -v jq >/dev/null 2>&1; then
+            JQ_BIN="$RUNNER_TEMP/bin/jq"
+            mkdir -p "$(dirname "$JQ_BIN")"
+            curl -fsSL -o "$JQ_BIN" https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-linux-amd64
+            chmod +x "$JQ_BIN"
+            export PATH="$(dirname "$JQ_BIN"):$PATH"
+          fi
+          jq --version
+
           STATUS="${{ job.status }}"
-          COLOR="#36a64f" # Green for success
+          COLOR="#36a64f"; [ "$STATUS" = "failure" ] && COLOR="#ff0000" || true
+          [ "$STATUS" = "cancelled" ] && COLOR="#cccc00" || true
 
-          if [ "$STATUS" == "failure" ]; then
-            COLOR="#ff0000"
-          elif [ "$STATUS" == "cancelled" ]; then
-            COLOR="#cccc00"
-          fi
-
-          # Load rollback details
-          ROLLBACK_FILE="${{ github.workspace }}/artifacts/rollback-log.txt"
-          if [[ -f "$ROLLBACK_FILE" && -s "$ROLLBACK_FILE" ]]; then
-            ROLLBACK_MSG=$(cat "$ROLLBACK_FILE")
-          else
-            ROLLBACK_MSG="✅ No rollback triggered."
-          fi
-
-          # Load health check summary
           HEALTH_FILE="${{ github.workspace }}/artifacts/health-summary.txt"
-          if [[ -f "$HEALTH_FILE" && -s "$HEALTH_FILE" ]]; then
-            HEALTH_MSG=$(cat "$HEALTH_FILE")
-          else
-            HEALTH_MSG="⚠️ Health summary not available."
-          fi
+          ROLLBACK_FILE="${{ github.workspace }}/artifacts/rollback-log.txt"
+          HEALTH_MSG="$( [ -s "$HEALTH_FILE" ] && cat "$HEALTH_FILE" || echo "⚠️ Health summary not available." )"
+          ROLLBACK_MSG="$( [ -s "$ROLLBACK_FILE" ] && cat "$ROLLBACK_FILE" || echo "✅ No rollback triggered." )"
+          HEALTH_MSG="${HEALTH_MSG:0:2900}"
+          ROLLBACK_MSG="${ROLLBACK_MSG:0:2900}"
 
-          curl -X POST -H 'Content-type: application/json' \
-            --data "{
-              \"attachments\": [
-                {
-                  \"color\": \"$COLOR\",
-                  \"title\": \"🚀 BSOFT CI/CD - $STATUS\",
-                  \"fields\": [
-                    {
-                      \"title\": \"Branch\",
-                      \"value\": \"${GITHUB_REF#refs/heads/}\",
-                      \"short\": true
-                    },
-                    {
-                      \"title\": \"Environment\",
-                      \"value\": \"Development\",
-                      \"short\": true
-                    },
-                    {
-                      \"title\": \"Rollback Info\",
-                      \"value\": \"$(echo "$ROLLBACK_MSG" | sed ':a;N;$!ba;s/\"/\\\"/g;s/\n/\\n/g')\"
-                    },
-                    {
-                      \"title\": \"Health Check\",
-                      \"value\": \"$(echo "$HEALTH_MSG" | sed ':a;N;$!ba;s/\"/\\\"/g;s/\n/\\n/g')\"
-                    }
-                  ],
-                  \"footer\": \"GitHub Actions\",
-                  \"ts\": $(date +%s),
-                  \"actions\": [
-                    {
-                      \"type\": \"button\",
-                      \"text\": \"🔍 View Workflow Run\",
-                      \"url\": \"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
-                    }
-                  ]
-                }
-              ]
-            }" \
-            ${{ secrets.SLACK_WEBHOOK }}
+          jq -n \
+            --arg color "$COLOR" \
+            --arg status "$STATUS" \
+            --arg branch "${GITHUB_REF#refs/heads/}" \
+            --arg env "Development" \
+            --arg rollback "$ROLLBACK_MSG" \
+            --arg health "$HEALTH_MSG" \
+            --arg url "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            --argjson ts "$(date +%s)" '
+            {attachments:[{
+              color:$color,
+              title:"🚀 BSOFT CI/CD - \($status)",
+              fields:[
+                {title:"Branch", value:$branch, short:true},
+                {title:"Environment", value:$env, short:true},
+                {title:"Rollback Info", value:$rollback},
+                {title:"Health Check",  value:$health}
+              ],
+              footer:"GitHub Actions",
+              ts:$ts,
+              actions:[{type:"button", text:"🔍 View Workflow Run", url:$url}]
+            }]} ' > payload.json
+
+          curl -sS -X POST -H 'Content-type: application/json' --data-binary @payload.json "$SLACK_WEBHOOK"
 
       - name: 🧼 Docker Cleanup
         if: always()

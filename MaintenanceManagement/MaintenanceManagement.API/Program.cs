@@ -10,19 +10,6 @@ using Core.Application.Common.Behaviors;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Kestrel: REST on 5293 (HTTP/1.1) and gRPC h2c on 7243 (HTTP/2 only)
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(5293, lo =>
-    {
-        lo.Protocols = HttpProtocols.Http1; // REST
-    });
-    options.ListenAnyIP(7243, lo =>
-    {
-        lo.Protocols = HttpProtocols.Http2; // pure h2c (no TLS)
-    });
-});
-
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 builder.Configuration
 

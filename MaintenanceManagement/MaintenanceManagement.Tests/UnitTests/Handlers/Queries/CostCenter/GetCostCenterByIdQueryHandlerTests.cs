@@ -31,7 +31,7 @@ namespace MaintenanceManagement.Tests.UnitTests.Handlers.Queries.CostCenter
             var deptGrpc = new Mock<IDepartmentGrpcClient>(MockBehavior.Strict);
             var unitGrpc = new Mock<IUnitGrpcClient>(MockBehavior.Strict);
 
-            var entity = new CostCenter
+            var entity = new Core.Domain.Entities.CostCenter
             {
                 Id = 101,
                 CostCenterCode = "CC-101",
@@ -107,7 +107,7 @@ namespace MaintenanceManagement.Tests.UnitTests.Handlers.Queries.CostCenter
             var deptGrpc = new Mock<IDepartmentGrpcClient>(MockBehavior.Strict);
             var unitGrpc = new Mock<IUnitGrpcClient>(MockBehavior.Strict);
 
-            var entity = new CostCenter
+            var entity = new Core.Domain.Entities.CostCenter
             {
                 Id = 202,
                 CostCenterCode = "CC-202",
