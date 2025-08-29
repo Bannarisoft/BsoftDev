@@ -29,9 +29,19 @@ jobs:
         uses: actions/checkout@v3
 
       - name: 🛡️ Setup Kubeconfig (Base64 Decode)
+        shell: bash
+        env:
+          KUBECONFIG_B64: ${{ secrets.KUBECONFIG }}
         run: |
-          echo "${{ secrets.KUBECONFIG }}" | base64 -d > "${{ env.KUBECONFIG }}"
-          export KUBECONFIG="${{ env.KUBECONFIG }}"
+        
+          set -euo pipefail
+          : "${KUBECONFIG_B64:?KUBECONFIG secret missing}"
+          printf '%s' "$KUBECONFIG_B64" | tr -d '\r' | base64 -d > "${{ env.KUBECONFIG }}"
+          chmod 600 "${{ env.KUBECONFIG }}"
+          # Sanity checks (will fail fast if creds invalid/interactive)
+          kubectl --request-timeout=10s version --short
+          kubectl --request-timeout=10s -n "${{ env.KUBE_NS }}" get secrets >/dev/null
+
 
       - name: 🔐 Docker Hub Login
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ env.DOCKER_USERNAME }}" --password-stdin
