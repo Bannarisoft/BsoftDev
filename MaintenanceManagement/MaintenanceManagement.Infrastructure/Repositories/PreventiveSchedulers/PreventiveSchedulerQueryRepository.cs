@@ -781,10 +781,10 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             var count = await _dbConnection.ExecuteScalarAsync<int>(cmd);
             return count > 0;
         }
-          public async Task<PreventiveSchedulerHeader> OnetimeFrequencyValidation(int id, CancellationToken ct)
+        public async Task<PreventiveSchedulerHeader> OnetimeFrequencyValidation(int id, CancellationToken ct)
         {
 
-                       const string sql = @"
+            const string sql = @"
                    SELECT
                        PS.Id,
                        PS.FrequencyTypeId,
@@ -795,27 +795,51 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                    WHERE PS.IsDeleted = 0 AND PS.Id = @PreventiveScheduleId;
                ";
 
-               var cmd = new CommandDefinition(
-                   commandText: sql,
-                   parameters: new { PreventiveScheduleId = id },
-                   cancellationToken: ct
-               );
+            var cmd = new CommandDefinition(
+                commandText: sql,
+                parameters: new { PreventiveScheduleId = id },
+                cancellationToken: ct
+            );
 
-               var rows = await _dbConnection.QueryAsync<
-                   PreventiveSchedulerHeader,
-                   Core.Domain.Entities.MiscMaster,
-                   PreventiveSchedulerHeader
-               >(
-                   cmd,
-                   map: (header, misc) =>
-                   {
-                       header.MiscFrequencyType = misc;  
-                       return header;
-                   },
-                   splitOn: "Id"  
-               );
+            var rows = await _dbConnection.QueryAsync<
+                PreventiveSchedulerHeader,
+                Core.Domain.Entities.MiscMaster,
+                PreventiveSchedulerHeader
+            >(
+                cmd,
+                map: (header, misc) =>
+                {
+                    header.MiscFrequencyType = misc;
+                    return header;
+                },
+                splitOn: "Id"
+            );
 
-               return rows.FirstOrDefault();
+            return rows.FirstOrDefault();
+        }
+         public async Task<List<int>> WorkOrderNotGeneratedScheduler(int PreventiveSchedulerId)
+        {
+            var query = $@"
+                 SELECT PSD.Id
+                FROM Maintenance.PreventiveSchedulerDetail AS PSD
+                WHERE PSD.PreventiveSchedulerHeaderId = @PreventiveSchedulerId
+                  AND PSD.IsDeleted = 0 AND PSD.IsActive = 1
+                  AND NOT EXISTS (
+                        SELECT 1
+                        FROM Maintenance.WorkOrder AS WO
+                        WHERE WO.PreventiveScheduleId = PSD.Id
+                      );
+
+            ";
+
+            
+            var parameters = new
+            {
+                PreventiveSchedulerId
+            };
+            var result = await _dbConnection.QueryAsync<int>(query, parameters);
+
+            return result.ToList();
         }
     }
 }
