@@ -40,7 +40,12 @@
     <PackageReference Include="BouncyCastle.NetCore" Version="2.2.1"/>
   </ItemGroup>
   <ItemGroup>
-    <Protobuf Include="..\..\Shared\Contracts\Protos\session.proto" GrpcServices="Client"/>    
+    <Protobuf Include="..\..\Shared\Contracts\Protos\session.proto" GrpcServices="Client"/>
+    <Protobuf Include="..\..\Shared\Contracts\Protos\getorcreatelocation.proto" GrpcServices="Client"/> 
+      <Protobuf Include="..\..\Shared\Contracts\Protos\city.proto" GrpcServices="Client" />
+    <Protobuf Include="..\..\Shared\Contracts\Protos\states.proto" GrpcServices="Client" />
+    <Protobuf Include="..\..\Shared\Contracts\Protos\country.proto" GrpcServices="Client" />
+
   </ItemGroup>
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>

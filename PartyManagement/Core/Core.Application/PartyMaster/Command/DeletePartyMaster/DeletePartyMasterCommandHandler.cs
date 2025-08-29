@@ -48,7 +48,21 @@ namespace Core.Application.PartyMaster.Command.DeletePartyMaster
 
             if (result)
             {
-                await _ipartyMasterCommandRepository.LogChange(partymaster.Id, "PartyMaster", "IsDeleted", "0", "1", "Delete");  
+               var log = new PartyActivityLog
+            {
+                PartyId = partymaster.Id,
+                TableName = "PartyMaster",
+                ColumnName = "IsDeleted",
+                OldValue = "0",
+                NewValue = "1",
+                ActionType = "Delete",
+                ChangedBy = _ipAddressService.GetUserId(),
+                ChangedByName=_ipAddressService.GetUserName(),
+                ChangedIp=_ipAddressService.GetSystemIPAddress(),
+                ChangedOn = DateTimeOffset.UtcNow
+            };
+
+                await _ipartyActivityLogCommandRepository.InsertAsync(log, cancellationToken); 
 
                 return true;
             }
