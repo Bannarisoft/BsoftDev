@@ -8,79 +8,84 @@ on:
 
 jobs:
   build-test-deploy:
-    name: Build, Test, and Deploy Microservices
+    name: Build, Test and Deploy Microservices
     environment: Development
     runs-on: [self-hosted, Linux, X64]
 
     env:
-      # ----- Secrets (coalesced) -----
-      EMAIL_TO:          ${{ secrets.EMAIL_TO          || '' }}
-      EMAIL_FROM:        ${{ secrets.EMAIL_FROM        || '' }}
-      SMTP_HOST:         ${{ secrets.SMTP_HOST         || '' }}
-      SMTP_PORT:         ${{ secrets.SMTP_PORT         || '' }}
-      SMTP_USER:         ${{ secrets.SMTP_USER         || '' }}
-      SMTP_PASS:         ${{ secrets.SMTP_PASS         || '' }}
-      SLACK_WEBHOOK:     ${{ secrets.SLACK_WEBHOOK     || '' }}
-
-      DOCKER_USERNAME:   ${{ secrets.DOCKER_USERNAME   || '' }}
-      DOCKER_PASSWORD:   ${{ secrets.DOCKER_PASSWORD   || '' }}
-
-      PFX_CERT_BASE64:   ${{ secrets.PFX_CERT_BASE64   || '' }}
-      PFX_CERT_PASSWORD: ${{ secrets.PFX_CERT_PASSWORD || '' }}
-
-      KUBECONFIG:        ${{ github.workspace }}/kubeconfig
-      KUBE_NS:           default
+      EMAIL_TO: ${{ secrets.EMAIL_TO }}
+      EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+      SMTP_HOST: ${{ secrets.SMTP_HOST }}
+      SMTP_PORT: ${{ secrets.SMTP_PORT }}
+      EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+      KUBECONFIG: ${{ github.workspace }}/kubeconfig
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      KUBE_NS: default
 
     steps:
       - name: ✅ Checkout Code
         uses: actions/checkout@v3
 
       - name: 🛡️ Setup Kubeconfig (Base64 Decode)
-        shell: bash
         run: |
-          set -euo pipefail
           echo "${{ secrets.KUBECONFIG }}" | base64 -d > "${{ env.KUBECONFIG }}"
           export KUBECONFIG="${{ env.KUBECONFIG }}"
 
       - name: 🔐 Docker Hub Login
-        if: env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != ''
-        shell: bash
-        run: |
-          echo "${{ env.DOCKER_PASSWORD }}" | docker login -u "${{ env.DOCKER_USERNAME }}" --password-stdin
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ env.DOCKER_USERNAME }}" --password-stdin
 
       # ===== SSL CERT FOR gRPC (ASP.NET Core with PFX) =====
+      # If you terminate TLS at Ingress with cert-manager, you can SKIP this block.
       - name: 🔐 Decode certificate.pfx from secret
-        if: env.PFX_CERT_BASE64 != ''
         shell: bash
+        env:
+          PFX_CERT_BASE64: ${{ secrets.PFX_CERT_BASE64 }}
         run: |
           set -euo pipefail
+
+          if [[ -z "${PFX_CERT_BASE64:-}" ]]; then
+            echo "⚠️ PFX_CERT_BASE64 is empty or not configured"; exit 1
+          fi
+
           mkdir -p Certs
-          if ! printf '%s' "${PFX_CERT_BASE64}" | tr -d '\r' | base64 -d > Certs/certificate.pfx; then
+
+          # Strip CRs just in case, and avoid adding an extra newline
+          if ! printf '%s' "$PFX_CERT_BASE64" | tr -d '\r' | base64 -d > Certs/certificate.pfx; then
             echo "❌ Base64 decode failed. Recreate the secret as a single-line Base64 string."; exit 1
           fi
+
           echo "✅ certificate.pfx created at Certs/certificate.pfx"
 
       - name: 🔐 Create/Update HTTPS secret in Kubernetes (PFX + password)
-        if: env.PFX_CERT_BASE64 != '' && env.PFX_CERT_PASSWORD != ''
+        env:
+          PFX_CERT_BASE64: ${{ secrets.PFX_CERT_BASE64 }}
+          PFX_CERT_PASSWORD: ${{ secrets.PFX_CERT_PASSWORD }}
+        if: env.PFX_CERT_BASE64 != '' # ✅ use env.* in if:
         shell: bash
         run: |
           set -euo pipefail
           export KUBECONFIG="${KUBECONFIG}"
           NS="${KUBE_NS}"
 
-          test -f Certs/certificate.pfx || { echo "❌ Certs/certificate.pfx missing"; exit 1; }
+           if [[ ! -f Certs/certificate.pfx ]]; then
+            echo "❌ Certs/certificate.pfx missing (previous step failed)"; exit 1
+          fi
+          if [[ -z "${PFX_CERT_PASSWORD:-}" ]]; then
+            echo "❌ PFX_CERT_PASSWORD secret not set"; exit 1
+          fi
 
           SEC_NAME="aspnet-https"
           kubectl -n "$NS" delete secret "$SEC_NAME" --ignore-not-found
           kubectl -n "$NS" create secret generic "$SEC_NAME" \
             --from-file=tls.pfx=Certs/certificate.pfx \
-            --from-literal=Kestrel__Certificates__Default__Password="${PFX_CERT_PASSWORD}"
+            --from-literal=Kestrel__Certificates__Default__Password="$PFX_CERT_PASSWORD"
+
           echo "✅ Created secret $SEC_NAME in namespace $NS"
 
       - name: 🔨 Build .NET Solutions
-        shell: bash
         run: |
-          set -e
           for sln in \
             UserManagement/UserManagement.sln \
             MaintenanceManagement/MaintenanceManagement.sln \
@@ -88,36 +93,30 @@ jobs:
             BackgroundService/BackgroundService.sln \
             SagaOrchestrator/SagaOrchestrator.sln; do
             echo "Building $sln"
-            dotnet build "$sln" -c Release
+            dotnet build "$sln" -c Release || exit 1
           done
 
       - name: 🧪 Run Unit Tests
-        shell: bash
         run: |
-          set -e
           find . -type f -name "*.Tests.csproj" | while read test; do
             echo "🧪 Testing: $test"
-            dotnet test "$test" -c Release --no-build --verbosity normal
+            dotnet test "$test" -c Release --no-build --verbosity normal || exit 1
           done
 
       - name: 🧪 Docker Version Check
-        shell: bash
         run: |
           docker version || exit 1
           docker buildx version || echo "🟡 buildx not installed, skipping..."
 
       - name: 🐳 Build Docker Images
-        shell: bash
         run: |
           docker build -t docker.io/${{ env.DOCKER_USERNAME }}/usermanagement:dev -f ./UserManagement/Dockerfile .
-          docker build -t docker.io/${{ env.DOCKER_USERNAME }}/maintenance:dev    -f ./MaintenanceManagement/Dockerfile .
-          docker build -t docker.io/${{ env.DOCKER_USERNAME }}/fixedasset:dev     -f ./FixedAssetManagement/Dockerfile .
-          docker build -t docker.io/${{ env.DOCKER_USERNAME }}/background:dev     -f ./BackgroundService/Dockerfile .
-          docker build -t docker.io/${{ env.DOCKER_USERNAME }}/saga:dev           -f ./SagaOrchestrator/Dockerfile .
+          docker build -t docker.io/${{ env.DOCKER_USERNAME }}/maintenance:dev -f ./MaintenanceManagement/Dockerfile .
+          docker build -t docker.io/${{ env.DOCKER_USERNAME }}/fixedasset:dev -f ./FixedAssetManagement/Dockerfile .
+          docker build -t docker.io/${{ env.DOCKER_USERNAME }}/background:dev -f ./BackgroundService/Dockerfile .
+          docker build -t docker.io/${{ env.DOCKER_USERNAME }}/saga:dev -f ./SagaOrchestrator/Dockerfile .
 
       - name: 📤 Push Docker Images to Docker Hub
-        if: env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != ''
-        shell: bash
         run: |
           docker push docker.io/${{ env.DOCKER_USERNAME }}/usermanagement:dev
           docker push docker.io/${{ env.DOCKER_USERNAME }}/maintenance:dev
@@ -126,7 +125,6 @@ jobs:
           docker push docker.io/${{ env.DOCKER_USERNAME }}/saga:dev
 
       - name: 🐰 Deploy RabbitMQ (with endpoint + TCP prechecks)
-        shell: bash
         run: |
           set -e
           export KUBECONFIG="${{ env.KUBECONFIG }}"
@@ -139,7 +137,7 @@ jobs:
           echo "👉 Endpoints:"
           kubectl get endpoints -n "$NS" rabbitmq -o wide
 
-          echo "👉 Smoke TCP to FQDN:"
+          echo "👉 Smoke TCP to FQDN (avoid BusyBox nslookup NXDOMAIN noise):"
           kubectl delete pod/rmq-netcheck -n "$NS" --ignore-not-found
           set +e
           kubectl run rmq-netcheck -n "$NS" \
@@ -153,7 +151,6 @@ jobs:
           test $STATUS -eq 0 || { echo '❌ Cannot reach rabbitmq.'"${NS}"'.svc.cluster.local:5672'; exit 1; }
 
       - name: 🚢 Deploy Microservices (with Rollback + better diagnostics)
-        shell: bash
         run: |
           set -euo pipefail
           export KUBECONFIG="${{ env.KUBECONFIG }}"
@@ -162,6 +159,7 @@ jobs:
           mkdir -p artifacts
           : > artifacts/rollback-log.txt
 
+          # Helper: capture rich debug for a service on failure
           debug_dump() {
             local svc="$1"
             {
@@ -172,11 +170,15 @@ jobs:
               kubectl describe deployment -n "$NS" "$svc-deployment" || true
               echo "----- DESCRIBE pods (events) -----"
               kubectl describe pods -n "$NS" -l app="$svc" || true
+
+              # init container logs (common name: wait-for-rabbitmq)
               echo "----- INIT LOGS (wait-for-rabbitmq) -----"
               for p in $(kubectl get pods -n "$NS" -l app="$svc" -o jsonpath='{.items[*].metadata.name}'); do
                 echo "--- pod: $p"
                 kubectl logs -n "$NS" "$p" -c wait-for-rabbitmq --tail=200 || true
               done
+
+              # main container last lines
               echo "----- MAIN CONTAINER LOGS (last 100) -----"
               kubectl logs -n "$NS" -l app="$svc" --tail=100 --all-containers=false || true
               echo
@@ -186,23 +188,28 @@ jobs:
           for svc in usermanagement maintenance fixedasset background saga; do
             echo "🚀 Deploying $svc"
 
+            # Validate manifests before apply
             if ! kubectl apply --dry-run=server -n "$NS" -f "k8s/$svc" > /dev/null; then
               echo "❌ $svc dry-run validation failed" | tee -a artifacts/rollback-log.txt
               continue
             fi
 
+            # Delete service (optional)
             kubectl delete -n "$NS" svc "$svc-service" --ignore-not-found
 
+            # Patch & annotate if deployment exists
             if kubectl get deployment -n "$NS" "$svc-deployment" > /dev/null 2>&1; then
               ts=$(date +%s)
               kubectl patch -n "$NS" deployment "$svc-deployment" \
                 -p "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"ci-timestamp\":\"$ts\"}}}}}"
+
               kubectl annotate -n "$NS" deployment "$svc-deployment" \
                 "kubernetes.io/change-cause=CI/CD deploy at $(date)" --overwrite
             else
               echo "⚠️ Deployment $svc-deployment not found, skipping patch/annotate" | tee -a artifacts/rollback-log.txt
             fi
 
+            # Apply manifests
             if ! kubectl apply -n "$NS" -f "k8s/$svc"; then
               echo "❌ Failed to apply $svc deployment" | tee -a artifacts/rollback-log.txt
               debug_dump "$svc"
@@ -212,9 +219,11 @@ jobs:
             echo "⏳ Waiting for rollout of $svc-deployment..."
             sleep 5
 
+            # Give it ample time (init waits + image pull): 10 minutes
             if ! kubectl rollout status -n "$NS" deployment/"$svc-deployment" --timeout=600s; then
               echo "❌ Rollout timeout for $svc" | tee -a artifacts/rollback-log.txt
               debug_dump "$svc"
+
               echo "🔁 Rolling back $svc-deployment..."
               kubectl rollout undo -n "$NS" deployment/"$svc-deployment" || true
               echo "🔁 Rollback triggered for $svc" | tee -a artifacts/rollback-log.txt
@@ -239,6 +248,7 @@ jobs:
           set -euo pipefail
           mkdir -p artifacts
 
+          # Prefer Ingress host/IP, else node ExternalIP, else node InternalIP
           INGRESS_IP=$(kubectl get ingress -A -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)
           INGRESS_HOST=$(kubectl get ingress -A -o jsonpath='{.items[0].spec.rules[0].host}' 2>/dev/null || true)
           NODE_IP=$(kubectl get nodes -o jsonpath='{range .items[*]}{.status.addresses[?(@.type=="ExternalIP")].address}{"\n"}{end}' | head -n1 || true)
@@ -261,6 +271,7 @@ jobs:
           echo "Service Health Summary - $(date)" > artifacts/health-summary.txt
           echo "----------------------------------" >> artifacts/health-summary.txt
 
+          # External (NodePort/Ingress)
           for svc in "${!ports[@]}"; do
             url="http://${TARGET_HOST}:${ports[$svc]}/health"
             code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 "$url" || echo 000)
@@ -270,6 +281,7 @@ jobs:
             esac
           done
 
+          # In-cluster check via ephemeral curl pod (ClusterIP doesn’t depend on firewall/NAT)
           echo -e "\nIn-cluster Health (ClusterIP):" | tee -a artifacts/health-summary.txt
           kubectl delete pod/healthcheck-curl --ignore-not-found >/dev/null 2>&1 || true
           kubectl run healthcheck-curl --image=curlimages/curl --restart=Never --command -- sleep 300
@@ -296,15 +308,15 @@ jobs:
           path: artifacts/health-summary.txt
 
       - name: 📧 Send Email via Zimbra SMTP
-        if: always() && env.EMAIL_TO != '' && env.EMAIL_FROM != '' && env.SMTP_HOST != '' && env.SMTP_PORT != '' && env.SMTP_USER != '' && env.SMTP_PASS != ''
+        if: always()
         shell: bash
         run: |
-          TO="${{ env.EMAIL_TO }}"
-          FROM="${{ env.EMAIL_FROM }}"
-          HOST="${{ env.SMTP_HOST }}"
-          PORT="${{ env.SMTP_PORT }}"
-          USER="${{ env.SMTP_USER }}"
-          PASS="${{ env.SMTP_PASS }}"
+          TO="${{ secrets.EMAIL_TO }}"
+          FROM="${{ secrets.EMAIL_FROM }}"
+          USER="${{ secrets.EMAIL_USERNAME }}"
+          PASS="${{ secrets.EMAIL_PASSWORD }}"
+          HOST="${{ secrets.SMTP_HOST }}"
+          PORT="${{ secrets.SMTP_PORT }}"
 
           cat <<EOF > ~/.msmtprc
           defaults
@@ -325,28 +337,38 @@ jobs:
 
           HEALTH_FILE="${{ github.workspace }}/artifacts/health-summary.txt"
           ROLLBACK_FILE="${{ github.workspace }}/artifacts/rollback-log.txt"
+          if [[ -f "$HEALTH_FILE" ]]; then
+            HEALTH_RESULTS=$(cat "$HEALTH_FILE")
+          else
+            HEALTH_RESULTS="Health summary not available. Possibly skipped due to earlier failure."
+          fi
+           if [[ -s "$ROLLBACK_FILE" ]]; then
+            ROLLBACK_DETAILS=$(cat "$ROLLBACK_FILE")
+          else
+            ROLLBACK_DETAILS="✅ No rollback triggered."
+          fi
 
-          HEALTH_RESULTS="$( [ -f "$HEALTH_FILE" ] && cat "$HEALTH_FILE" || echo 'Health summary not available.' )"
-          ROLLBACK_DETAILS="$( [ -s "$ROLLBACK_FILE" ] && cat "$ROLLBACK_FILE" || echo '✅ No rollback triggered.' )"
-
-          printf '%s\n' "Subject: 🔔 CI/CD Deployment - ${{ job.status }}
+          EMAIL_BODY="Subject: 🔔 CI/CD Deployment - ${{ job.status }}
           To: ${TO}
           Project: BSOFT
           Environment: Development
           Status: ${{ job.status }}
 
           Rollback Details:
-          ${ROLLBACK_DETAILS}
+          $ROLLBACK_DETAILS
 
           Health Check Summary:
-          ${HEALTH_RESULTS}
+          $HEALTH_RESULTS
 
           Time: $(date)
-          " | msmtp ${TO}
+          "
+          echo -e "$EMAIL_BODY" | msmtp ${TO}
 
       - name: 📢 Send Slack (jq)
-        if: always() && env.SLACK_WEBHOOK != ''
+        if: always()
         shell: bash
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         run: |
           set -euo pipefail
           : "${RUNNER_TEMP:=/tmp}"
@@ -397,7 +419,6 @@ jobs:
 
       - name: 🧼 Docker Cleanup
         if: always()
-        shell: bash
         run: |
           docker system prune -af
           docker builder prune -af
