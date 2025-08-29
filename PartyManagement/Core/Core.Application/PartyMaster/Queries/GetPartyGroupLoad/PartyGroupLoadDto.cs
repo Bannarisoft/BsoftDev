@@ -11,6 +11,7 @@ namespace Core.Application.PartyMaster.Queries.GetPartyGroupLoad
         public string? PartyGroupName { get; set; }
         public int PartyTypeId { get; set; }
         public string? PartyTypeName { get; set; }
+        
 
     }
 }

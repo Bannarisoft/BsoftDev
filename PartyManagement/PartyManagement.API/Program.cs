@@ -7,6 +7,7 @@ using PartyManagement.API.Middleware;
 using PartyManagement.API.Validation.Common;
 using PartyManagement.Infrastructure;
 using PartyManagement.Infrastructure.Logging.Middleware;
+using Shared.Grpc;
 
 var builder = WebApplication.CreateBuilder(args);
 

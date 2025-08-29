@@ -242,10 +242,10 @@ namespace PartyManagement.Infrastructure.Repositories.PartyMaster
                             existingChildpartyaddress.AddressType = incoming.AddressType;
                             existingChildpartyaddress.AddressLine1 = incoming.AddressLine1;
                             existingChildpartyaddress.AddressLine2 = incoming.AddressLine2;
-                            existingChildpartyaddress.City = incoming.City;
-                            existingChildpartyaddress.State = incoming.State;
+                            existingChildpartyaddress.CityId = incoming.CityId;
+                            existingChildpartyaddress.StateId = incoming.StateId;
                             existingChildpartyaddress.PostalCode = incoming.PostalCode;
-                            existingChildpartyaddress.Country = incoming.Country;
+                            existingChildpartyaddress.CountryId = incoming.CountryId;
                             
 
                         }
@@ -258,10 +258,10 @@ namespace PartyManagement.Infrastructure.Repositories.PartyMaster
                             AddressType = incoming.AddressType,
                             AddressLine1 = incoming.AddressLine1,
                             AddressLine2 = incoming.AddressLine2,
-                            City = incoming.City,
-                            State = incoming.State,
+                            CityId = incoming.CityId,
+                            StateId = incoming.StateId,
                             PostalCode = incoming.PostalCode,
-                            Country = incoming.Country
+                            CountryId = incoming.CountryId
                         });
 
                         // Insert Log - PartyAddress

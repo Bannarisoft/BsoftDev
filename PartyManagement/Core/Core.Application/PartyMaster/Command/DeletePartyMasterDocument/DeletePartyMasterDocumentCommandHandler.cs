@@ -64,8 +64,23 @@ namespace Core.Application.PartyMaster.Command.DeletePartyMasterDocument
                 {
                     throw new Exception("Document entry not found or deletion failed in DB.");
                 }
-                
-                await _ipartyMasterCommandRepository.LogChange(request.PartyId, "PartyDocuments", "FileName", request.FileName?? "", "", "Delete");                  
+                // ✅ Log
+                var log = new PartyActivityLog
+                {
+                PartyId = request.PartyId,
+                TableName = "PartyDocuments",
+                ColumnName = "FileName",
+                OldValue = request.FileName ?? string.Empty,
+                NewValue = "",
+                ActionType = "Delete",
+                ChangedBy = _ipAddressService.GetUserId(),
+                ChangedByName=_ipAddressService.GetUserName(),
+                ChangedIp=_ipAddressService.GetSystemIPAddress(),
+                ChangedOn = DateTimeOffset.UtcNow
+            };
+
+                await _ipartyActivityLogCommandRepository.InsertAsync(log, cancellationToken); 
+               
             }
 
             return true;
