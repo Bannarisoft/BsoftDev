@@ -9,6 +9,7 @@ using BackgroundService.Domain.Common;
 using BackgroundService.Domain.Entities.Notification;
 using BackgroundService.Domain.Entities.Workflow;
 using Dapper;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequests
 {
@@ -16,7 +17,7 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequest
     {
         private readonly IDbConnection _dbConnection;
         private readonly IIPAddressService _ipaddressService;
-        public ApprovalRequestQueryRepository(IDbConnection dbConnection, IIPAddressService ipaddressService)
+        public ApprovalRequestQueryRepository([FromKeyedServices("Notification")] IDbConnection dbConnection, IIPAddressService ipaddressService)
         {
             _dbConnection = dbConnection;
             _ipaddressService = ipaddressService;
@@ -98,42 +99,42 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequest
 
        
 
-        public async Task<List<dynamic>> GetAllApprovalRequestByWorkflowType(string ModuleTypeName)
-        {
-            const string dataQuery = @" WITH RankedApprovals AS (
-                SELECT 
-                    AR.ModuleTransactionId,
-                    AR.Id AS ApprovalRequestId,
-                    Status.Code AS CurrentStatus,
-                    WorkFlow.ModuleTypeName,
-                    ApprovalStep.Code AS ApprovalStep,
-                    ASD.StepOrder,
-                    ROW_NUMBER() OVER (PARTITION BY AR.ModuleTransactionId ORDER BY ASD.StepOrder DESC) AS rn
-                FROM [AppData].[ApprovalRequest] AR
-                INNER JOIN [AppData].[ApprovalStepDetail] ASD ON ASD.Id = AR.ApprovalStepDetailId
-                INNER JOIN [AppData].[MiscMaster] Status ON Status.Id = AR.StatusId
-                INNER JOIN [AppData].[WorkflowType] WorkFlow ON WorkFlow.Id = AR.WorkflowTypeId
-                INNER JOIN [AppData].[MiscMaster] ApprovalStep ON ApprovalStep.Id = ASD.ApprovalStepId
-                WHERE WorkFlow.ModuleTypeName = @ModuleTypeName
-            )
-            SELECT 
-                ModuleTransactionId,
-                ApprovalRequestId,
-                CurrentStatus,
-                ModuleTypeName,
-                ApprovalStep
-            FROM RankedApprovals
-            WHERE rn = 1;
+        // public async Task<List<dynamic>> GetAllApprovalRequestByWorkflowType(string ModuleTypeName)
+        // {
+        //     const string dataQuery = @" WITH RankedApprovals AS (
+        //         SELECT 
+        //             AR.ModuleTransactionId,
+        //             AR.Id AS ApprovalRequestId,
+        //             Status.Code AS CurrentStatus,
+        //             WorkFlow.ModuleTypeName,
+        //             ApprovalStep.Code AS ApprovalStep,
+        //             ASD.StepOrder,
+        //             ROW_NUMBER() OVER (PARTITION BY AR.ModuleTransactionId ORDER BY ASD.StepOrder DESC) AS rn
+        //         FROM [AppData].[ApprovalRequest] AR
+        //         INNER JOIN [AppData].[ApprovalStepDetail] ASD ON ASD.Id = AR.ApprovalStepDetailId
+        //         INNER JOIN [AppData].[MiscMaster] Status ON Status.Id = AR.StatusId
+        //         INNER JOIN [AppData].[WorkflowType] WorkFlow ON WorkFlow.Id = AR.WorkflowTypeId
+        //         INNER JOIN [AppData].[MiscMaster] ApprovalStep ON ApprovalStep.Id = ASD.ApprovalStepId
+        //         WHERE WorkFlow.ModuleTypeName = @ModuleTypeName
+        //     )
+        //     SELECT 
+        //         ModuleTransactionId,
+        //         ApprovalRequestId,
+        //         CurrentStatus,
+        //         ModuleTypeName,
+        //         ApprovalStep
+        //     FROM RankedApprovals
+        //     WHERE rn = 1;
 
-            ";
+        //     ";
 
-            var parameters = new
-            {
-                ModuleTypeName
-            };
-            var result = await _dbConnection.QueryAsync(dataQuery, parameters);
-            return result.ToList();
-        }
+        //     var parameters = new
+        //     {
+        //         ModuleTypeName
+        //     };
+        //     var result = await _dbConnection.QueryAsync(dataQuery, parameters);
+        //     return result.ToList();
+        // }
 
         public async Task<List<ApprovalRequest>> GetApprovalRequestByWorkFlowTypeAsync(string WorkFlowType)
         {
@@ -230,170 +231,144 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequest
             return ApprovalRequest.ToList();
         }
 
-        public async Task<List<int>> GetApprovalStepDetailByIdAsync(string WorkFlowType, int ModuleTransactionId, int UnitId, int DepartmentId)
-        {
-            const string query = @"
-                SELECT ASD.Id
-            FROM [AppData].[ApprovalStepDetail] ASD
-            INNER JOIN [AppData].[ApprovalStepUnitMapping] ASM 
-                ON ASM.ApprovalStepDetailId = ASD.Id
-            INNER JOIN [AppData].[ApprovalStepDepartmentMapping] ApprovalDept 
-                ON ApprovalDept.ApprovalStepDetailId = ASD.Id
-            LEFT JOIN [AppData].[ApprovalRequest] AR 
-                ON AR.ApprovalStepDetailId = ASD.Id 
-                AND AR.WorkflowType = @WorkFlowType 
-                AND AR.ModuleTransactionId = @ModuleTransactionId
-            WHERE ASD.IsDeleted = 0 
-              AND ASD.IsActive = 1 
-              AND AR.Id IS NULL AND ASM.UnitId = @UnitId AND ApprovalDept.DepartmentId = @DepartmentId
-            ORDER BY ASD.StepOrder ASC;";
+        // public async Task<List<int>> GetApprovalStepDetailByIdAsync(string WorkFlowType, int ModuleTransactionId, int UnitId, int DepartmentId)
+        // {
+        //     const string query = @"
+        //         SELECT ASD.Id
+        //     FROM [AppData].[ApprovalStepDetail] ASD
+        //     INNER JOIN [AppData].[ApprovalStepUnitMapping] ASM 
+        //         ON ASM.ApprovalStepDetailId = ASD.Id
+        //     INNER JOIN [AppData].[ApprovalStepDepartmentMapping] ApprovalDept 
+        //         ON ApprovalDept.ApprovalStepDetailId = ASD.Id
+        //     LEFT JOIN [AppData].[ApprovalRequest] AR 
+        //         ON AR.ApprovalStepDetailId = ASD.Id 
+        //         AND AR.WorkflowType = @WorkFlowType 
+        //         AND AR.ModuleTransactionId = @ModuleTransactionId
+        //     WHERE ASD.IsDeleted = 0 
+        //       AND ASD.IsActive = 1 
+        //       AND AR.Id IS NULL AND ASM.UnitId = @UnitId AND ApprovalDept.DepartmentId = @DepartmentId
+        //     ORDER BY ASD.StepOrder ASC;";
 
-            var WorkflowType = await _dbConnection.QueryAsync<int>(query, new { WorkFlowType, ModuleTransactionId, UnitId, DepartmentId });
-            return WorkflowType.ToList();
-        }
-        public async Task<List<int>> StartApprovalProcessAsync(List<int> Id, Dictionary<string, object> requestData)
-        {
-            var resultIds = new List<int>();
-            var steps = await _dbConnection.QueryAsync<dynamic>(
-                @"SELECT s.Id, s.StepOrder, s.TargetTypeId, r.ConditionKey, r.Operator, r.Value
-                  FROM [AppData].[ApprovalStepDetail] s
-                  LEFT JOIN [AppData].[RuleSkipApproverMapping] m ON s.Id = m.ApprovalDetailId
-                  LEFT JOIN [AppData].[ApprovalRule] r ON m.RuleId = r.Id
-                  WHERE s.Id IN @Id
-                  ORDER BY s.StepOrder",
-                new { Id });
+        //     var WorkflowType = await _dbConnection.QueryAsync<int>(query, new { WorkFlowType, ModuleTransactionId, UnitId, DepartmentId });
+        //     return WorkflowType.ToList();
+        // }
+        // public async Task<List<int>> StartApprovalProcessAsync(List<int> Id, Dictionary<string, object> requestData)
+        // {
+        //     var resultIds = new List<int>();
+        //     var steps = await _dbConnection.QueryAsync<dynamic>(
+        //         @"SELECT s.Id, s.StepOrder, s.TargetTypeId, r.ConditionKey, r.Operator, r.Value
+        //           FROM [AppData].[ApprovalStepDetail] s
+        //           LEFT JOIN [AppData].[RuleSkipApproverMapping] m ON s.Id = m.ApprovalDetailId
+        //           LEFT JOIN [AppData].[ApprovalRule] r ON m.RuleId = r.Id
+        //           WHERE s.Id IN @Id
+        //           ORDER BY s.StepOrder",
+        //         new { Id });
 
-            var groupedSteps = steps.GroupBy(x => x.Id);
+        //     var groupedSteps = steps.GroupBy(x => x.Id);
 
-            foreach (var stepGroup in groupedSteps)
-            {
-                var step = stepGroup.First();
-                bool allRulesPass = true;
+        //     foreach (var stepGroup in groupedSteps)
+        //     {
+        //         var step = stepGroup.First();
+        //         bool allRulesPass = true;
 
-                foreach (var rule in stepGroup)
-                {
-                    if (!string.IsNullOrEmpty(rule.ConditionKey))
-                    {
-                        var actualValue = requestData.ContainsKey(rule.ConditionKey)
-                                            ? requestData[rule.ConditionKey]?.ToString()
-                                            : null;
+        //         foreach (var rule in stepGroup)
+        //         {
+        //             if (!string.IsNullOrEmpty(rule.ConditionKey))
+        //             {
+        //                 var actualValue = requestData.ContainsKey(rule.ConditionKey)
+        //                                     ? requestData[rule.ConditionKey]?.ToString()
+        //                                     : null;
 
-                        if (!EvaluateCondition(actualValue, rule.Operator, rule.Value))
-                        {
-                            allRulesPass = false;
-                            break;
-                        }
-                    }
-                }
+        //                 if (!EvaluateCondition(actualValue, rule.Operator, rule.Value))
+        //                 {
+        //                     allRulesPass = false;
+        //                     break;
+        //                 }
+        //             }
+        //         }
 
-                // if (!allRulesPass)
-                // {
-                // await MarkTransactionAsync(requestId, step.UserId, step.StepOrder, "Skipped");
-                // continue;
-                // }
+        //         // if (!allRulesPass)
+        //         // {
+        //         // await MarkTransactionAsync(requestId, step.UserId, step.StepOrder, "Skipped");
+        //         // continue;
+        //         // }
 
-                // ✅ Send approval request
-                // await InsertTransactionAsync(requestId, step, "Pending");
-                // var approved = await _approvalService.WaitForApproval(step.UserId, requestData);
+        //         // ✅ Send approval request
+        //         // await InsertTransactionAsync(requestId, step, "Pending");
+        //         // var approved = await _approvalService.WaitForApproval(step.UserId, requestData);
 
-                // if (!approved)
-                // {
-                //     await MarkTransactionAsync(requestId, step.UserId, step.StepOrder, "Rejected");
-                //     break;
-                // }
+        //         // if (!approved)
+        //         // {
+        //         //     await MarkTransactionAsync(requestId, step.UserId, step.StepOrder, "Rejected");
+        //         //     break;
+        //         // }
 
-                // await MarkTransactionAsync(requestId, step.UserId, step.StepOrder, "Approved");
+        //         // await MarkTransactionAsync(requestId, step.UserId, step.StepOrder, "Approved");
 
-                if (allRulesPass)
-                {
-                    resultIds.Add(stepGroup.Key);
-                }
-            }
-            return resultIds;
-        }
+        //         if (allRulesPass)
+        //         {
+        //             resultIds.Add(stepGroup.Key);
+        //         }
+        //     }
+        //     return resultIds;
+        // }
 
-        private bool EvaluateCondition(string? actualValue, string? op, string? expectedValue)
-        {
+        // private bool EvaluateCondition(string? actualValue, string? op, string? expectedValue)
+        // {
 
-            if (string.IsNullOrEmpty(op) || string.IsNullOrEmpty(expectedValue))
-                return true;
+        //     if (string.IsNullOrEmpty(op) || string.IsNullOrEmpty(expectedValue))
+        //         return true;
 
 
-            if (string.IsNullOrEmpty(actualValue))
-                return op == "!=" && !string.IsNullOrEmpty(expectedValue);
+        //     if (string.IsNullOrEmpty(actualValue))
+        //         return op == "!=" && !string.IsNullOrEmpty(expectedValue);
 
-            switch (op.Trim())
-            {
-                case "=":
-                case "==":
-                    return string.Equals(actualValue, expectedValue, StringComparison.OrdinalIgnoreCase);
+        //     switch (op.Trim())
+        //     {
+        //         case "=":
+        //         case "==":
+        //             return string.Equals(actualValue, expectedValue, StringComparison.OrdinalIgnoreCase);
 
-                case "!=":
-                case "<>":
-                    return !string.Equals(actualValue, expectedValue, StringComparison.OrdinalIgnoreCase);
+        //         case "!=":
+        //         case "<>":
+        //             return !string.Equals(actualValue, expectedValue, StringComparison.OrdinalIgnoreCase);
 
-                case ">":
-                    return TryParseDecimal(actualValue) > TryParseDecimal(expectedValue);
+        //         case ">":
+        //             return TryParseDecimal(actualValue) > TryParseDecimal(expectedValue);
 
-                case "<":
-                    return TryParseDecimal(actualValue) < TryParseDecimal(expectedValue);
+        //         case "<":
+        //             return TryParseDecimal(actualValue) < TryParseDecimal(expectedValue);
 
-                case ">=":
-                    return TryParseDecimal(actualValue) >= TryParseDecimal(expectedValue);
+        //         case ">=":
+        //             return TryParseDecimal(actualValue) >= TryParseDecimal(expectedValue);
 
-                case "<=":
-                    return TryParseDecimal(actualValue) <= TryParseDecimal(expectedValue);
+        //         case "<=":
+        //             return TryParseDecimal(actualValue) <= TryParseDecimal(expectedValue);
 
-                case "Contains":
-                    return actualValue.Contains(expectedValue, StringComparison.OrdinalIgnoreCase);
+        //         case "Contains":
+        //             return actualValue.Contains(expectedValue, StringComparison.OrdinalIgnoreCase);
 
-                case "NotContains":
-                    return !actualValue.Contains(expectedValue, StringComparison.OrdinalIgnoreCase);
+        //         case "NotContains":
+        //             return !actualValue.Contains(expectedValue, StringComparison.OrdinalIgnoreCase);
 
-                case "In":
-                    return expectedValue.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                                        .Any(v => string.Equals(v.Trim(), actualValue, StringComparison.OrdinalIgnoreCase));
+        //         case "In":
+        //             return expectedValue.Split(',', StringSplitOptions.RemoveEmptyEntries)
+        //                                 .Any(v => string.Equals(v.Trim(), actualValue, StringComparison.OrdinalIgnoreCase));
 
-                case "NotIn":
-                    return !expectedValue.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                                        .Any(v => string.Equals(v.Trim(), actualValue, StringComparison.OrdinalIgnoreCase));
+        //         case "NotIn":
+        //             return !expectedValue.Split(',', StringSplitOptions.RemoveEmptyEntries)
+        //                                 .Any(v => string.Equals(v.Trim(), actualValue, StringComparison.OrdinalIgnoreCase));
 
-                default:
-                    return true;
-            }
-        }
+        //         default:
+        //             return true;
+        //     }
+        // }
 
-        private decimal TryParseDecimal(string value)
-        {
-            return decimal.TryParse(value, out var result) ? result : 0;
-        }
-        public async Task<bool> IsAnyApprovalPending(int Id, CancellationToken cancellationToken)
-        {
-            const string dataQuery = @"
-                SELECT
-                    Count(*)
-                FROM [AppData].[ApprovalRequest]       AR
-                INNER JOIN [AppData].[ApprovalRequestLine] ARL ON AR.Id = ARL.ApprovalRequestId
-                INNER JOIN [AppData].[MiscMaster]      MM ON MM.Id = ARL.StatusId
-                WHERE
-                    MM.Code = @Status
-                    AND AR.Id = @Id
-            ";
-
-            var parameters = new
-            {
-                Status = MiscEnumEntity.Pending,
-                Id
-            };
-            var count = await _dbConnection.ExecuteScalarAsync<int>(
-                new CommandDefinition(
-                   dataQuery,
-                   parameters,
-                   cancellationToken: cancellationToken
-               )
-             );
-            return count > 0;
-        }
+        // private decimal TryParseDecimal(string value)
+        // {
+        //     return decimal.TryParse(value, out var result) ? result : 0;
+        // }
+       
         public async Task<List<dynamic>> ApprovalRequestLineStatusByWorkFlowType(string WorkFlowType)
         {
             const string query = @"
@@ -436,5 +411,70 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequest
             return WorkflowType.ToList();
         }
 
+        public async Task<(List<dynamic> Lines, dynamic Header)> GetApprovalRequestById(int Id)
+        {
+            const string query = @"
+            ;WITH LineRows AS (
+                SELECT
+                    ARL.ModuleLineTransactionId,
+                    MM.Code AS ApproverStatusCode
+                FROM [AppData].[ApprovalRequestLine] ARL
+                INNER JOIN [AppData].[ApprovalRequest] AR ON AR.Id=ARL.ApprovalRequestId
+                INNER JOIN [AppData].[MiscMaster] MM ON MM.Id = ARL.StatusId
+                WHERE AR.Id=@Id
+
+            ),
+            LineRollup AS (
+                SELECT
+                    ModuleLineTransactionId,
+                    SUM(CASE WHEN ApproverStatusCode = @Rejected THEN 1 ELSE 0 END) AS RejCount,
+                    SUM(CASE WHEN ApproverStatusCode = @Approved THEN 1 ELSE 0 END) AS ApprCount,
+                    COUNT(*)                                                          AS ApproverCount
+                FROM LineRows
+                GROUP BY ModuleLineTransactionId
+            ),
+            LineStatus AS (
+                SELECT
+                    ModuleLineTransactionId,
+                    CASE
+                        WHEN RejCount > 0 THEN @Rejected
+                        WHEN ApproverCount > 0 AND ApprCount = ApproverCount THEN @Approved
+                        ELSE @Pending
+                    END AS Status
+                FROM LineRollup
+            )
+
+            SELECT ModuleLineTransactionId, Status FROM LineStatus;
+
+			SELECT
+            AR.Id                  AS ApprovalRequestId,
+            AR.ModuleTransactionId AS ModuleTransactionId,
+            MM.Id                  AS StatusId,
+            MM.Code                AS StatusCode
+        FROM [AppData].[ApprovalRequest] AR
+        INNER JOIN [AppData].[MiscMaster] MM ON MM.Id = AR.StatusId
+        WHERE AR.Id = @Id;";
+
+            var parameters = new
+            {
+                Pending = MiscEnumEntity.Pending,
+                Rejected = MiscEnumEntity.Rejected,
+                Approved = MiscEnumEntity.Approved,
+                Id 
+            };
+
+            using var multi = await _dbConnection.QueryMultipleAsync(
+                  sql: query,
+                  param: parameters,
+                  commandType: CommandType.Text,
+                  commandTimeout: 60);
+
+                  var lines  = (await multi.ReadAsync()).ToList();               
+                var header = await multi.ReadSingleOrDefaultAsync(); 
+
+
+
+            return new (lines, header);
+        }
     }
 }

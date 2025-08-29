@@ -111,27 +111,114 @@ namespace PurchaseManagement.Infrastructure.Repositories.PurchaseIndents
         public async Task<List<IndentDetail>> UpdateIndentDetailAsync(List<IndentDetail> indentDetail)
         {
             if (indentDetail == null || indentDetail.Count == 0)
-                    return new List<IndentDetail>();
+                return new List<IndentDetail>();
 
-                var ids = indentDetail.Select(d => d.Id).ToList();
+            var ids = indentDetail.Select(d => d.Id).ToList();
 
-                var existing = await _dbContext.IndentDetail
-                    .Where(d => ids.Contains(d.Id))
-                    .ToListAsync();
+            var existing = await _dbContext.IndentDetail
+                .Where(d => ids.Contains(d.Id))
+                .ToListAsync();
 
-                
-                foreach (var entity in existing)
+
+            foreach (var entity in existing)
+            {
+                var incoming = indentDetail.FirstOrDefault(u => u.Id == entity.Id);
+                if (incoming == null) continue;
+
+                entity.ApprovedQuantity = incoming.ApprovedQuantity;
+
+            }
+
+            await _dbContext.SaveChangesAsync();
+            return existing;
+
+        }
+         public async Task<bool> RollbackStatusAsync(int id)
+        {
+            var existingPurchaseIndent = await _dbContext.IndentHeader
+             .Include(cf => cf.IndentDetails)
+           .FirstOrDefaultAsync(u => u.Id == id);
+
+            var Indent = _imapper.Map<UpdatePurchaseIndentCommand>(existingPurchaseIndent);
+
+            var StatusMisc = await _miscMasterQueryRepository.GetMiscMasterByName(MiscEnumEntity.Status, MiscEnumEntity.Draft);
+            var IndentLog = new IndentLog
+            {
+                IndentHeaderId = id,
+                ActionType = "RollBack",
+                ActionRemarks = "Indent Updated",
+                PreviousData = JsonSerializer.Serialize(Indent),
+                NewData = MiscEnumEntity.Draft,
+                StatusId = StatusMisc.Id
+            };
+
+            await _logServiceCommand.CreateAsync(IndentLog);
+
+            if (existingPurchaseIndent != null)
+            {
+
+
+                existingPurchaseIndent.StatusId = StatusMisc.Id;
+
+                foreach (var updatedDetail in existingPurchaseIndent.IndentDetails)
                 {
-                    var incoming = indentDetail.FirstOrDefault(u => u.Id == entity.Id);
-                    if (incoming == null) continue;
+                    var existingDetail = existingPurchaseIndent.IndentDetails
+                        .FirstOrDefault(d => d.Id == updatedDetail.Id);
 
-                    entity.ApprovedQuantity = incoming.ApprovedQuantity;
-                    
+                    if (existingDetail != null)
+                    {
+                        existingDetail.StatusId = StatusMisc.Id;
+
+                    }
+                    else
+                    {
+
+                        existingPurchaseIndent.IndentDetails.Add(updatedDetail);
+                    }
                 }
 
-                await _dbContext.SaveChangesAsync();
-                return existing;
-                
+
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+
+            return false;
+        }
+
+        public async Task<bool> FinalizeStatus(IndentHeader indentHeader)
+        {
+            var existingPurchaseIndent = await _dbContext.IndentHeader
+            .Include(cf => cf.IndentDetails)
+          .FirstOrDefaultAsync(u => u.Id == indentHeader.Id);
+           
+             if (existingPurchaseIndent != null)
+            {
+
+
+                existingPurchaseIndent.StatusId = indentHeader.StatusId;
+
+                foreach (var updatedDetail in indentHeader.IndentDetails)
+                {
+                    var existingDetail = existingPurchaseIndent.IndentDetails
+                        .FirstOrDefault(d => d.Id == updatedDetail.Id);
+
+                    if (existingDetail != null)
+                    {
+                        existingDetail.ApprovedQuantity = updatedDetail.ApprovedQuantity;
+                        existingDetail.StatusId = updatedDetail.StatusId;
+
+                    }
+                    else
+                    {
+
+                        existingPurchaseIndent.IndentDetails.Add(updatedDetail);
+                    }
+                }
+
+
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+
+            return false;
         }
     }
 }

@@ -12,6 +12,7 @@ namespace SagaOrchestrator.Application.Orchestration.Models.Workflow
         public Guid CorrelationId { get; set; }
         public int CurrentState { get; set; }
         public int IndentId { get; set; }
+        public string Status { get; set; }
         public ICollection<UpdateApprovedQtyDto> ApprovedQty { get; set; }
     }
 }

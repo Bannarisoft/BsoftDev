@@ -64,11 +64,18 @@ namespace Core.Application.Common.Mappings
       .ForMember(dest => dest.IndentType, opt => opt.MapFrom(src => src.IndentType.Code));
 
       CreateMap<IndentHeader, PendingIndentByIdDto>();
-      CreateMap<IndentDetail, PendingIndentDetailByIdDto>();
+      CreateMap<IndentDetail, PendingIndentDetailByIdDto>()
+      .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.Code));
 
       CreateMap<UpdateApprovedQtyDto, IndentDetail>()
       .ForMember(dest => dest.ApprovedQuantity, opt => opt.MapFrom(src => src.ApprovedQuantity))
-      .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.IndentDetailId));
+      .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.IndentDetailId))
+      .ForMember(dest => dest.Status, opt => opt.Ignore());
+
+      CreateMap<UpdateIndentDetailCommand, IndentHeader>()
+      .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.IndentId))
+      .ForMember(dest => dest.IndentDetails, opt => opt.MapFrom(src => src.ApprovedQty))
+      .ForMember(dest => dest.Status, opt => opt.Ignore());
         }
         
     }

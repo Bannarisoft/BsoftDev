@@ -14,7 +14,9 @@ namespace Core.Domain.Entities
         public int UnitId { get; set; }
         public string Purpose { get; set; }
         public int DepartmentId { get; set; }
+        public int StatusId { get; set; }
         public ICollection<IndentDetail> IndentDetails { get; set; }
         public MiscMaster IndentType { get; set; }
+        public MiscMaster Status { get; set; }
     }
 }

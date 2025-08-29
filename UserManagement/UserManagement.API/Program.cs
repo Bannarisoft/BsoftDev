@@ -91,6 +91,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapGrpcService<CountryGrpcService>().EnableGrpcWeb();
     endpoints.MapGrpcService<UserAllGrpcService>().EnableGrpcWeb();
     endpoints.MapGrpcService<GetorCreatelocationGrpService>().EnableGrpcWeb(); // PartyMaster City,State,Country Create/Get
+    endpoints.MapGrpcService<UserUnitGrpcService>().EnableGrpcWeb();
     endpoints.MapControllers();
 });
 

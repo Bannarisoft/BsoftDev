@@ -7,13 +7,14 @@ using BackgroundService.Application.Workflow.Common.Interfaces.IApprovalRule;
 using BackgroundService.Domain.Entities.Notification;
 using BackgroundService.Domain.Entities.Workflow;
 using Dapper;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRules
 {
     public class ApprovalRuleQueryRepository : IApprovalRuleQuery
     {
         private readonly IDbConnection _dbConnection;
-        public ApprovalRuleQueryRepository(IDbConnection dbConnection)
+        public ApprovalRuleQueryRepository([FromKeyedServices("Notification")] IDbConnection dbConnection)
         {
             _dbConnection = dbConnection;
         }

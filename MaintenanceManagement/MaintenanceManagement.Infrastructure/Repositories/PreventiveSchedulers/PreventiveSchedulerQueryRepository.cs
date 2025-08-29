@@ -28,7 +28,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             var query = @"
                     SELECT COUNT(1) FROM [Maintenance].[PreventiveSchedulerHeader] PSH
                  INNER JOIN [Maintenance].[PreventiveSchedulerActivity] PSA ON PSA.PreventiveSchedulerHeaderId = PSH.Id
-                   WHERE PSA.ActivityId = @ActivityId AND PSH.MachineGroupId =@MachineGroupId   AND PSH.IsDeleted = 0 AND PSH.UnitId=@UnitId ";
+                   WHERE PSA.ActivityId = @ActivityId AND PSH.MachineGroupId =@MachineGroupId   AND PSH.IsDeleted = 0 AND PSH.IsActive = 1 AND PSH.UnitId=@UnitId ";
             var parameters = new DynamicParameters(new { ActivityId = activityId, MachineGroupId = machinegroupId, UnitId });
 
             if (id is not null)
@@ -91,6 +91,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     PS.[ModifiedIP],
                     MG.Id AS MachineGroupId,
                     MG.GroupName AS MachineGroup,
+                    MG.DepartmentId AS ProductionDepartmentId,
                     MC.Id AS CategoryId,
                     MC.Code AS CategoryName ,
                     Schedule.Id AS ScheduleId,
@@ -447,7 +448,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             var UnitId = _ipAddressService.GetUnitId();
             var query = @"SELECT COUNT(1) FROM [Maintenance].[MachineGroup] MG
                  INNER JOIN [Maintenance].[MachineMaster] MM ON MM.MachineGroupId=MG.Id
-                  WHERE MG.Id = @Id AND MG.IsDeleted = 0 AND MM.Unitid=@UnitId";
+                  WHERE MG.Id = @Id AND MG.IsDeleted = 0 AND MG.IsActive = 1 AND MM.IsDeleted = 0 AND MM.IsActive = 1 AND MM.Unitid=@UnitId";
 
             var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id, UnitId });
             return count > 0;
@@ -727,7 +728,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             FROM LatestMachineStatus L
             LEFT JOIN Maintenance.WorkOrder WO ON WO.PreventiveScheduleId = L.Id
 			LEFT JOIN [Maintenance].[MiscMaster] MM ON MM.Id = WO.StatusId
-            WHERE rn = 1 AND L.IsActive = 0 or L.IsDeleted=1 or MM.Code=@Status;
+            WHERE rn = 1 AND (L.IsActive = 0 or L.IsDeleted=1 or MM.Code=@Status);
 
             -- Step 2: Get machines not in PreventiveSchedulerDetail (unmapped)
             SELECT M.Id, M.MachineCode, M.MachineName  

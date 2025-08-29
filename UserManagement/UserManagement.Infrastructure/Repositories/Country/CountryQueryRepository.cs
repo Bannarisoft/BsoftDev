@@ -103,6 +103,6 @@ namespace UserManagement.Infrastructure.Repositories.Country
                        var CompanyExists = await multi.ReadFirstOrDefaultAsync<int?>(); 
                     
                        return StateExists.HasValue || CompanyExists.HasValue;
-            }
+            }        
     }
 }

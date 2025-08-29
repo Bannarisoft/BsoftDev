@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using BackgroundService.Application.Interfaces;
 using Dapper;
 using Hangfire;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackgroundService.Infrastructure.Services
 {
@@ -15,7 +16,7 @@ namespace BackgroundService.Infrastructure.Services
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IDbConnection _dbConnection;
-        public MaintenanceService(IHttpClientFactory httpClientFactory, IDbConnection dbConnection)
+        public MaintenanceService(IHttpClientFactory httpClientFactory,[FromKeyedServices("Hangfire")] IDbConnection dbConnection)
         {
             _httpClientFactory = httpClientFactory;
             _dbConnection = dbConnection;

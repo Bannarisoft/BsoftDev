@@ -5,15 +5,11 @@ package party.party;
 
 service PartyService {
   rpc GetPartyAutoComplete (PartyRequest) returns (PartyResponse);
-  rpc GetPartyById         (GetPartyByIdRequest) returns (PartyDto);  
-  rpc GetPartiesByIds      (GetPartiesByIdsRequest) returns (PartyResponse);
+  rpc GetPartyById         (GetPartyByIdRequest) returns (PartyDto);    
 }
 
 message PartyRequest { string search = 1; }
 message GetPartyByIdRequest { int32 id = 1; }
-
-// ✅ new:
-message GetPartiesByIdsRequest { repeated int32 ids = 1; }
 
 message PartyResponse { repeated PartyDto items = 1; }
 

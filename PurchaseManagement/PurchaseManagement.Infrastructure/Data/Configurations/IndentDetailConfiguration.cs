@@ -33,10 +33,10 @@ namespace PurchaseManagement.Infrastructure.Data.Configurations
                 .HasColumnType("int")
                 .IsRequired();
 
-        builder.Property(m => m.IndentHeaderId)
-                .HasColumnName("IndentHeaderId")
-                .HasColumnType("int")
-                .IsRequired();
+            builder.Property(m => m.IndentHeaderId)
+                    .HasColumnName("IndentHeaderId")
+                    .HasColumnType("int")
+                    .IsRequired();
 
             builder.Property(m => m.ItemId)
                 .HasColumnName("ItemId")
@@ -48,10 +48,10 @@ namespace PurchaseManagement.Infrastructure.Data.Configurations
                    .HasColumnType("decimal(18,2)")
                    .IsRequired();
 
-                   builder.Property(m => m.ApprovedQuantity)
-                   .HasColumnName("ApprovedQuantity")
-                   .HasColumnType("decimal(18,2)")
-                   .IsRequired(false);
+            builder.Property(m => m.ApprovedQuantity)
+            .HasColumnName("ApprovedQuantity")
+            .HasColumnType("decimal(18,2)")
+            .IsRequired(false);
 
 
             builder.Property(m => m.RequiredDate)
@@ -73,6 +73,11 @@ namespace PurchaseManagement.Infrastructure.Data.Configurations
         .HasColumnName("Remark")
         .HasColumnType("varchar(max)")
         .IsRequired();
+
+            builder.Property(m => m.StatusId)
+                       .HasColumnName("StatusId")
+                       .HasColumnType("int")
+                       .IsRequired();
 
 
             builder.Property(b => b.IsActive)
@@ -101,10 +106,15 @@ namespace PurchaseManagement.Infrastructure.Data.Configurations
 
             builder.Property(b => b.ModifiedIP)
                     .HasColumnType("varchar(20)");
-                    
-                    builder.HasOne(ac => ac.IndentHeader)
-                .WithMany(am => am.IndentDetails)
-                .HasForeignKey(ac => ac.IndentHeaderId)
+
+            builder.HasOne(ac => ac.IndentHeader)
+        .WithMany(am => am.IndentDetails)
+        .HasForeignKey(ac => ac.IndentHeaderId)
+        .OnDelete(DeleteBehavior.NoAction);
+                
+                 builder.HasOne(ac => ac.Status)
+                .WithMany(am => am.StatusDetail)
+                .HasForeignKey(ac => ac.StatusId)
                 .OnDelete(DeleteBehavior.NoAction);
         }
     }

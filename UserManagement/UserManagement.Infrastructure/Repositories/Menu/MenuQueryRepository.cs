@@ -25,11 +25,11 @@ namespace UserManagement.Infrastructure.Repositories.Menu
             string parentIdList = string.Join(",", parentId);
             string query = $@"
               WITH RecursiveMenu AS (
-                  SELECT Id, ModuleId, ParentId, MenuName, MenuUrl
+                  SELECT Id, ModuleId, ParentId, MenuName, MenuUrl, Type
                   FROM [AppData].[Menus]
                   WHERE ParentId IN ({parentIdList}) AND IsDeleted=0
                   UNION ALL
-                  SELECT m.Id, m.ModuleId, m.ParentId, m.MenuName, m.MenuUrl
+                  SELECT m.Id, m.ModuleId, m.ParentId, m.MenuName, m.MenuUrl, m.Type
                   FROM [AppData].[Menus] m
                   INNER JOIN RecursiveMenu rm ON m.ParentId = rm.Id
               )
@@ -82,7 +82,8 @@ namespace UserManagement.Infrastructure.Repositories.Menu
                 ME.ParentId,
                 ParentMenu.MenuName AS ParentName,
                 ME.SortOrder,
-                Cast(ME.CreatedAt as varchar) AS CreatedAt
+                Cast(ME.CreatedAt as varchar) AS CreatedAt,
+                ME.Type
             FROM AppData.Menus ME
             INNER JOIN [AppData].[Modules] MO ON MO.Id=ME.ModuleId
             LEFT JOIN AppData.Menus ParentMenu ON ParentMenu.Id=ME.ParentId

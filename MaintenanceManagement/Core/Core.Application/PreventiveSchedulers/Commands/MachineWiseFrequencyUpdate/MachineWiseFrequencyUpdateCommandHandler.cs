@@ -62,10 +62,10 @@ namespace Core.Application.PreventiveSchedulers.Commands.MachineWiseFrequencyUpd
 
                     DetailResult.MaterialReqStartDays = DateOnly.FromDateTime(ItemReminderDate);
                     
-                    if (!string.IsNullOrEmpty(DetailResult.HangfireJobId))
-                    {
-                        _backgroundServiceClient.RemoveHangFireJob(DetailResult.HangfireJobId,token);
-                    }
+                    // if (!string.IsNullOrEmpty(DetailResult.HangfireJobId))
+                    // {
+                    //     _backgroundServiceClient.RemoveHangFireJob(DetailResult.HangfireJobId,token);
+                    // }
 
                     // var delay = DetailResult.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today;
                     var targetDateTime = DetailResult.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue);
@@ -91,10 +91,10 @@ namespace Core.Application.PreventiveSchedulers.Commands.MachineWiseFrequencyUpd
             {
                 DetailResult.IsActive = Status.Inactive;
                 
-                if (!string.IsNullOrEmpty(DetailResult.HangfireJobId))
-                 {
-                     _backgroundServiceClient.RemoveHangFireJob(DetailResult.HangfireJobId,token);
-                 }
+                // if (!string.IsNullOrEmpty(DetailResult.HangfireJobId))
+                //  {
+                //      _backgroundServiceClient.RemoveHangFireJob(DetailResult.HangfireJobId,token);
+                //  }
             }
 
             var response = await _preventiveSchedulerCommand.UpdateScheduleDetails(DetailResult);

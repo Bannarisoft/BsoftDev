@@ -39,7 +39,7 @@ namespace Core.Application.PurchaseIndents.Queries.GetPendingIndentById
             var workflowResponse = await _workflowGrpcClient.GetApprovalRequestLineStatusAsync(MiscEnumEntity.PurchaseIndent);
             var workflowApproverResponse = await _workflowGrpcClient.GetApproverListAsync(MiscEnumEntity.PurchaseIndent);
 
-             var ApproverStatusLookup = workflowResponse.ToDictionary(d => d.ModuleLineTransactionId, d => d.Status);
+            //  var ApproverStatusLookup = workflowResponse.ToDictionary(d => d.ModuleLineTransactionId, d => d.Status);
              var ApproverLookup = workflowApproverResponse.ToDictionary(d => d.ModuleLineTransactionId, d => d.ApproverValue);
              var ApproveRequestLineLookup = workflowApproverResponse.ToDictionary(d => d.ModuleLineTransactionId, d => d.ApprovalRequestLineId);
 
@@ -47,10 +47,10 @@ namespace Core.Application.PurchaseIndents.Queries.GetPendingIndentById
 
             foreach (var dto in Indent.IndentDetails)
             {
-                if (ApproverStatusLookup.TryGetValue(dto.Id, out var Status))
-                {
-                    dto.Status = Status;
-                }
+                // if (ApproverStatusLookup.TryGetValue(dto.Id, out var Status))
+                // {
+                //     dto.Status = Status;
+                // }
                 if (ApproverLookup.TryGetValue(dto.Id, out var ApproverValue))
                 {
                     dto.ApproverId = Convert.ToInt32(ApproverValue);

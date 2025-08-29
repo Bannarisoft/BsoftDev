@@ -4,6 +4,7 @@ using BackgroundService.Application.Notification.Common.Interfaces.INotification
 using BackgroundService.Application.Notification.NotificationConfig.Queries.GetAllNotificationConfig;
 using BackgroundService.Application.Notification.NotificationConfig.Queries.GetNotificationConfigAutoComplete;
 using Dapper;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace  BackgroundService.Infrastructure.Repositories.Notification.NotificationConfig
 {
@@ -12,7 +13,7 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
         private readonly IDbConnection _dbConnection;       
         private readonly IIPAddressService _ipAddressService;
 
-        public NotificationConfigQueryRepository(IDbConnection dbConnection, IIPAddressService iPAddressService)
+        public NotificationConfigQueryRepository([FromKeyedServices("Notification")] IDbConnection dbConnection, IIPAddressService iPAddressService)
         {
             _dbConnection = dbConnection;
             _ipAddressService = iPAddressService;

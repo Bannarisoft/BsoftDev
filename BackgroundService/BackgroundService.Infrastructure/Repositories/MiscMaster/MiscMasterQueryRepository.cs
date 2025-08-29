@@ -1,6 +1,7 @@
 using System.Data;
 using BackgroundService.Application.Interfaces.IMiscMaster;
 using Dapper;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackgroundService.Infrastructure.Repositories.MiscMaster
 {
@@ -8,7 +9,7 @@ namespace BackgroundService.Infrastructure.Repositories.MiscMaster
     {
     private readonly IDbConnection _dbConnection;
 
-     public MiscMasterQueryRepository(IDbConnection dbConnection)
+     public MiscMasterQueryRepository([FromKeyedServices("Notification")] IDbConnection dbConnection)
         {
             _dbConnection = dbConnection;
 

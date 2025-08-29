@@ -9,5 +9,6 @@ namespace Contracts.Dtos.Purchase
     {
         public int IndentDetailId { get; set; }
         public decimal ApprovedQuantity { get; set; }
+        public string Status { get; set; }
     }
 }

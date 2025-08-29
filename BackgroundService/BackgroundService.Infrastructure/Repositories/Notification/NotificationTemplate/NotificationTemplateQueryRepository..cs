@@ -4,6 +4,7 @@ using BackgroundService.Application.Notification.Common.Interfaces.INotification
 using BackgroundService.Application.Notification.NotificationTemplate.Queries.GetAllNotificationTemplate;
 using BackgroundService.Application.Notification.NotificationTemplate.Queries.GetNotificationTemplateAutoComplete;
 using Dapper;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace  BackgroundService.Infrastructure.Repositories.Notification.NotificationTemplate
 {
@@ -11,7 +12,7 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
     {
         private readonly IDbConnection _dbConnection;            
 
-        public NotificationTemplateQueryRepository(IDbConnection dbConnection)
+        public NotificationTemplateQueryRepository([FromKeyedServices("Notification")] IDbConnection dbConnection)
         {
             _dbConnection = dbConnection;            
         }

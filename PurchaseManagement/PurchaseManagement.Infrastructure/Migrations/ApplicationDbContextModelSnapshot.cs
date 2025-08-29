@@ -94,6 +94,10 @@ namespace PurchaseManagement.Infrastructure.Migrations
                         .HasColumnType("date")
                         .HasColumnName("RequiredDate");
 
+                    b.Property<int>("StatusId")
+                        .HasColumnType("int")
+                        .HasColumnName("StatusId");
+
                     b.Property<decimal>("TotalEstimatedCost")
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("TotalEstimatedCost");
@@ -101,6 +105,8 @@ namespace PurchaseManagement.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("IndentHeaderId");
+
+                    b.HasIndex("StatusId");
 
                     b.ToTable("IndentDetail", "Purchase");
                 });
@@ -170,6 +176,10 @@ namespace PurchaseManagement.Infrastructure.Migrations
                         .HasColumnType("varchar(max)")
                         .HasColumnName("Purpose");
 
+                    b.Property<int>("StatusId")
+                        .HasColumnType("int")
+                        .HasColumnName("StatusId");
+
                     b.Property<int>("UnitId")
                         .HasColumnType("int")
                         .HasColumnName("UnitId");
@@ -177,6 +187,8 @@ namespace PurchaseManagement.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("IndentTypeId");
+
+                    b.HasIndex("StatusId");
 
                     b.ToTable("IndentHeader", "Purchase");
                 });
@@ -370,7 +382,15 @@ namespace PurchaseManagement.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "Status")
+                        .WithMany("StatusDetail")
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.Navigation("IndentHeader");
+
+                    b.Navigation("Status");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.IndentHeader", b =>
@@ -381,7 +401,15 @@ namespace PurchaseManagement.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "Status")
+                        .WithMany("StatusHeader")
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.Navigation("IndentType");
+
+                    b.Navigation("Status");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
@@ -403,6 +431,10 @@ namespace PurchaseManagement.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
                 {
                     b.Navigation("IndentType");
+
+                    b.Navigation("StatusDetail");
+
+                    b.Navigation("StatusHeader");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>

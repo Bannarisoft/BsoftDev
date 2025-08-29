@@ -13,6 +13,7 @@ namespace BackgroundService.Domain.Common
         public const string Pending = "Pending";
         public const string wwwroot = "wwwroot";
         public const string ApproveDocument = "ApproveDocument";
+        public const string PurchaseIndent = "Purchase Indent";
         
     }
 }
