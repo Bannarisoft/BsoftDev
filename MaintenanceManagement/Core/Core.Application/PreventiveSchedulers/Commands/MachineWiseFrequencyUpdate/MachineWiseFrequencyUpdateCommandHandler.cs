@@ -61,7 +61,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.MachineWiseFrequencyUpd
                     DetailResult.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate);
 
                     DetailResult.MaterialReqStartDays = DateOnly.FromDateTime(ItemReminderDate);
-                    
+
                     // if (!string.IsNullOrEmpty(DetailResult.HangfireJobId))
                     // {
                     //     _backgroundServiceClient.RemoveHangFireJob(DetailResult.HangfireJobId,token);
@@ -76,12 +76,12 @@ namespace Core.Application.PreventiveSchedulers.Commands.MachineWiseFrequencyUpd
                     if (delay.TotalSeconds > 0)
                     {
 
-                        newJobId = await _backgroundServiceClient.ScheduleWorkOrder(DetailResult.Id, delayInMinutes,token);
+                        newJobId = await _backgroundServiceClient.ScheduleWorkOrder(DetailResult.Id, delayInMinutes, token);
                     }
                     else
                     {
 
-                        newJobId = await _backgroundServiceClient.ScheduleWorkOrder(DetailResult.Id, 5,token);
+                        newJobId = await _backgroundServiceClient.ScheduleWorkOrder(DetailResult.Id, 5, token);
                     }
                     DetailResult.HangfireJobId = newJobId;
                 }
@@ -90,11 +90,12 @@ namespace Core.Application.PreventiveSchedulers.Commands.MachineWiseFrequencyUpd
             else
             {
                 DetailResult.IsActive = Status.Inactive;
-                
+
                 // if (!string.IsNullOrEmpty(DetailResult.HangfireJobId))
                 //  {
                 //      _backgroundServiceClient.RemoveHangFireJob(DetailResult.HangfireJobId,token);
                 //  }
+                await _backgroundServiceClient.RemoveHangFireJob(request.Id.ToString(),token);
             }
 
             var response = await _preventiveSchedulerCommand.UpdateScheduleDetails(DetailResult);
