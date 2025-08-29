@@ -68,7 +68,7 @@ namespace PartyManagement.Infrastructure.Repositories.PartyMaster
         {
             var sql = @"
             SELECT * FROM Party.PartyMaster WHERE Id = @Id;
-            SELECT * FROM Party.PartyType WHERE PartyId = @Id;
+            select A.Id,A.PartyId,A.PartyTypeId,A.PartyGroupId,C.description as GlCategory from Party.PartyType A INNER JOIN Party.PartyGroup B ON A.PartyGroupId=B.Id INNER JOIN Party.MiscMaster C ON B.GlCategoryId=C.Id where a.PartyId=@Id;
             SELECT * FROM Party.PartyContact WHERE PartyId = @Id;
             SELECT * FROM Party.PartyAddress WHERE PartyId = @Id;
             SELECT * FROM Party.PartyBank WHERE PartyId = @Id;

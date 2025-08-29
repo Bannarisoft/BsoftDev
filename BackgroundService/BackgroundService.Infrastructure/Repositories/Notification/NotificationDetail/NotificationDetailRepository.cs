@@ -7,6 +7,7 @@ using BackgroundService.Infrastructure.Data.Notification;
 using Contracts.Events.Notifications;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackgroundService.Infrastructure.Repositories.Notification.NotificationDetail
 {
@@ -16,7 +17,7 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
         private readonly IDbConnection _dbConnection;
         private readonly IIPAddressService _ipAddressService;
 
-        public NotificationDetailRepository(IDbConnection dbConnection, NotificationDbContext applicationDbContext, IIPAddressService iPAddressService)
+        public NotificationDetailRepository([FromKeyedServices("Notification")] IDbConnection dbConnection, NotificationDbContext applicationDbContext, IIPAddressService iPAddressService)
         {
             _dbConnection = dbConnection;
             _applicationDbContext = applicationDbContext;

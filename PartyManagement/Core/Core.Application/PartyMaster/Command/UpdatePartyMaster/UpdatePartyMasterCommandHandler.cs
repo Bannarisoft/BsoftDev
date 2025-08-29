@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Contracts.Interfaces.External.IParty;
 using Core.Application.Common.Exceptions;
 using Core.Application.Common.Interfaces.IPartyMaster;
 using Core.Domain.Events;
@@ -16,13 +17,15 @@ namespace Core.Application.PartyMaster.Command.UpdatePartyMaster
         private readonly IPartyMasterQueryRepository _ipartyMasterQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
+        private readonly ILocationGrpcClient _locationGrpcClient;  // ✅ add this
 
-        public UpdatePartyMasterCommandHandler(IPartyMasterCommandRepository partyMasterCommandRepository, IMapper mapper, IMediator mediator, IPartyMasterQueryRepository ipartyMasterQueryRepository)
+        public UpdatePartyMasterCommandHandler(IPartyMasterCommandRepository partyMasterCommandRepository, IMapper mapper, IMediator mediator, IPartyMasterQueryRepository ipartyMasterQueryRepository, ILocationGrpcClient locationGrpcClient)
         {
             _partyMasterCommandRepository = partyMasterCommandRepository;
             _mapper = mapper;
             _mediator = mediator;
             _ipartyMasterQueryRepository = ipartyMasterQueryRepository;
+            _locationGrpcClient = locationGrpcClient;
         }
 
         public async Task<bool> Handle(UpdatePartyMasterCommand request, CancellationToken cancellationToken)
@@ -63,6 +66,44 @@ namespace Core.Application.PartyMaster.Command.UpdatePartyMaster
 
                // Map DTO to Entity (Fix: Pass full DTO, not just Id)
             var partyEntity = _mapper.Map<Core.Domain.Entities.PartyMaster>(request.UpdatePartyMaster);
+
+              // ------------------- Call gRPC Location Service -------------------
+            if (request.UpdatePartyMaster.PartyAddressesUpdate != null && request.UpdatePartyMaster.PartyAddressesUpdate.Any())
+            {
+                for (int i = 0; i < request.UpdatePartyMaster.PartyAddressesUpdate.Count; i++)
+                {
+                    var addressDto = request.UpdatePartyMaster.PartyAddressesUpdate[i];
+                    var addressEntity = partyEntity.PartyAddressTypes.ElementAt(i);
+
+                    // Only call gRPC if City/State/Country is provided (update case)
+                    if (!string.IsNullOrWhiteSpace(addressDto.City) &&
+                        !string.IsNullOrWhiteSpace(addressDto.State) &&
+                        !string.IsNullOrWhiteSpace(addressDto.Country))
+                    {
+                        var location = await _locationGrpcClient.GetOrCreateLocationAsync(
+                            addressDto.City,
+                            addressDto.State,
+                            addressDto.Country
+                        );
+
+                        if (location == null)
+                            throw new Exception("Location could not be resolved via gRPC.");
+
+                        // Assign IDs to entity
+                        addressEntity.CityId = location.CityId;
+                        addressEntity.StateId = location.StateId;
+                        addressEntity.CountryId = location.CountryId;
+                    }
+                    else
+                    {
+                        // Keep existing IDs if City/State/Country not provided
+                        addressEntity.CityId = addressEntity.CityId;
+                        addressEntity.StateId = addressEntity.StateId;
+                        addressEntity.CountryId = addressEntity.CountryId;
+                    }
+                }
+            }
+
             // Update main entity in repository
             var result = await _partyMasterCommandRepository.UpdateAsync(partyEntity.Id, partyEntity);
 

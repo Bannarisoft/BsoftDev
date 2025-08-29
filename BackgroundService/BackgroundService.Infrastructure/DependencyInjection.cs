@@ -56,6 +56,7 @@ using BackgroundService.Application.Interfaces.IMiscMaster;
 using BackgroundService.Infrastructure.Repositories.MiscMaster;
 using BackgroundService.Application.Common.Interfaces.IMiscTypeMaster;
 using BackgroundService.Infrastructure.Repositories.MiscTypeMaster;
+using BackgroundService.Application.Interfaces.IHangfire;
 
 namespace BackgroundService.Infrastructure
 {
@@ -86,11 +87,16 @@ namespace BackgroundService.Infrastructure
 
             services.AddTransient<IHangfireDbConnectionFactory>(sp => new HangfireDbConnectionFactory(HangfireConnectionString));
             services.AddTransient<INotificationDbConnectionFactory>(sp => new NotificationDbConnectionFactory(NotificationConnectionString));
-            services.AddScoped<IDbConnection>(sp =>
-            {
-                var factory = sp.GetRequiredService<INotificationDbConnectionFactory>();
-                return factory.CreateConnection();
-            });
+            // services.AddScoped<IDbConnection>(sp =>
+            // {
+            //     var factory = sp.GetRequiredService<INotificationDbConnectionFactory>();
+            //     return factory.CreateConnection();
+            // });
+            services.AddKeyedScoped<IDbConnection>("Hangfire",
+                (sp, key) => sp.GetRequiredService<IHangfireDbConnectionFactory>().CreateConnection());
+
+            services.AddKeyedScoped<IDbConnection>("Notification",
+              (sp, key) => sp.GetRequiredService<INotificationDbConnectionFactory>().CreateConnection());
 
               // MongoDB Context
             services.AddSingleton<IMongoClient>(sp =>
@@ -311,6 +317,7 @@ namespace BackgroundService.Infrastructure
                 return database.GetCollection<OutboxMessage>(collectionName);
             });
             services.AddScoped<IFileStorageService, FileStorageService>();
+            services.AddScoped<IHangfireQuery, HangfireQueryRepository>();
             return services;
         }
     }
