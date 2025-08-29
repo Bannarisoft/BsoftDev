@@ -3,7 +3,7 @@ name: CI/CD Deploy to Development (Kubernetes + Docker on Linux)
 on:
   push:
     branches:
-      - dev
+      - Development
       - feature/*
 
 jobs:
