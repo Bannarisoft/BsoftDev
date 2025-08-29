@@ -167,10 +167,11 @@ namespace Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventiv
                      requestData: request,
                      cancellationToken
                     );
-                   foreach (var detail in Scheduledetail.PreventiveSchedulerDetails)
-                    {
-                       await _backgroundServiceClient.RemoveHangFireJob(detail.Id.ToString(),token);
-                    }   
+                    var response = await _preventiveSchedulerQuery.WorkOrderNotGeneratedScheduler(request.Id);
+                   foreach (var detail in response)
+                {
+                    await _backgroundServiceClient.RemoveHangFireJob(detail.ToString(), token);
+                }   
                         
                     
                 var preventiveSchedulerHeader = _mapper.Map<PreventiveSchedulerHeader>(request);
