@@ -34,6 +34,7 @@ namespace Core.Application.Common.Interfaces.IPreventiveScheduler
         Task<PreventiveSchedulerHeader> GetDetailSchedulerByPreventiveScheduleId(int Id);
         Task<List<Core.Domain.Entities.MachineMaster>> GetUnMappedMachineIdByCode(int Id);
         Task<bool> OneTimeSchedulerValidate(int preventiveSchedulerId, CancellationToken ct);
-         Task<PreventiveSchedulerHeader> OnetimeFrequencyValidation(int id, CancellationToken ct);
+        Task<PreventiveSchedulerHeader> OnetimeFrequencyValidation(int id, CancellationToken ct);
+        Task<List<int>> WorkOrderNotGeneratedScheduler(int PreventiveSchedulerId);
     }
 }

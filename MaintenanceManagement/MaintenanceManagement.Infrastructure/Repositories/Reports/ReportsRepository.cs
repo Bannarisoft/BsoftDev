@@ -197,6 +197,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
                 Cast(PSD.ActualWorkOrderDate as varchar) AS DueDate,Cast(PSD.LastMaintenanceActivityDate AS varchar) AS LastCompletionDate,MM.MachineCode,
                 WOStatus.Code AS WorkOrderStatus,WO.WorkOrderDocNo,CASE 
                 WHEN DATEDIFF(DAY, PSD.ActualWorkOrderDate,GETDATE()) < 1 THEN 'NA'
+                WHEN WOStatus.Code in ('CLOSED','Cancelled') THEN 'NA'
                 ELSE CAST(DATEDIFF(DAY, PSD.ActualWorkOrderDate,GETDATE()) AS VARCHAR)
                 END AS PendingDays,PSH.UnitId
                 from [Maintenance].[PreventiveSchedulerHeader] PSH
