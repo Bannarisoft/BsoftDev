@@ -43,21 +43,24 @@ namespace PartyManagement.Infrastructure.Data.Configurations
                .HasColumnName("AddressLine2")
                .HasColumnType("nvarchar(100)");
 
-            builder.Property(m => m.City)
-               .HasColumnName("City")
-               .HasColumnType("nvarchar(50)");
+            builder.Property(m => m.CityId)
+               .HasColumnName("CityId")
+                .HasColumnType("int")
+                .IsRequired();
 
-            builder.Property(m => m.State)
-               .HasColumnName("State")
-               .HasColumnType("nvarchar(50)");
+            builder.Property(m => m.StateId)
+               .HasColumnName("StateId")
+               .HasColumnType("int")
+                .IsRequired();
 
             builder.Property(m => m.PostalCode)
                .HasColumnName("PostalCode")
                .HasColumnType("nvarchar(10)");
 
-            builder.Property(m => m.Country)
-               .HasColumnName("Country")
-               .HasColumnType("nvarchar(50)");  
+            builder.Property(m => m.CountryId)
+               .HasColumnName("CountryId")
+                .HasColumnType("int")
+                .IsRequired(); 
         }
     }
 }

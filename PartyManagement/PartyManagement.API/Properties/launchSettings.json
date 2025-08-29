@@ -45,6 +45,19 @@
         "DATABASE_USERID":"developer",
         "DATABASE_PASSWORD":"Dev@#$456"
       }
+    }, 
+    "local": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "applicationUrl": "http://localhost:5293",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Local",
+        "DATABASE_SERVER":"192.168.1.126",
+        "DATABASE_USERID":"developer",
+        "DATABASE_PASSWORD":"Dev@#$456"
+      }
     }
   }
 }
