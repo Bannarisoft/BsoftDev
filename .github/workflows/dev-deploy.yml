@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-test-deploy:
-    name: Build, Test and Deploy Microservices
+    name: Build, Test, and Deploy Microservices
     environment: Development
     runs-on: [self-hosted, Linux, X64]
 
