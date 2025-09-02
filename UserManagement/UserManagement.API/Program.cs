@@ -6,6 +6,7 @@ using UserManagement.API.Configurations;
 using UserManagement.API.GrpcServices;
 using MediatR;
 using Core.Application.Common.Behaviors;
+using MassTransit;
 
 
 
@@ -39,8 +40,30 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddCorsPolicy();
 builder.Services.AddApplicationServices();
 builder.Services.AddGrpcClients(builder.Configuration);
-builder.Services.AddSagaInfrastructure(builder.Configuration);
-builder.Services.AddInfrastructureServices(builder.Configuration, builder.Environment);
+// builder.Services.AddSagaInfrastructure(builder.Configuration);
+// builder.Services.AddInfrastructureServices(builder.Configuration, builder.Environment);
+// ⬇️ IMPORTANT: Avoid wiring the real bus in tests
+if (!builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Services.AddSagaInfrastructure(builder.Configuration);        // likely registers RabbitMQ MassTransit
+    builder.Services.AddInfrastructureServices(builder.Configuration, builder.Environment);
+}
+else
+{
+    // Provide a single in-memory MassTransit bus for tests
+    builder.Services.AddMassTransit(x =>
+    {
+        x.UsingInMemory((ctx, cfg) => { });
+    });
+
+    // If your infrastructure method also adds health checks for the bus,
+    // and you see "masstransit-bus" duplicates again, you can optionally remove the MT health check here:
+    // builder.Services.PostConfigure<HealthCheckServiceOptions>(o =>
+    // {
+    //     foreach (var reg in o.Registrations.Where(r => r.Name == "masstransit-bus").ToList())
+    //         o.Registrations.Remove(reg);
+    // });
+}
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));

@@ -22,6 +22,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\UserManagement.API\UserManagement.API.csproj" />
+    <ProjectReference Include="..\UserManagement.Infrastructure\UserManagement.Infrastructure.csproj" />
+    <ProjectReference Include="..\UserManagement\Core\Core.Application\Core.Application.csproj" />
   </ItemGroup>
 
   <Target Name="CopyDepsJson" AfterTargets="Build">

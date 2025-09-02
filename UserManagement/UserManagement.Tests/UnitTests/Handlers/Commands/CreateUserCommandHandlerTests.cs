@@ -12,8 +12,8 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Core.Application.Common.Interfaces;
 using MediatR;
-using Contracts.Events.Users;
 using System;
+using Contracts.Events.Users;
 
 namespace UserManagement.Tests.UnitTests.Handlers
 {
